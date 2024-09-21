@@ -99,8 +99,9 @@ Do not provide any additional details or explanations.`;
     console.log('Prompt being sent to OpenAI:', prompt);
 
     try {
-        // Retrieve API key from storage
+        // Retrieve API key & model from storage
         const apiKey = await getApiKey();
+        const model = await getModel()
         if (!apiKey) {
             throw 'OpenAI API key not found.';
         }
@@ -112,7 +113,7 @@ Do not provide any additional details or explanations.`;
                 'Authorization': `Bearer ${apiKey}`
             },
             body: JSON.stringify({
-                model: 'gpt-4',
+                model: model,
                 messages: [
                     { role: 'system', content: 'You are an expert code reviewer with deep knowledge of software development best practices.' },
                     { role: 'user', content: prompt }
@@ -142,6 +143,19 @@ function getApiKey() {
                 resolve(data.openaiApiKey);
             } else {
                 reject('OpenAI API key not found.');
+            }
+        });
+    });
+}
+
+// Function to retrieve OpenAI model from storage
+function getModel() {
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.get('openaiModel', (data) => {
+            if (data.openaiModel) {
+                resolve(data.openaiModel);
+            } else {
+                reject('OpenAI model not found.');
             }
         });
     });
@@ -217,8 +231,9 @@ Keep your response concise and to the point. Use appropriate markdown formatting
             console.log('Detailed prompt being sent to OpenAI:', prompt);
 
             try {
-                // Retrieve API key from storage
+                // Retrieve API key & model from storage
                 const apiKey = await getApiKey();
+                const model = await getModel();
                 if (!apiKey) {
                     throw 'OpenAI API key not found.';
                 }
@@ -230,7 +245,7 @@ Keep your response concise and to the point. Use appropriate markdown formatting
                         'Authorization': `Bearer ${apiKey}`
                     },
                     body: JSON.stringify({
-                        model: 'gpt-4',
+                        model: model,
                         messages: [
                             { role: 'system', content: 'You are an expert code reviewer providing concise, actionable feedback.' },
                             { role: 'user', content: prompt }

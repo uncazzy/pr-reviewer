@@ -2,39 +2,42 @@ const analyzeButton = document.getElementById('analyze');
 const resultDiv = document.getElementById('result');
 const loadingDiv = document.getElementById('loading');
 
-// When the popup is opened, check for saved results
 document.addEventListener('DOMContentLoaded', () => {
-     // Check if hljs is loaded before using it
-     if (typeof hljs !== 'undefined') {
-        // Register the languages
+    // Check if we're on a valid GitHub PR page
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        const currentUrl = tabs[0].url;
+        const isPRPage = /^https:\/\/github\.com\/.*\/pull\/\d+\/files/.test(currentUrl);
+        analyzeButton.disabled = !isPRPage;
+        
+        if (isPRPage) {
+            checkForResults(currentUrl);
+        } else {
+            resultDiv.innerHTML = '<p>Please navigate to a GitHub pull request page to use this extension.</p>';
+        }
+    });
+
+    // Initialize syntax highlighting
+    if (typeof hljs !== 'undefined') {
         hljs.registerLanguage('javascript', window.hljsDefineJavaScript);
         hljs.registerLanguage('css', window.hljsDefineCSS);
         hljs.registerLanguage('python', window.hljsDefinePython);
-
-        // Initialize syntax highlighting
         hljs.highlightAll();
     } else {
         console.error('Highlight.js is not loaded');
     }
-    checkForResults();
-    chrome.storage.local.get('error', (data) => {
-        if (data.error) {
-            alert(data.error);
-            chrome.storage.local.remove('error');
-        }
-    });
+
+    // Add event listener for the clear storage button
+    const clearStorageButton = document.getElementById('clearStorage');
+    clearStorageButton.addEventListener('click', clearStorage);
 });
 
-function checkForResults() {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        const currentUrl = tabs[0].url;
-        chrome.storage.local.get(['prResults', 'prUrl'], (data) => {
-            if (data.prResults && data.prUrl === currentUrl) {
-                displaySavedResults(data.prResults);
-            } else {
-                console.log('No saved results for this PR.');
-            }
-        });
+function checkForResults(currentUrl) {
+    chrome.storage.local.get(['prResults', 'prUrl'], (data) => {
+        if (data.prResults && data.prUrl === currentUrl) {
+            displaySavedResults(data.prResults);
+        } else {
+            console.log('No saved results for this PR.');
+        }
     });
 }
 
@@ -50,26 +53,21 @@ function displaySavedResults(results) {
     });
 }
 
-// When the "Analyze PR Code" button is clicked
 analyzeButton.addEventListener('click', () => {
-    // Check if API key is set
     chrome.storage.local.get('openaiApiKey', (data) => {
         if (!data.openaiApiKey) {
             alert('Please set your OpenAI API Key in the extension options.');
             return;
         }
 
-        // Clear previous results and extracted data
         chrome.storage.local.remove(['prResults', 'processingComplete', 'extractedData'], () => {
-            // Clear previous results and show loading
             resultDiv.innerHTML = '';
             loadingDiv.style.display = 'block';
-            analyzeButton.disabled = true; // Disable the button to prevent multiple clicks
+            analyzeButton.disabled = true;
 
             chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
                 const currentUrl = tabs[0].url;
                 chrome.storage.local.set({ 'currentPrUrl': currentUrl }, () => {
-                    // Execute content script
                     chrome.scripting.executeScript({
                         target: { tabId: tabs[0].id },
                         files: ['contentScript.js']
@@ -82,7 +80,6 @@ analyzeButton.addEventListener('click', () => {
     });
 });
 
-// Listen for storage changes to update UI
 chrome.storage.onChanged.addListener((changes, area) => {
     if (area === 'local') {
         if (changes.prResults) {
@@ -106,12 +103,10 @@ function createFileFeedback(message) {
     const fileDiv = document.createElement('div');
     fileDiv.className = 'file-feedback';
 
-    // File name section
     const fileName = document.createElement('div');
     fileName.className = 'file-name';
     fileName.textContent = `File: ${message.fileName}`;
 
-    // Status section with icon
     const statusDiv = document.createElement('div');
     statusDiv.className = 'feedback-label';
 
@@ -126,20 +121,17 @@ function createFileFeedback(message) {
     statusDiv.appendChild(statusIcon);
     statusDiv.append(` ${message.status}`);
 
-    // Issue section
     const issueDiv = document.createElement('div');
     issueDiv.className = 'feedback-content';
     issueDiv.textContent = message.issue;
 
-    // Expand Feedback button
     const expandButton = document.createElement('button');
     expandButton.className = 'expand-button';
     expandButton.textContent = 'Expand Feedback';
     expandButton.addEventListener('click', function() {
-        expandFeedback(message.fileName, this);
+        expandFeedback(message.fileName, this, detailedFeedbackDiv);
     });
 
-    // Detailed Feedback section
     const detailedFeedbackDiv = document.createElement('div');
     detailedFeedbackDiv.className = 'detailed-feedback';
     detailedFeedbackDiv.id = `detailed-${CSS.escape(message.fileName)}`;
@@ -150,51 +142,59 @@ function createFileFeedback(message) {
     fileDiv.appendChild(expandButton);
     fileDiv.appendChild(detailedFeedbackDiv);
 
-    // Append the file div to the result div
     resultDiv.appendChild(fileDiv);
 }
 
-function expandFeedback(fileName, button) {
-    const detailedFeedbackDiv = document.getElementById(`detailed-${CSS.escape(fileName)}`);
+function expandFeedback(fileName, button, detailedFeedbackDiv) {
     if (detailedFeedbackDiv.style.display === 'none' || detailedFeedbackDiv.style.display === '') {
-        detailedFeedbackDiv.style.display = 'block';
-        detailedFeedbackDiv.style.maxHeight = '0';
-        detailedFeedbackDiv.style.overflow = 'hidden';
-        detailedFeedbackDiv.style.transition = 'max-height 0.5s ease';
-
-        // Request detailed feedback from background.js
-        chrome.runtime.sendMessage({ action: 'getDetailedFeedback', fileName: fileName }, (response) => {
-            if (response && response.detailedFeedback) {
-                // Use marked.js to parse the markdown
-                const parsedContent = marked.parse(response.detailedFeedback);
-
-                // Apply syntax highlighting to code blocks
-                detailedFeedbackDiv.innerHTML = parsedContent;
-
-                // Highlight code blocks
-                detailedFeedbackDiv.querySelectorAll('pre code').forEach((block) => {
-                    hljs.highlightElement(block);
-                });
-
-                // Expand the detailed feedback
-                detailedFeedbackDiv.style.maxHeight = detailedFeedbackDiv.scrollHeight + 'px';
+        chrome.storage.local.get(['detailedFeedback'], (data) => {
+            if (data.detailedFeedback && data.detailedFeedback[fileName]) {
+                displayDetailedFeedback(data.detailedFeedback[fileName], detailedFeedbackDiv, button);
             } else {
-                detailedFeedbackDiv.innerHTML = '<p class="error-message">Failed to load detailed feedback.</p>';
+                detailedFeedbackDiv.style.display = 'block';
+                detailedFeedbackDiv.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading detailed feedback...</div>';
+
+                chrome.runtime.sendMessage({ action: 'getDetailedFeedback', fileName: fileName }, (response) => {
+                    if (response && response.detailedFeedback) {
+                        chrome.storage.local.get(['detailedFeedback'], (data) => {
+                            const detailedFeedback = data.detailedFeedback || {};
+                            detailedFeedback[fileName] = response.detailedFeedback;
+                            chrome.storage.local.set({ detailedFeedback: detailedFeedback }, () => {
+                                console.log('Detailed feedback saved for:', fileName);
+                            });
+                        });
+
+                        displayDetailedFeedback(response.detailedFeedback, detailedFeedbackDiv, button);
+                    } else {
+                        detailedFeedbackDiv.innerHTML = '<p class="error-message">Failed to load detailed feedback.</p>';
+                    }
+                });
             }
         });
-
-        // Change button text
-        button.textContent = 'Collapse Feedback';
     } else {
-        // Collapse the detailed feedback
         detailedFeedbackDiv.style.maxHeight = '0';
-
-        // After transition, hide the element
         setTimeout(() => {
             detailedFeedbackDiv.style.display = 'none';
         }, 500);
-
-        // Change button text
         button.textContent = 'Expand Feedback';
     }
+}
+
+function displayDetailedFeedback(feedback, detailedFeedbackDiv, button) {
+    const parsedContent = marked.parse(feedback);
+    detailedFeedbackDiv.innerHTML = parsedContent;
+    detailedFeedbackDiv.querySelectorAll('pre code').forEach((block) => {
+        hljs.highlightElement(block);
+    });
+    detailedFeedbackDiv.style.maxHeight = detailedFeedbackDiv.scrollHeight + 'px';
+    button.textContent = 'Collapse Feedback';
+}
+
+// Function to clear storage
+function clearStorage() {
+    chrome.storage.local.clear(() => {
+        console.log('Storage cleared');
+        resultDiv.innerHTML = '<p>Storage cleared. Refresh the page to see the changes.</p>';
+        alert('Storage cleared. Please refresh the page to see the changes.');
+    });
 }

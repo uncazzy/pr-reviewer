@@ -173,6 +173,30 @@
             color: #dc3545;
             margin-top: 10px;
         }
+
+        .loading {
+            text-align: center;
+            padding: 10px;
+        }
+
+        .loading i {
+            margin-right: 5px;
+        }
+
+        #clearStorage {
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        #clearStorage:hover {
+            background-color: #c82333;
+        }
     </style>
 </head>
 
@@ -188,6 +212,8 @@
     </div>
 
     <div id="result"></div>
+
+    <button id="clearStorage">Clear Storage</button>
 
     <!-- Include marked.js and highlight.js -->
     <script src="libs/marked.min.js"></script>
