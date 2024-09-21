@@ -7,6 +7,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         console.log('Received files in background.js:', message.files);
         extractedData = message.files; // Store for later use
 
+        // Save extractedData to local storage
+        chrome.storage.local.set({ 'extractedData': extractedData }, () => {
+            console.log('Extracted data saved to local storage');
+        });
+
         processFiles(message.files);
     }
 });
@@ -66,24 +71,28 @@ async function analyzeCodeWithGPT(fileName, oldCode, newCode, fullFileContent) {
     const prompt = `
 You are reviewing a pull request for the file: ${fileName}.
 
-## Full File Content:
+## Full File Content (including new changes):
 \`\`\`
 ${fullFileContent}
 \`\`\`
 
-## Old Code Snippet:
+## Removed or Replaced Code Snippet:
 \`\`\`
 ${oldCode}
 \`\`\`
 
-## New Code Snippet:
+## New or Updated Code Snippet:
 \`\`\`
 ${newCode}
 \`\`\`
 
+The "Removed or Replaced Code Snippet" shows code that has been deleted or modified in this pull request.
+The "New or Updated Code Snippet" shows the new or modified code that replaces the old snippet.
+The "Full File Content" shows the entire file with all changes applied.
+
 Considering the full file context and the specific changes, provide a quick review in the following format:
 - **Status**: [Looks Good / Requires Changes]
-- **Issue**: [If status is "Requires Changes", provide a brief one-sentence description of the main issue]
+- **Issue**: [If status is "Requires Changes", provide a brief one-sentence description of the main issue. Otherwise reply with "No issues detected"]
 
 Do not provide any additional details or explanations.`;
 
@@ -149,28 +158,38 @@ function parseFeedback(feedback) {
     };
 }
 
+// Listener for getDetailedFeedback messages
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === 'getDetailedFeedback') {
-        getDetailedFeedback(message.fileName).then(feedback => {
-            sendResponse({ detailedFeedback: feedback });
-        });
+        getDetailedFeedback(message.fileName)
+            .then(feedback => {
+                sendResponse({ detailedFeedback: feedback });
+            })
+            .catch(error => {
+                console.error('Error in getDetailedFeedback:', error);
+                sendResponse({ error: 'Failed to get detailed feedback' });
+            });
         return true; // Indicates that the response is sent asynchronously
     }
 });
 
 // Function to get detailed feedback
 async function getDetailedFeedback(fileName) {
-    const fileData = extractedData.find(file => file.fileName === fileName);
-    if (!fileData) {
-        return 'File data not found.';
-    }
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.get('extractedData', async (data) => {
+            const extractedData = data.extractedData || [];
+            const fileData = extractedData.find(file => file.fileName === fileName);
+            if (!fileData) {
+                reject('File data not found.');
+                return;
+            }
 
-    // Clean up code snippets
-    const oldCode = fileData.oldCode.trim();
-    const newCode = fileData.newCode.trim();
-    const fullContent = fileData.fullContent.trim();
+            // Clean up code snippets
+            const oldCode = fileData.oldCode.trim();
+            const newCode = fileData.newCode.trim();
+            const fullContent = fileData.fullContent.trim();
 
-    const prompt = `
+            const prompt = `
 You are reviewing a pull request for the file: ${fileName}.
 
 ## Full File Content:
@@ -195,40 +214,43 @@ Provide a detailed review of the changes, focusing on:
 
 Keep your response concise and to the point. Use appropriate markdown formatting, especially for code snippets.`;
 
-    console.log('Detailed prompt being sent to OpenAI:', prompt);
+            console.log('Detailed prompt being sent to OpenAI:', prompt);
 
-    try {
-        // Retrieve API key from storage
-        const apiKey = await getApiKey();
-        if (!apiKey) {
-            throw 'OpenAI API key not found.';
-        }
+            try {
+                // Retrieve API key from storage
+                const apiKey = await getApiKey();
+                if (!apiKey) {
+                    throw 'OpenAI API key not found.';
+                }
 
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
-            },
-            body: JSON.stringify({
-                model: 'gpt-4',
-                messages: [
-                    { role: 'system', content: 'You are an expert code reviewer providing concise, actionable feedback.' },
-                    { role: 'user', content: prompt }
-                ],
-                max_tokens: 1000,
-                temperature: 0.2
-            })
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-4',
+                        messages: [
+                            { role: 'system', content: 'You are an expert code reviewer providing concise, actionable feedback.' },
+                            { role: 'user', content: prompt }
+                        ],
+                        max_tokens: 1000,
+                        temperature: 0.2
+                    })
+                });
+
+                const data = await response.json();
+                if (data.error) {
+                    console.error('OpenAI API error:', data.error);
+                    reject(`Error from OpenAI: ${data.error.message}`);
+                } else {
+                    resolve(data.choices[0].message.content);
+                }
+            } catch (error) {
+                console.error('Error fetching detailed feedback from OpenAI:', error);
+                reject('Error fetching detailed feedback from OpenAI.');
+            }
         });
-
-        const data = await response.json();
-        if (data.error) {
-            console.error('OpenAI API error:', data.error);
-            return `Error from OpenAI: ${data.error.message}`;
-        }
-        return data.choices[0].message.content;
-    } catch (error) {
-        console.error('Error fetching detailed feedback from OpenAI:', error);
-        return 'Error fetching detailed feedback from OpenAI.';
-    }
+    });
 }

@@ -63,7 +63,7 @@
     }
 
     // Send the extracted data to the background script
-    // chrome.runtime.sendMessage({ files: extractedData });
+    chrome.runtime.sendMessage({ files: extractedData });
 
     // Function to extract file information
     function extractFileInfo(file) {
@@ -72,14 +72,13 @@
             console.warn('File name element not found');
             return null;
         }
-
+    
         const fileName = fileNameElement.textContent.trim();
-
         const newFileLines = [];
-
+    
         // Select all code rows
         const codeRows = file.querySelectorAll('tr');
-
+    
         codeRows.forEach(row => {
             const codeCell = row.querySelector('td.blob-code[data-split-side="right"]');
             if (!codeCell) return; // Skip rows without code cells
@@ -101,22 +100,22 @@
     
         // Join the lines while preserving single new lines between actual code lines
         const fullContent = newFileLines.join('\n');
-
-        // Extract old and new code snippets
+    
+        // Extract old and new code snippets (unchanged from before)
         const oldCode = Array.from(file.querySelectorAll('.blob-code-deletion .blob-code-inner'))
             .map(node => node.textContent.replace(/\s+$/, ''))
             .join('\n');
-
+    
         const newCode = Array.from(file.querySelectorAll('.blob-code-addition .blob-code-inner'))
             .map(node => node.textContent.replace(/\s+$/, ''))
             .join('\n');
-
+    
         // Log the extracted code snippets
         console.log(`File: ${fileName}`);
         console.log('Old Code:\n', oldCode);
         console.log('New Code:\n', newCode);
         console.log('Full New Content:\n', fullContent);
-
+    
         return {
             fileName,
             oldCode,

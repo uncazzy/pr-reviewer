@@ -47,8 +47,8 @@ analyzeButton.addEventListener('click', () => {
             return;
         }
 
-        // Clear previous results
-        chrome.storage.local.remove(['prResults', 'processingComplete'], () => {
+        // Clear previous results and extracted data
+        chrome.storage.local.remove(['prResults', 'processingComplete', 'extractedData'], () => {
             // Clear previous results and show loading
             resultDiv.innerHTML = '';
             loadingDiv.style.display = 'block';
