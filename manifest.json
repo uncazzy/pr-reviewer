@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "PR Code Reviewer",
+  "version": "1.0",
+  "permissions": [
+      "activeTab",
+      "scripting",
+      "storage"
+  ],
+  "background": {
+      "service_worker": "background.js"
+  },
+  "action": {
+      "default_popup": "popup.html"
+  },
+  "options_page": "options.html",
+  "content_scripts": [
+      {
+          "matches": ["https://github.com/*"],
+          "js": ["contentScript.js"],
+          "run_at": "document_idle"
+      }
+  ],
+  "web_accessible_resources": [
+      {
+          "resources": ["libs/*"],
+          "matches": ["<all_urls>"]
+      }
+  ]
+}
