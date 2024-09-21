@@ -4,6 +4,18 @@ const loadingDiv = document.getElementById('loading');
 
 // When the popup is opened, check for saved results
 document.addEventListener('DOMContentLoaded', () => {
+     // Check if hljs is loaded before using it
+     if (typeof hljs !== 'undefined') {
+        // Register the languages
+        hljs.registerLanguage('javascript', window.hljsDefineJavaScript);
+        hljs.registerLanguage('css', window.hljsDefineCSS);
+        hljs.registerLanguage('python', window.hljsDefinePython);
+
+        // Initialize syntax highlighting
+        hljs.highlightAll();
+    } else {
+        console.error('Highlight.js is not loaded');
+    }
     checkForResults();
     chrome.storage.local.get('error', (data) => {
         if (data.error) {
@@ -123,8 +135,8 @@ function createFileFeedback(message) {
     const expandButton = document.createElement('button');
     expandButton.className = 'expand-button';
     expandButton.textContent = 'Expand Feedback';
-    expandButton.addEventListener('click', () => {
-        expandFeedback(message.fileName);
+    expandButton.addEventListener('click', function() {
+        expandFeedback(message.fileName, this);
     });
 
     // Detailed Feedback section
@@ -142,11 +154,13 @@ function createFileFeedback(message) {
     resultDiv.appendChild(fileDiv);
 }
 
-function expandFeedback(fileName) {
+function expandFeedback(fileName, button) {
     const detailedFeedbackDiv = document.getElementById(`detailed-${CSS.escape(fileName)}`);
     if (detailedFeedbackDiv.style.display === 'none' || detailedFeedbackDiv.style.display === '') {
         detailedFeedbackDiv.style.display = 'block';
-        detailedFeedbackDiv.textContent = 'Loading detailed feedback...';
+        detailedFeedbackDiv.style.maxHeight = '0';
+        detailedFeedbackDiv.style.overflow = 'hidden';
+        detailedFeedbackDiv.style.transition = 'max-height 0.5s ease';
 
         // Request detailed feedback from background.js
         chrome.runtime.sendMessage({ action: 'getDetailedFeedback', fileName: fileName }, (response) => {
@@ -161,11 +175,26 @@ function expandFeedback(fileName) {
                 detailedFeedbackDiv.querySelectorAll('pre code').forEach((block) => {
                     hljs.highlightElement(block);
                 });
+
+                // Expand the detailed feedback
+                detailedFeedbackDiv.style.maxHeight = detailedFeedbackDiv.scrollHeight + 'px';
             } else {
-                detailedFeedbackDiv.textContent = 'Failed to load detailed feedback.';
+                detailedFeedbackDiv.innerHTML = '<p class="error-message">Failed to load detailed feedback.</p>';
             }
         });
+
+        // Change button text
+        button.textContent = 'Collapse Feedback';
     } else {
-        detailedFeedbackDiv.style.display = 'none';
+        // Collapse the detailed feedback
+        detailedFeedbackDiv.style.maxHeight = '0';
+
+        // After transition, hide the element
+        setTimeout(() => {
+            detailedFeedbackDiv.style.display = 'none';
+        }, 500);
+
+        // Change button text
+        button.textContent = 'Expand Feedback';
     }
 }

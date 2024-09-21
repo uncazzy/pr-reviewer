@@ -1,4 +1,4 @@
-(async function() {
+(async function () {
     console.log('Content script loaded');
 
     // Function to programmatically expand all files
@@ -72,50 +72,47 @@
             console.warn('File name element not found');
             return null;
         }
-    
+
         const fileName = fileNameElement.textContent.trim();
         const newFileLines = [];
-    
+
         // Select all code rows
         const codeRows = file.querySelectorAll('tr');
-    
+
         codeRows.forEach(row => {
-            const codeCell = row.querySelector('td.blob-code[data-split-side="right"]');
+            // Select the code cell, excluding hunk headers and left-side cells in split diffs
+            let codeCell = row.querySelector('td.blob-code:not(.blob-code-hunk):not([data-split-side="left"])');
+
             if (!codeCell) return; // Skip rows without code cells
-    
+
             // Capture the text content of the cell, including leading spaces
-            let lineContent = codeCell.textContent;
-    
-            // Remove excessive newlines and spaces within the line
-            lineContent = lineContent.replace(/\s*\n\s*/g, ' ');
-    
-            // Add line content to the result only if it's not empty
-            if (lineContent !== '') {
-                newFileLines.push(lineContent);
-            } else if (newFileLines.length > 0 && newFileLines[newFileLines.length - 1] !== '') {
-                // Add a single empty line between meaningful lines, but prevent consecutive empty lines
-                newFileLines.push('');
-            }
+            let lineContent = codeCell.innerText;
+
+            // Add line content to the result
+            newFileLines.push(lineContent);
         });
-    
-        // Join the lines while preserving single new lines between actual code lines
-        const fullContent = newFileLines.join('\n');
-    
+
+        // Join the lines while preserving the original code structure
+        let fullContent = newFileLines.join('\n');
+
+        // Remove excessive blank lines (more than two consecutive newlines)
+        fullContent = fullContent.replace(/\n{3,}/g, '\n\n');
+
         // Extract old and new code snippets (unchanged from before)
         const oldCode = Array.from(file.querySelectorAll('.blob-code-deletion .blob-code-inner'))
             .map(node => node.textContent.replace(/\s+$/, ''))
             .join('\n');
-    
+
         const newCode = Array.from(file.querySelectorAll('.blob-code-addition .blob-code-inner'))
             .map(node => node.textContent.replace(/\s+$/, ''))
             .join('\n');
-    
+
         // Log the extracted code snippets
         console.log(`File: ${fileName}`);
         console.log('Old Code:\n', oldCode);
         console.log('New Code:\n', newCode);
         console.log('Full New Content:\n', fullContent);
-    
+
         return {
             fileName,
             oldCode,

@@ -1,165 +1,201 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>PR Code Review</title>
-  <link rel="stylesheet" href="fonts/css/all.min.css"> <!-- Include Font Awesome CSS -->
-  <link rel="stylesheet" href="libs/highlight/styles/default.min.css">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 15px;
-      background-color: #2e2e2e;
-      color: #f1f1f1;
-      width: 600px; /* Increased from 400px */
-      height: 700px; /* Increased from 600px */
-      overflow: hidden;
-    }
-    h1 {
-      font-size: 18px;
-      font-weight: bold;
-      margin-bottom: 15px;
-      text-align: center;
-      color: #ffffff;
-    }
-    #analyze {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      padding: 10px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
-      cursor: pointer;
-      margin-bottom: 15px;
-    }
-    #analyze i {
-      margin-right: 8px;
-    }
-    #analyze:hover {
-      background-color: #45a049;
-    }
-    #loading {
-      display: none;
-      text-align: center;
-    }
-    #loading i {
-      font-size: 24px;
-      animation: spin 2s linear infinite;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    #result {
-      height: calc(100% - 130px);
-      overflow-y: auto;
-      background-color: #3e3e3e;
-      padding: 10px;
-      border: 1px solid #555;
-      border-radius: 5px;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-    .file-feedback {
-      margin-bottom: 15px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid #555;
-    }
-    .file-name {
-      font-weight: bold;
-      margin-bottom: 5px;
-      color: #ffcc00;
-    }
-    .feedback-label {
-      font-weight: bold;
-      margin-bottom: 5px;
-      display: flex;
-      align-items: center;
-    }
-    .feedback-label i {
-      margin-right: 5px;
-    }
-    .looks-good {
-      color: #00cc44;
-    }
-    .requires-changes {
-      color: #cc0000;
-    }
-    .feedback-content {
-      margin-bottom: 5px;
-    }
-    .feedback-content p {
-      margin: 0 0 5px 0;
-    }
-    .feedback-content ul {
-      margin: 0 0 5px 20px;
-      padding: 0;
-      list-style-position: inside;
-    }
-    .copy-button {
-      background-color: #555;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 3px;
-      font-size: 12px;
-      cursor: pointer;
-      color: #f1f1f1;
-    }
-    .copy-button:hover {
-      background-color: #666;
-    }
-    .expand-button {
-      background-color: #555;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 3px;
-      font-size: 12px;
-      cursor: pointer;
-      color: #f1f1f1;
-      margin-top: 10px;
-    }
-    .expand-button:hover {
-      background-color: #666;
-    }
-    .detailed-feedback {
-      display: none;
-      margin-top: 10px;
-      padding: 10px;
-      background-color: #4e4e4e;
-      border-radius: 5px;
-    }
-    pre {
-      background-color: #f0f0f0;
-      color: black;
-      padding: 10px;
-      border-radius: 5px;
-      overflow-x: auto;
-    }
-    code {
-      font-family: 'Courier New', Courier, monospace;
-    }
-  </style>
-</head>
-<body>
-  <h1>PR Code Review</h1>
-  <button id="analyze">
-    <i class="fas fa-play"></i>
-  </button>
-  
-  <div id="loading">
-    <i class="fas fa-spinner"></i>
-    <p>Analyzing...</p>
-  </div>
 
-  <div id="result"></div>
-  <!-- Include local marked.js and highlight.js -->
-  <script src="libs/marked.min.js"></script>
-  <script src="libs/highlight/highlight.min.js"></script>
-  <script src="popup.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <title>PR Code Review</title>
+    <link rel="stylesheet" href="fonts/css/all.min.css"> <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="libs/highlight/styles/default.min.css"> <!-- Highlight.js Theme -->
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 15px;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            width: 600px;
+            height: 700px;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #ffffff;
+        }
+
+        h1 .accent {
+            color: #569cd6;
+        }
+
+        #analyze {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 12px;
+            background-color: #007acc;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            transition: background-color 0.3s;
+        }
+
+        #analyze i {
+            margin-right: 8px;
+        }
+
+        #analyze:hover {
+            background-color: #005f9e;
+        }
+
+        #analyze:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+
+        #loading {
+            display: none;
+            text-align: center;
+        }
+
+        #loading i {
+            font-size: 32px;
+            animation: spin 1s linear infinite;
+            color: #007acc;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        #result {
+            height: calc(100% - 130px);
+            overflow-y: auto;
+            background-color: #252526;
+            padding: 10px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .file-feedback {
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .file-name {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #9cdcfe;
+        }
+
+        .feedback-label {
+            max-width: fit-content;
+            border-radius: 3px;
+            margin-bottom: 5px;
+            padding: 3px;
+        }
+
+        .status-badge {
+            border-radius: 12px;
+            padding: 5px 10px;
+            font-size: 12px;
+            color: #fff;
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+        .looks-good {
+            background-color: #28a745;
+        }
+
+        .requires-changes {
+            background-color: #dc3545;
+        }
+
+        .feedback-content {
+            margin-top: 10px;
+        }
+
+        .expand-button {
+            background: none;
+            color: #569cd6;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .expand-button:hover {
+            text-decoration: underline;
+        }
+
+        .detailed-feedback {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 5px;
+        }
+
+        pre {
+            background-color: #1b1b1b;
+            color: #d4d4d4;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+
+        code {
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .error-message {
+            color: #dc3545;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1><i class="fas fa-code-branch accent"></i> PR Code Review</h1>
+    <button id="analyze">
+        <i class="fas fa-play"></i> Analyze PR Code
+    </button>
+
+    <div id="loading">
+        <i class="fas fa-spinner"></i>
+        <p>Analyzing...</p>
+    </div>
+
+    <div id="result"></div>
+
+    <!-- Include marked.js and highlight.js -->
+    <script src="libs/marked.min.js"></script>
+    <script src="libs/highlight/highlight.min.js"></script>
+    <script src="libs/highlight/languages/javascript.min.js"></script> <!-- JavaScript -->
+    <script src="libs/highlight/languages/css.min.js"></script> <!-- CSS -->
+    <script src="libs/highlight/languages/python.min.js"></script> <!-- Python -->
+    <script src="popup.js"></script>
 </body>
+
 </html>
