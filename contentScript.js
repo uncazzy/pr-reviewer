@@ -15,8 +15,14 @@
                 expandButton.click();
                 expandedCount++;
             } else if (collapseButton) {
-                // File is already expanded, no action needed
-                expandedCount++;
+                // File is already expanded, collapse and then expand it again
+                collapseButton.click();
+                await new Promise(resolve => setTimeout(resolve, 100)); // Wait for collapse animation
+                const newExpandButton = container.querySelector('button.js-expand-full');
+                if (newExpandButton) {
+                    newExpandButton.click();
+                    expandedCount++;
+                }
             }
         }
 
@@ -31,15 +37,22 @@
     // Function to wait for content to load
     function waitForContentLoad() {
         return new Promise((resolve) => {
-            const observer = new MutationObserver((mutations, obs) => {
+            const maxWaitTime = 10000; // 10 seconds
+            const startTime = Date.now();
+
+            const checkContent = () => {
                 const isLoading = document.querySelector('.js-diff-progressive-spinner, .js-diff-progressive-loader');
                 if (!isLoading) {
-                    obs.disconnect();
                     resolve();
+                } else if (Date.now() - startTime > maxWaitTime) {
+                    console.warn('Content loading timed out');
+                    resolve();
+                } else {
+                    setTimeout(checkContent, 100);
                 }
-            });
+            };
 
-            observer.observe(document.body, { childList: true, subtree: true });
+            checkContent();
         });
     }
 
