@@ -71,30 +71,29 @@ async function analyzeCodeWithGPT(fileName, oldCode, newCode, fullFileContent) {
     const prompt = `
 You are reviewing a pull request for the file: ${fileName}.
 
-## Full File Content (including new changes):
+## Full File Content:
 \`\`\`
 ${fullFileContent}
 \`\`\`
 
-## Removed or Replaced Code Snippet:
+## Old Code Snippet:
 \`\`\`
-${oldCode}
+${oldCode ? oldCode : 'No previous code; this is a new file.'}
 \`\`\`
 
-## New or Updated Code Snippet:
+## New Code Snippet:
 \`\`\`
 ${newCode}
 \`\`\`
 
-The "Removed or Replaced Code Snippet" shows code that has been deleted or modified in this pull request.
-The "New or Updated Code Snippet" shows the new or modified code that replaces the old snippet.
-The "Full File Content" shows the entire file with all changes applied.
+Note: Both the old and new code snippets represent only the changes made in this pull request. It is important to evaluate both the old and new code **in the context of the entire file** as shown in the "Full File Content" section. The code snippets may appear incomplete when viewed on their own, but they fit within the overall structure of the full code.
 
 Considering the full file context and the specific changes, provide a quick review in the following format:
 - **Status**: [Looks Good / Requires Changes]
 - **Issue**: [If status is "Requires Changes", provide a brief one-sentence description of the main issue. Otherwise reply with "No issues detected"]
 
-Do not provide any additional details or explanations.`;
+Do not provide any additional details or explanations. Keep the response concise and strictly in the format specified.
+`;
 
     console.log('Prompt being sent to OpenAI:', prompt);
 
@@ -115,7 +114,7 @@ Do not provide any additional details or explanations.`;
             body: JSON.stringify({
                 model: model,
                 messages: [
-                    { role: 'system', content: 'You are an expert code reviewer with deep knowledge of software development best practices.' },
+                    { role: 'system', content: 'You are an expert code reviewer with advanced knowledge of software development practices. You excel in identifying potential issues, inefficiencies, and improvements in pull requests. Your feedback should be concise, constructive, and focused on logic, performance, maintainability, and security. Always prioritize code readability, best practices, and future scalability in your reviews. Provide clear, actionable insights while ensuring the changes align with the overall project context.' },
                     { role: 'user', content: prompt }
                 ],
                 max_tokens: 1500,
@@ -215,7 +214,7 @@ ${fullContent}
 
 ## Old Code Snippet:
 \`\`\`
-${oldCode}
+${oldCode ? oldCode : 'No previous code; this is a new file.'}
 \`\`\`
 
 ## New Code Snippet:
@@ -223,12 +222,16 @@ ${oldCode}
 ${newCode}
 \`\`\`
 
-Provide a detailed review of the changes, focusing on:
+Provide a detailed review of the changes, focusing on the following:
 1. What specific changes are needed (if any)?
 2. Why are these changes necessary?
 3. If applicable, provide brief code examples to illustrate the suggested changes.
 
-Keep your response concise and to the point. Use appropriate markdown formatting, especially for code snippets.`;
+Note: Both the old and new code snippets represent only the changes made in this pull request. It is important to evaluate both the old and new code **in the context of the entire file** as shown in the "Full File Content" section. The code snippets may appear incomplete when viewed on their own, but they fit within the overall structure of the full code.
+
+If no old code is provided, assume this is a new file and review accordingly.
+
+Keep your response concise and to the point. Use markdown formatting for code snippets, and ensure all feedback is actionable and easy to follow.`;
 
             console.log('Detailed prompt being sent to OpenAI:', prompt);
 
@@ -249,7 +252,7 @@ Keep your response concise and to the point. Use appropriate markdown formatting
                     body: JSON.stringify({
                         model: model,
                         messages: [
-                            { role: 'system', content: 'You are an expert code reviewer providing concise, actionable feedback.' },
+                            { role: 'system', content: 'You are an expert code reviewer with in-depth knowledge of software development best practices, security considerations, and performance optimization. Your role is to provide detailed, actionable feedback on the provided code changes. Your review should focus on identifying potential issues, suggesting improvements, and providing clear explanations with examples where necessary. Use concise language and format your response in markdown, especially for any code snippets, ensuring your feedback is easy to follow and implement.' },
                             { role: 'user', content: prompt }
                         ],
                         max_tokens: 1000,
