@@ -76,17 +76,19 @@ You are reviewing a pull request for the file: ${fileName}.
 ${fullFileContent}
 \`\`\`
 
-## Old Code Snippet:
+## Old Lines of Code (if applicable):
 \`\`\`
 ${oldCode ? oldCode : 'No previous code; this is a new file.'}
 \`\`\`
 
-## New Code Snippet:
+## Updated Lines of Code:
 \`\`\`
 ${newCode}
 \`\`\`
 
-Note: Both the old and new code snippets represent only the changes made in this pull request. It is important to evaluate both the old and new code **in the context of the entire file** as shown in the "Full File Content" section. The code snippets may appear incomplete when viewed on their own, but they fit within the overall structure of the full code.
+Important: The "Updated Lines of Code" section represents only the specific lines that have been changed or added in this pull request. These lines are **not meant to be a complete code block** on their own. You must evaluate these updated lines **in the context of the entire file**, as shown in the "Full File Content" section. The updated lines may appear incomplete when viewed in isolation, but they should be considered within the full code structure.
+
+Do not assess the updated lines of code in isolation. Always evaluate them in the full context of the entire file.
 
 Considering the full file context and the specific changes, provide a quick review in the following format:
 - **Status**: [Looks Good / Requires Changes]
@@ -212,12 +214,12 @@ You are reviewing a pull request for the file: ${fileName}.
 ${fullContent}
 \`\`\`
 
-## Old Code Snippet:
+## Old Lines of Code (if applicable):
 \`\`\`
 ${oldCode ? oldCode : 'No previous code; this is a new file.'}
 \`\`\`
 
-## New Code Snippet:
+## Updated Lines of Code:
 \`\`\`
 ${newCode}
 \`\`\`
@@ -227,7 +229,9 @@ Provide a detailed review of the changes, focusing on the following:
 2. Why are these changes necessary?
 3. If applicable, provide brief code examples to illustrate the suggested changes.
 
-Note: Both the old and new code snippets represent only the changes made in this pull request. It is important to evaluate both the old and new code **in the context of the entire file** as shown in the "Full File Content" section. The code snippets may appear incomplete when viewed on their own, but they fit within the overall structure of the full code.
+Important: The "Updated Lines of Code" section represents only the specific lines that have been changed or added in this pull request. These lines are **not meant to be a complete code block** on their own. You must evaluate these updated lines **in the context of the entire file**, as shown in the "Full File Content" section. The updated lines may appear incomplete when viewed in isolation, but they should be considered within the full code structure.
+
+Do not assess the updated lines of code in isolation. Always evaluate them in the full context of the entire file.
 
 If no old code is provided, assume this is a new file and review accordingly.
 

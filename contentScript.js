@@ -3,18 +3,29 @@
 
     // Function to programmatically expand all files
     async function expandAllFiles() {
-        const expandButtons = document.querySelectorAll('button.js-expand-full');
+        const fileContainers = document.querySelectorAll('.file');
+        let expandedCount = 0;
 
-        console.log(`Found ${expandButtons.length} expand buttons`);
+        for (const container of fileContainers) {
+            const expandButton = container.querySelector('button.js-expand-full');
+            const collapseButton = container.querySelector('button.js-collapse-diff');
 
-        for (const button of expandButtons) {
-            if (button.offsetParent !== null) { // Check if the button is visible
-                button.click();
+            if (expandButton && expandButton.offsetParent !== null) {
+                // File is not expanded, so expand it
+                expandButton.click();
+                expandedCount++;
+            } else if (collapseButton) {
+                // File is already expanded, no action needed
+                expandedCount++;
             }
         }
 
-        // Wait for content to load
-        await waitForContentLoad();
+        console.log(`Expanded ${expandedCount} out of ${fileContainers.length} files`);
+
+        // Wait for content to load if any files were expanded
+        if (expandedCount > 0) {
+            await waitForContentLoad();
+        }
     }
 
     // Function to wait for content to load
