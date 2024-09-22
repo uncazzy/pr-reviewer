@@ -10,12 +10,24 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            padding: 15px;
+            padding: 0;
             background-color: #1e1e1e;
             color: #d4d4d4;
             width: 600px;
-            height: 700px;
-            overflow: hidden;
+            height: 600px;
+            overflow-y: auto;
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            background-color: #1e1e1e;
+            padding: 15px;
+            z-index: 1000;
+        }
+
+        #result {
+            padding: 0 15px 15px;
         }
 
         h1 {
@@ -81,10 +93,7 @@
         }
 
         #result {
-            height: calc(100% - 130px);
-            overflow-y: auto;
             background-color: #252526;
-            padding: 10px;
             border: 1px solid #333;
             border-radius: 5px;
             font-size: 15px;
@@ -214,14 +223,16 @@
 </head>
 
 <body>
-    <h1><i class="fas fa-code-branch accent"></i> PR Code Review</h1>
-    <button id="analyze">
-        <i class="fas fa-play"></i> Analyze PR Code
-    </button>
+    <div class="header">
+        <h1><i class="fas fa-code-branch accent"></i> PR Code Review</h1>
+        <button id="analyze">
+            <i class="fas fa-play"></i> Analyze PR Code
+        </button>
 
-    <div id="loading">
-        <i class="fas fa-spinner"></i>
-        <p>Analyzing...</p>
+        <div id="loading">
+            <i class="fas fa-spinner"></i>
+            <p>Analyzing...</p>
+        </div>
     </div>
 
     <div id="result"></div>

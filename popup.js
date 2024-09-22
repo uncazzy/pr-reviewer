@@ -192,8 +192,8 @@ function displayDetailedFeedback(feedback, detailedFeedbackDiv, button) {
     detailedFeedbackDiv.querySelectorAll('pre code').forEach((block) => {
         hljs.highlightElement(block);
     });
-    detailedFeedbackDiv.style.display = 'block'; // Ensure it's visible
-    detailedFeedbackDiv.style.maxHeight = detailedFeedbackDiv.scrollHeight + 'px';
+    detailedFeedbackDiv.style.display = 'block';
+    // Remove the maxHeight setting
     button.textContent = 'Collapse Feedback';
 
     // Add refresh button
@@ -205,8 +205,8 @@ function displayDetailedFeedback(feedback, detailedFeedbackDiv, button) {
 }
 
 function collapseDetailedFeedback(detailedFeedbackDiv, button) {
-    detailedFeedbackDiv.style.maxHeight = '0';
-    detailedFeedbackDiv.style.display = 'none'; // Hide immediately
+    // Remove the maxHeight setting
+    detailedFeedbackDiv.style.display = 'none';
     button.textContent = 'Expand Feedback';
 }
 
