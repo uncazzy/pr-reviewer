@@ -192,7 +192,9 @@ async function getDetailedFeedback(fileName) {
     return new Promise((resolve, reject) => {
         chrome.storage.local.get('extractedData', async (data) => {
             const extractedData = data.extractedData || [];
-            const fileData = extractedData.find(file => file.fileName === fileName);
+            const fileData = extractedData.find(file => 
+                file.fileName === fileName || file.fileName === fileName.replace(/\\/g, '')
+            );
             if (!fileData) {
                 reject('File data not found.');
                 return;

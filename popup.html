@@ -197,6 +197,19 @@
         #clearStorage:hover {
             background-color: #c82333;
         }
+
+        .refresh-button {
+            margin-bottom: 10px;
+            padding: 5px 10px;
+            background-color: #f0f0f0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .refresh-button:hover {
+            background-color: #e0e0e0;
+        }
     </style>
 </head>
 
@@ -213,14 +226,13 @@
 
     <div id="result"></div>
 
-    <button id="clearStorage">Clear Storage</button>
-
     <!-- Include marked.js and highlight.js -->
     <script src="libs/marked.min.js"></script>
     <script src="libs/highlight/highlight.min.js"></script>
     <script src="libs/highlight/languages/javascript.min.js"></script> <!-- JavaScript -->
     <script src="libs/highlight/languages/css.min.js"></script> <!-- CSS -->
     <script src="libs/highlight/languages/python.min.js"></script> <!-- Python -->
+    <script src="libs/highlight/languages/typescript.min.js"></script> <!-- Typescript -->
     <script src="popup.js"></script>
 </body>
 

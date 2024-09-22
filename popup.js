@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentUrl = tabs[0].url;
         const isPRPage = /^https:\/\/github\.com\/.*\/pull\/\d+\/files/.test(currentUrl);
         analyzeButton.disabled = !isPRPage;
-        
+
         if (isPRPage) {
             checkForResults(currentUrl);
         } else {
@@ -18,17 +18,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize syntax highlighting
     if (typeof hljs !== 'undefined') {
-        hljs.registerLanguage('javascript', window.hljsDefineJavaScript);
-        hljs.registerLanguage('css', window.hljsDefineCSS);
-        hljs.registerLanguage('python', window.hljsDefinePython);
+        // hljs.registerLanguage('javascript', window.hljsDefineJavaScript);
+        // hljs.registerLanguage('css', window.hljsDefineCSS);
+        // hljs.registerLanguage('python', window.hljsDefinePython);
         hljs.highlightAll();
     } else {
         console.error('Highlight.js is not loaded');
     }
-
-    // Add event listener for the clear storage button
-    const clearStorageButton = document.getElementById('clearStorage');
-    clearStorageButton.addEventListener('click', clearStorage);
 });
 
 function checkForResults(currentUrl) {
@@ -128,7 +124,7 @@ function createFileFeedback(message) {
     const expandButton = document.createElement('button');
     expandButton.className = 'expand-button';
     expandButton.textContent = 'Expand Feedback';
-    expandButton.addEventListener('click', function() {
+    expandButton.addEventListener('click', function () {
         expandFeedback(message.fileName, this, detailedFeedbackDiv);
     });
 
@@ -151,33 +147,43 @@ function expandFeedback(fileName, button, detailedFeedbackDiv) {
             if (data.detailedFeedback && data.detailedFeedback[fileName]) {
                 displayDetailedFeedback(data.detailedFeedback[fileName], detailedFeedbackDiv, button);
             } else {
-                detailedFeedbackDiv.style.display = 'block';
-                detailedFeedbackDiv.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading detailed feedback...</div>';
-
-                chrome.runtime.sendMessage({ action: 'getDetailedFeedback', fileName: fileName }, (response) => {
-                    if (response && response.detailedFeedback) {
-                        chrome.storage.local.get(['detailedFeedback'], (data) => {
-                            const detailedFeedback = data.detailedFeedback || {};
-                            detailedFeedback[fileName] = response.detailedFeedback;
-                            chrome.storage.local.set({ detailedFeedback: detailedFeedback }, () => {
-                                console.log('Detailed feedback saved for:', fileName);
-                            });
-                        });
-
-                        displayDetailedFeedback(response.detailedFeedback, detailedFeedbackDiv, button);
-                    } else {
-                        detailedFeedbackDiv.innerHTML = '<p class="error-message">Failed to load detailed feedback.</p>';
-                    }
-                });
+                fetchAndDisplayDetailedFeedback(fileName, detailedFeedbackDiv, button);
             }
         });
     } else {
-        detailedFeedbackDiv.style.maxHeight = '0';
-        setTimeout(() => {
-            detailedFeedbackDiv.style.display = 'none';
-        }, 500);
-        button.textContent = 'Expand Feedback';
+        collapseDetailedFeedback(detailedFeedbackDiv, button);
     }
+}
+
+function fetchAndDisplayDetailedFeedback(fileName, detailedFeedbackDiv, button) {
+    detailedFeedbackDiv.style.display = 'block';
+    detailedFeedbackDiv.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading detailed feedback...</div>';
+
+    chrome.storage.local.get('extractedData', (data) => {
+        if (!data.extractedData || !data.extractedData.find(file => file.fileName === fileName)) {
+            detailedFeedbackDiv.innerHTML = '<p class="error-message">File data not found. Please re-analyze the PR.</p>';
+            return;
+        }
+
+        chrome.runtime.sendMessage({ action: 'getDetailedFeedback', fileName: fileName }, (response) => {
+            if (response && response.detailedFeedback) {
+                saveDetailedFeedbackToStorage(fileName, response.detailedFeedback);
+                displayDetailedFeedback(response.detailedFeedback, detailedFeedbackDiv, button);
+            } else {
+                detailedFeedbackDiv.innerHTML = '<p class="error-message">Failed to load detailed feedback.</p>';
+            }
+        });
+    });
+}
+
+function saveDetailedFeedbackToStorage(fileName, feedback) {
+    chrome.storage.local.get(['detailedFeedback'], (data) => {
+        const detailedFeedback = data.detailedFeedback || {};
+        detailedFeedback[fileName] = feedback;
+        chrome.storage.local.set({ detailedFeedback: detailedFeedback }, () => {
+            console.log('Detailed feedback saved for:', fileName);
+        });
+    });
 }
 
 function displayDetailedFeedback(feedback, detailedFeedbackDiv, button) {
@@ -186,8 +192,71 @@ function displayDetailedFeedback(feedback, detailedFeedbackDiv, button) {
     detailedFeedbackDiv.querySelectorAll('pre code').forEach((block) => {
         hljs.highlightElement(block);
     });
+    detailedFeedbackDiv.style.display = 'block'; // Ensure it's visible
     detailedFeedbackDiv.style.maxHeight = detailedFeedbackDiv.scrollHeight + 'px';
     button.textContent = 'Collapse Feedback';
+
+    // Add refresh button
+    const refreshButton = document.createElement('button');
+    refreshButton.className = 'refresh-button';
+    refreshButton.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh';
+    refreshButton.addEventListener('click', () => refreshDetailedFeedback(detailedFeedbackDiv.id.replace('detailed-', ''), detailedFeedbackDiv, button));
+    detailedFeedbackDiv.insertBefore(refreshButton, detailedFeedbackDiv.firstChild);
+}
+
+function collapseDetailedFeedback(detailedFeedbackDiv, button) {
+    detailedFeedbackDiv.style.maxHeight = '0';
+    detailedFeedbackDiv.style.display = 'none'; // Hide immediately
+    button.textContent = 'Expand Feedback';
+}
+
+function refreshDetailedFeedback(fileName, detailedFeedbackDiv, button) {
+    detailedFeedbackDiv.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Refreshing detailed feedback...</div>';
+
+    chrome.storage.local.get(['detailedFeedback', 'extractedData'], (data) => {
+        console.log("Full data from storage:", data);
+        console.log("Searching for fileName:", fileName);
+
+        if (!data.extractedData || !Array.isArray(data.extractedData)) {
+            console.log("extractedData is not an array or is undefined:", data.extractedData);
+            detailedFeedbackDiv.innerHTML = '<p class="error-message">File data not found. Please re-analyze the PR.</p>';
+            return;
+        }
+
+        console.log("extractedData array:", data.extractedData);
+
+        const matchingFile = data.extractedData.find(file => {
+            console.log("Comparing:", file.fileName, "with", fileName);
+            console.log("Stripped comparison:", file.fileName, "with", fileName.replace(/\\/g, ''));
+            return file.fileName === fileName || file.fileName === fileName.replace(/\\/g, '');
+        });
+
+        if (!matchingFile) {
+            console.log("No matching file found");
+            detailedFeedbackDiv.innerHTML = '<p class="error-message">File data not found. Please re-analyze the PR.</p>';
+            return;
+        }
+
+        console.log("Matching file found:", matchingFile);
+
+        // Remove existing detailed feedback if it exists
+        if (data.detailedFeedback) {
+            delete data.detailedFeedback[fileName];
+            chrome.storage.local.set({ detailedFeedback: data.detailedFeedback }, () => {
+                console.log('Removed existing detailed feedback for:', fileName);
+            });
+        }
+
+        // Fetch new detailed feedback
+        chrome.runtime.sendMessage({ action: 'getDetailedFeedback', fileName: fileName }, (response) => {
+            if (response && response.detailedFeedback) {
+                saveDetailedFeedbackToStorage(fileName, response.detailedFeedback);
+                displayDetailedFeedback(response.detailedFeedback, detailedFeedbackDiv, button);
+            } else {
+                detailedFeedbackDiv.innerHTML = '<p class="error-message">Failed to load detailed feedback.</p>';
+            }
+        });
+    });
 }
 
 // Function to clear storage
