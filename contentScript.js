@@ -100,17 +100,19 @@
         const fileName = fileNameElement.textContent.trim();
         const newFileLines = [];
 
-        // Select all code rows
+        // Select all code rows, including those with context and additions
         const codeRows = file.querySelectorAll('tr');
 
         codeRows.forEach(row => {
-            // Select the code cell, excluding hunk headers and left-side cells in split diffs
-            let codeCell = row.querySelector('td.blob-code:not(.blob-code-hunk):not([data-split-side="left"])');
+            // Select the code cell, including context, deletions, and excluding hunk headers and left-side cells in split diffs
+            let codeCell = row.querySelector(
+                'td.blob-code:not(.blob-code-hunk):not([data-split-side="left"]), td.blob-code-context'
+            );
 
             if (!codeCell) return; // Skip rows without code cells
 
             // Capture the text content of the cell, including leading spaces
-            let lineContent = codeCell.innerText;
+            let lineContent = codeCell.querySelector('.blob-code-inner')?.innerText || codeCell.innerText;
 
             // Add line content to the result
             newFileLines.push(lineContent);
@@ -144,4 +146,5 @@
             fullContent
         };
     }
+
 })();
