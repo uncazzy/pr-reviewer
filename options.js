@@ -6,6 +6,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveModelButton = document.getElementById('saveModel');
     const clearStorageButton = document.getElementById('clearStorage');
     const statusDiv = document.getElementById('status');
+    const donateButton = document.getElementById('donateButton');
+
+    donateButton.addEventListener('click', handleDonation);
 
     // Load saved API key and model
     chrome.storage.local.get(['openaiApiKey', 'openaiModel'], (data) => {
@@ -53,5 +56,10 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             statusDiv.textContent = '';
         }, 3000);
+    }
+
+    function handleDonation() {
+        const donationUrl = 'https://buymeacoffee.com/azurd';
+        chrome.tabs.create({ url: donationUrl, active: true });
     }
 });

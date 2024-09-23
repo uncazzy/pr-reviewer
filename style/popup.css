@@ -205,3 +205,56 @@ code {
 .refresh-button:hover {
     background-color: #e0e0e0;
 }
+
+.settings-button {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    background-color: #f0f0f0;
+    border: none;
+    border-radius: 50%;
+    width: 30px; 
+    height: 30px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease;
+}
+
+.settings-button i {
+    font-size: 16px;
+    color: #333;
+}
+
+.settings-button:hover {
+    background-color: #e0e0e0;
+}
+
+#about-section {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+
+#about-section h2 {
+    margin-top: 0;
+    color: #333;
+}
+
+#donate-button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+}
+
+#donate-button:hover {
+    background-color: #218838;
+}

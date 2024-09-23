@@ -11,6 +11,17 @@
 <body>
     <h1><i class="fas fa-cog"></i> PR Code Reviewer Options</h1>
 
+    <!-- Overview Section -->
+    <div class="section">
+        <h2>Overview</h2>
+        <p>PR Code Reviewer is a Chrome extension that helps streamline GitHub pull request reviews. By using OpenAI's
+            GPT-4, it analyzes code changes and provides suggestions for improvements or potential issues.</p>
+        <p>The extension automatically extracts new code additions, old code removals or changes, and the full code
+            context from the pull request. This data is then formatted into a prompt for GPT-4 to generate precise
+            feedback, making code reviews faster and more efficient.</p>
+    </div>
+
+    <!-- API Configuration Section -->
     <div class="section">
         <h2>API Configuration</h2>
         <label for="apiKey">OpenAI API Key:</label>
@@ -28,9 +39,16 @@
         <button id="saveModel">Save Model Selection</button>
     </div>
 
+    <!-- Data Management Section -->
     <div class="section">
         <h2>Data Management</h2>
         <button id="clearStorage">Clear All Stored Data</button>
+    </div>
+
+    <!-- Donate Section -->
+    <div class="section">
+        <h2>Support the Project</h2>
+        <button id="donateButton"><i class="fas fa-heart"></i> Donate</button>
     </div>
 
     <div id="status"></div>

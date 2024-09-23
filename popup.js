@@ -8,6 +8,11 @@ document.addEventListener('DOMContentLoaded', initializePopup);
 analyzeButton.addEventListener('click', handleAnalyzeClick);
 chrome.storage.onChanged.addListener(handleStorageChanges);
 
+const settingsButton = document.getElementById('settings-button');
+settingsButton.addEventListener('click', () => {
+    chrome.runtime.openOptionsPage();  // Opens the options page
+});
+
 // Initialization
 function initializePopup() {
     checkGitHubPRPage();
@@ -317,4 +322,9 @@ function refreshDetailedFeedback(fileName, detailedFeedbackDiv, button) {
             }
         });
     });
+}
+
+
+function toggleAboutSection() {
+    chrome.runtime.openOptionsPage();  // Redirects to the options page
 }
