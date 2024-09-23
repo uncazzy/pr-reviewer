@@ -43,6 +43,7 @@ function checkForResults(currentUrl) {
             displaySavedResults(data.prResults);
         } else {
             console.log('No saved results for this PR.');
+            resultDiv.style.display = 'none';
         }
     });
 }
@@ -50,6 +51,7 @@ function checkForResults(currentUrl) {
 function displaySavedResults(results) {
     if (!Array.isArray(results) || results.length === 0) {
         console.log('Results are empty or not an array:', results);
+        resultDiv.style.display = 'none';
         return;
     }
     resultDiv.innerHTML = '';
@@ -57,6 +59,7 @@ function displaySavedResults(results) {
     results.forEach(result => {
         createFileFeedback(result);
     });
+    resultDiv.style.display = 'block';
 }
 
 // UI Creation
@@ -133,6 +136,7 @@ function handleAnalyzeClick() {
 
         chrome.storage.local.remove(['prResults', 'processingComplete', 'extractedData'], () => {
             resultDiv.innerHTML = '';
+            resultDiv.style.display = 'none';
             loadingDiv.style.display = 'block';
             analyzeButton.disabled = true;
 
@@ -196,6 +200,7 @@ function handleStorageChanges(changes, area) {
             analyzeButton.disabled = false;
             alert(changes.error.newValue);
             chrome.storage.local.remove('error');
+            resultDiv.style.display = 'none';
         }
     }
 }
