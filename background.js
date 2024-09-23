@@ -191,11 +191,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 // Function to get detailed feedback
 async function getDetailedFeedback(fileName) {
     return new Promise((resolve, reject) => {
-        chrome.storage.local.get('extractedData', async (data) => {
+        chrome.storage.local.get(['extractedData', 'prResults'], async (data) => {
             const extractedData = data.extractedData || [];
+            const prResults = data.prResults || [];
+            
             const fileData = extractedData.find(file => 
                 file.fileName === fileName || file.fileName === fileName.replace(/\\/g, '')
             );
+            const initialFeedback = prResults.find(result => result.fileName === fileName);
+            
             if (!fileData) {
                 reject('File data not found.');
                 return;
@@ -224,6 +228,10 @@ ${oldCode ? oldCode : 'No previous code; this is a new file.'}
 ${newCode}
 \`\`\`
 
+## Initial Feedback:
+Status: ${initialFeedback ? initialFeedback.status : 'N/A'}
+Issue: ${initialFeedback ? initialFeedback.issue : 'N/A'}
+
 Provide a detailed review of the changes, focusing on the following:
 1. What specific changes are needed (if any)?
 2. Why are these changes necessary?
@@ -234,6 +242,8 @@ Important: The "Updated Lines of Code" section represents only the specific line
 Do not assess the updated lines of code in isolation. Always evaluate them in the full context of the entire file.
 
 If no old code is provided, assume this is a new file and review accordingly.
+
+Consider the initial feedback provided and expand upon it if relevant. If the initial feedback suggests issues, address them in your detailed review.
 
 Keep your response concise and to the point. Use markdown formatting for code snippets, and ensure all feedback is actionable and easy to follow.`;
 
