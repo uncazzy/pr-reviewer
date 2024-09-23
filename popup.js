@@ -17,7 +17,7 @@ function initializePopup() {
 function checkGitHubPRPage() {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         const currentUrl = tabs[0].url;
-        const isPRPage = /^https:\/\/github\.com\/.*\/pull\/\d+\/files/.test(currentUrl);
+        const isPRPage = /^https:\/\/github\.com\/[^/]+\/[^/]+\/pull\/\d+/.test(currentUrl);
         analyzeButton.disabled = !isPRPage;
 
         if (isPRPage) {
@@ -137,14 +137,44 @@ function handleAnalyzeClick() {
             analyzeButton.disabled = true;
 
             chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-                const currentUrl = tabs[0].url;
+                const currentTab = tabs[0];
+                let currentUrl = currentTab.url;
+
                 chrome.storage.local.set({ 'currentPrUrl': currentUrl }, () => {
-                    chrome.scripting.executeScript({
-                        target: { tabId: tabs[0].id },
-                        files: ['contentScript.js']
-                    }, () => {
-                        console.log("Content script executed");
-                    });
+                    // Check if the current URL includes '/files'
+                    if (!currentUrl.includes('/files')) {
+                        // Replace "commits" or "checks" with "files" in the URL
+                        currentUrl = currentUrl.replace('/commits', '/files').replace('/checks', '/files');
+
+                        // If the current URL doesn't end with '/files' or any specific tab, append '/files'
+                        const filesUrl = currentUrl.match(/\/pull\/\d+$/) ? `${currentUrl}/files` : currentUrl;
+
+                        // Update the tab with the new URL
+                        chrome.tabs.update(currentTab.id, { url: filesUrl }, () => {
+                            // Listen for the tab to finish loading
+                            chrome.tabs.onUpdated.addListener(function listener(tabId, changeInfo, tab) {
+                                if (tabId === currentTab.id && changeInfo.status === 'complete') {
+                                    // Remove the listener to prevent multiple triggers
+                                    chrome.tabs.onUpdated.removeListener(listener);
+                                    // Execute the content script
+                                    chrome.scripting.executeScript({
+                                        target: { tabId: tab.id },
+                                        files: ['contentScript.js']
+                                    }, () => {
+                                        console.log("Content script executed on /files tab");
+                                    });
+                                }
+                            });
+                        });
+                    } else {
+                        // Already on the '/files' tab, execute the content script directly
+                        chrome.scripting.executeScript({
+                            target: { tabId: currentTab.id },
+                            files: ['contentScript.js']
+                        }, () => {
+                            console.log("Content script executed on /files tab");
+                        });
+                    }
                 });
             });
         });
