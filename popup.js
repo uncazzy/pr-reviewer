@@ -18,9 +18,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize syntax highlighting
     if (typeof hljs !== 'undefined') {
-        // hljs.registerLanguage('javascript', window.hljsDefineJavaScript);
-        // hljs.registerLanguage('css', window.hljsDefineCSS);
-        // hljs.registerLanguage('python', window.hljsDefinePython);
         hljs.highlightAll();
     } else {
         console.error('Highlight.js is not loaded');
@@ -256,14 +253,5 @@ function refreshDetailedFeedback(fileName, detailedFeedbackDiv, button) {
                 detailedFeedbackDiv.innerHTML = '<p class="error-message">Failed to load detailed feedback.</p>';
             }
         });
-    });
-}
-
-// Function to clear storage
-function clearStorage() {
-    chrome.storage.local.clear(() => {
-        console.log('Storage cleared');
-        resultDiv.innerHTML = '<p>Storage cleared. Refresh the page to see the changes.</p>';
-        alert('Storage cleared. Please refresh the page to see the changes.');
     });
 }

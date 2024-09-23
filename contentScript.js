@@ -84,7 +84,7 @@
     }
 
     // Send the extracted data to the background script
-    // chrome.runtime.sendMessage({ files: extractedData });
+    chrome.runtime.sendMessage({ files: extractedData });
 
     // Function to extract file information
     function extractFileInfo(file) {
