@@ -10,19 +10,16 @@
             const expandButton = container.querySelector('button.js-expand-full');
             const collapseButton = container.querySelector('button.js-collapse-diff');
 
-            if (expandButton && expandButton.offsetParent !== null) {
+            if (expandButton && expandButton.offsetParent !== null && !expandButton.hidden) {
                 // File is not expanded, so expand it
+                console.log("Expanding content...");
                 expandButton.click();
                 expandedCount++;
-            } else if (collapseButton) {
-                // File is already expanded, collapse and then expand it again
-                collapseButton.click();
-                await new Promise(resolve => setTimeout(resolve, 100)); // Wait for collapse animation
-                const newExpandButton = container.querySelector('button.js-expand-full');
-                if (newExpandButton) {
-                    newExpandButton.click();
-                    expandedCount++;
-                }
+                // Wait for the content to load after expanding
+                await new Promise(resolve => setTimeout(resolve, 500));
+            } else if (collapseButton && expandButton.hidden) {
+                // Content is already expanded, skip
+                console.log("Content already expanded, skipping...");
             }
         }
 
@@ -87,7 +84,7 @@
     }
 
     // Send the extracted data to the background script
-    chrome.runtime.sendMessage({ files: extractedData });
+    // chrome.runtime.sendMessage({ files: extractedData });
 
     // Function to extract file information
     function extractFileInfo(file) {
@@ -106,7 +103,7 @@
         codeRows.forEach(row => {
             // Select the code cell, including context, deletions, and excluding hunk headers and left-side cells in split diffs
             let codeCell = row.querySelector(
-                'td.blob-code:not(.blob-code-hunk):not([data-split-side="left"]), td.blob-code-context'
+                'td.blob-code:not(.blob-code-hunk):not([data-split-side="left"])'
             );
 
             if (!codeCell) return; // Skip rows without code cells
