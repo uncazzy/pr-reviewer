@@ -1,0 +1,80 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #1e1e1e;
+    color: #d4d4d4;
+}
+
+h1 {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #ffffff;
+}
+
+.section {
+    background-color: #252526;
+    border: 1px solid #333;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+h2 {
+    font-size: 18px;
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #569cd6;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    font-size: large;
+    margin: 10px;
+}
+
+input[type="text"],
+select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+    border: 1px solid #555;
+    border-radius: 5px;
+    background-color: #3e3e3e;
+    color: #f1f1f1;
+}
+
+button {
+    padding: 10px 15px;
+    background-color: #007acc;
+    border: none;
+    border-radius: 5px;
+    color: #f1f1f1;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+button:hover {
+    background-color: #005f9e;
+}
+
+#modelSelect {
+    max-width: fit-content;
+    display: flex;
+}
+
+#clearStorage {
+    background-color: #dc3545;
+}
+
+#clearStorage:hover {
+    background-color: #c82333;
+}
+
+#status {
+    margin-top: 15px;
+    font-style: italic;
+}

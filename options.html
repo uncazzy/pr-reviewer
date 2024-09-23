@@ -1,107 +1,41 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <title>PR Code Reviewer Options</title>
     <link rel="stylesheet" href="fonts/css/all.min.css"> <!-- Font Awesome CSS -->
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #1e1e1e;
-            color: #d4d4d4;
-        }
-        h1 {
-            font-size: 22px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            color: #ffffff;
-        }
-        .section {
-            background-color: #252526;
-            border: 1px solid #333;
-            border-radius: 5px;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-        h2 {
-            font-size: 18px;
-            margin-top: 0;
-            margin-bottom: 15px;
-            color: #569cd6;
-        }
-        label {
-            display: block;
-            font-weight: bold;
-            font-size: large;
-            margin: 10px;
-        }
-        input[type="text"], select {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 15px;
-            box-sizing: border-box;
-            border: 1px solid #555;
-            border-radius: 5px;
-            background-color: #3e3e3e;
-            color: #f1f1f1;
-        }
-        button {
-            padding: 10px 15px;
-            background-color: #007acc;
-            border: none;
-            border-radius: 5px;
-            color: #f1f1f1;
-            cursor: pointer;
-            margin-right: 10px;
-        }
-        button:hover {
-            background-color: #005f9e;
-        }
-        #modelSelect {
-            max-width: fit-content;
-            display: flex;
-        }
-        #clearStorage {
-            background-color: #dc3545;
-        }
-        #clearStorage:hover {
-            background-color: #c82333;
-        }
-        #status {
-            margin-top: 15px;
-            font-style: italic;
-        }
-    </style>
+    <link rel="stylesheet" href="style/options.css">
 </head>
+
 <body>
     <h1><i class="fas fa-cog"></i> PR Code Reviewer Options</h1>
-    
+
     <div class="section">
         <h2>API Configuration</h2>
         <label for="apiKey">OpenAI API Key:</label>
         <input type="text" id="apiKey" placeholder="Enter your OpenAI API Key">
         <button id="saveApiKey">Save API Key</button>
         <button id="clearApiKey">Clear API Key</button>
-        
+
         <label for="modelSelect">OpenAI Model:</label>
         <select id="modelSelect">
-            <option value="gpt-4">GPT-4</option>
-            <option value="gpt-4-turbo">GPT-4 Turbo</option>
-            <option value="gpt-4o">GPT-4o</option>
             <option value="gpt-4o-mini">GPT-4o Mini</option>
+            <option value="gpt-4o">GPT-4o</option>
+            <option value="gpt-4-turbo">GPT-4 Turbo</option>
+            <option value="gpt-4">GPT-4</option>
         </select>
         <button id="saveModel">Save Model Selection</button>
     </div>
-    
+
     <div class="section">
         <h2>Data Management</h2>
         <button id="clearStorage">Clear All Stored Data</button>
     </div>
-    
+
     <div id="status"></div>
-    
+
     <script src="options.js"></script>
 </body>
+
 </html>

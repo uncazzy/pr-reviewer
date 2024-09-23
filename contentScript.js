@@ -130,12 +130,6 @@
             .map(node => node.textContent.replace(/\s+$/, ''))
             .join('\n');
 
-        // Log the extracted code snippets
-        console.log(`File: ${fileName}`);
-        console.log('Old Code:\n', oldCode);
-        console.log('New Code:\n', newCode);
-        console.log('Full New Content:\n', fullContent);
-
         return {
             fileName,
             oldCode,

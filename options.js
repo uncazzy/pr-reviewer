@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (confirm('Are you sure you want to clear all stored data? This action cannot be undone.')) {
             chrome.storage.local.clear(() => {
                 apiKeyInput.value = '';
-                modelSelect.value = 'gpt-4'; // Reset to default
+                modelSelect.value = 'gpt-4o-mini'; // Reset to default
                 updateStatus('All stored data has been cleared.');
             });
         }

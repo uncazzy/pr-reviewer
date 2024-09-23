@@ -1,9 +1,20 @@
+// Constants
 const analyzeButton = document.getElementById('analyze');
 const resultDiv = document.getElementById('result');
 const loadingDiv = document.getElementById('loading');
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Check if we're on a valid GitHub PR page
+// Event Listeners
+document.addEventListener('DOMContentLoaded', initializePopup);
+analyzeButton.addEventListener('click', handleAnalyzeClick);
+chrome.storage.onChanged.addListener(handleStorageChanges);
+
+// Initialization
+function initializePopup() {
+    checkGitHubPRPage();
+    initializeSyntaxHighlighting();
+}
+
+function checkGitHubPRPage() {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         const currentUrl = tabs[0].url;
         const isPRPage = /^https:\/\/github\.com\/.*\/pull\/\d+\/files/.test(currentUrl);
@@ -15,15 +26,17 @@ document.addEventListener('DOMContentLoaded', () => {
             resultDiv.innerHTML = '<p>Please navigate to a GitHub pull request page to use this extension.</p>';
         }
     });
+}
 
-    // Initialize syntax highlighting
+function initializeSyntaxHighlighting() {
     if (typeof hljs !== 'undefined') {
         hljs.highlightAll();
     } else {
         console.error('Highlight.js is not loaded');
     }
-});
+}
 
+// Result Handling
 function checkForResults(currentUrl) {
     chrome.storage.local.get(['prResults', 'prUrl'], (data) => {
         if (data.prResults && data.prUrl === currentUrl) {
@@ -46,7 +59,72 @@ function displaySavedResults(results) {
     });
 }
 
-analyzeButton.addEventListener('click', () => {
+// UI Creation
+function createFileFeedback(message) {
+    const fileDiv = document.createElement('div');
+    fileDiv.className = 'file-feedback';
+
+    const fileName = createFileName(message.fileName);
+    const statusDiv = createStatusDiv(message.status);
+    const issueDiv = createIssueDiv(message.issue);
+    const expandButton = createExpandButton(message.fileName);
+    const detailedFeedbackDiv = createDetailedFeedbackDiv(message.fileName);
+
+    fileDiv.append(fileName, statusDiv, issueDiv, expandButton, detailedFeedbackDiv);
+    resultDiv.appendChild(fileDiv);
+}
+
+function createFileName(fileName) {
+    const fileNameDiv = document.createElement('div');
+    fileNameDiv.className = 'file-name';
+    fileNameDiv.textContent = `File: ${fileName}`;
+    return fileNameDiv;
+}
+
+function createStatusDiv(status) {
+    const statusDiv = document.createElement('div');
+    statusDiv.className = 'feedback-label';
+
+    const statusIcon = document.createElement('i');
+    if (status.toLowerCase() === 'requires changes') {
+        statusIcon.className = 'fas fa-exclamation-circle';
+        statusDiv.classList.add('requires-changes');
+    } else {
+        statusIcon.className = 'fas fa-check-circle';
+        statusDiv.classList.add('looks-good');
+    }
+    statusDiv.appendChild(statusIcon);
+    statusDiv.append(` ${status}`);
+    return statusDiv;
+}
+
+function createIssueDiv(issue) {
+    const issueDiv = document.createElement('div');
+    issueDiv.className = 'feedback-content';
+    issueDiv.textContent = issue;
+    return issueDiv;
+}
+
+function createExpandButton(fileName) {
+    const expandButton = document.createElement('button');
+    expandButton.className = 'expand-button';
+    expandButton.textContent = 'Expand Feedback';
+    expandButton.addEventListener('click', function () {
+        const detailedFeedbackDiv = document.getElementById(`detailed-${CSS.escape(fileName)}`);
+        expandFeedback(fileName, this, detailedFeedbackDiv);
+    });
+    return expandButton;
+}
+
+function createDetailedFeedbackDiv(fileName) {
+    const detailedFeedbackDiv = document.createElement('div');
+    detailedFeedbackDiv.className = 'detailed-feedback';
+    detailedFeedbackDiv.id = `detailed-${CSS.escape(fileName)}`;
+    return detailedFeedbackDiv;
+}
+
+// Event Handlers
+function handleAnalyzeClick() {
     chrome.storage.local.get('openaiApiKey', (data) => {
         if (!data.openaiApiKey) {
             alert('Please set your OpenAI API Key in the extension options.');
@@ -71,9 +149,9 @@ analyzeButton.addEventListener('click', () => {
             });
         });
     });
-});
+}
 
-chrome.storage.onChanged.addListener((changes, area) => {
+function handleStorageChanges(changes, area) {
     if (area === 'local') {
         if (changes.prResults) {
             const results = changes.prResults.newValue;
@@ -90,54 +168,9 @@ chrome.storage.onChanged.addListener((changes, area) => {
             chrome.storage.local.remove('error');
         }
     }
-});
-
-function createFileFeedback(message) {
-    const fileDiv = document.createElement('div');
-    fileDiv.className = 'file-feedback';
-
-    const fileName = document.createElement('div');
-    fileName.className = 'file-name';
-    fileName.textContent = `File: ${message.fileName}`;
-
-    const statusDiv = document.createElement('div');
-    statusDiv.className = 'feedback-label';
-
-    const statusIcon = document.createElement('i');
-    if (message.status.toLowerCase() === 'requires changes') {
-        statusIcon.className = 'fas fa-exclamation-circle';
-        statusDiv.classList.add('requires-changes');
-    } else {
-        statusIcon.className = 'fas fa-check-circle';
-        statusDiv.classList.add('looks-good');
-    }
-    statusDiv.appendChild(statusIcon);
-    statusDiv.append(` ${message.status}`);
-
-    const issueDiv = document.createElement('div');
-    issueDiv.className = 'feedback-content';
-    issueDiv.textContent = message.issue;
-
-    const expandButton = document.createElement('button');
-    expandButton.className = 'expand-button';
-    expandButton.textContent = 'Expand Feedback';
-    expandButton.addEventListener('click', function () {
-        expandFeedback(message.fileName, this, detailedFeedbackDiv);
-    });
-
-    const detailedFeedbackDiv = document.createElement('div');
-    detailedFeedbackDiv.className = 'detailed-feedback';
-    detailedFeedbackDiv.id = `detailed-${CSS.escape(message.fileName)}`;
-
-    fileDiv.appendChild(fileName);
-    fileDiv.appendChild(statusDiv);
-    fileDiv.appendChild(issueDiv);
-    fileDiv.appendChild(expandButton);
-    fileDiv.appendChild(detailedFeedbackDiv);
-
-    resultDiv.appendChild(fileDiv);
 }
 
+// Detailed Feedback
 function expandFeedback(fileName, button, detailedFeedbackDiv) {
     if (detailedFeedbackDiv.style.display === 'none' || detailedFeedbackDiv.style.display === '') {
         chrome.storage.local.get(['detailedFeedback'], (data) => {
@@ -190,10 +223,8 @@ function displayDetailedFeedback(feedback, detailedFeedbackDiv, button) {
         hljs.highlightElement(block);
     });
     detailedFeedbackDiv.style.display = 'block';
-    // Remove the maxHeight setting
     button.textContent = 'Collapse Feedback';
 
-    // Add refresh button
     const refreshButton = document.createElement('button');
     refreshButton.className = 'refresh-button';
     refreshButton.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh';
@@ -202,7 +233,6 @@ function displayDetailedFeedback(feedback, detailedFeedbackDiv, button) {
 }
 
 function collapseDetailedFeedback(detailedFeedbackDiv, button) {
-    // Remove the maxHeight setting
     detailedFeedbackDiv.style.display = 'none';
     button.textContent = 'Expand Feedback';
 }
@@ -236,7 +266,6 @@ function refreshDetailedFeedback(fileName, detailedFeedbackDiv, button) {
 
         console.log("Matching file found:", matchingFile);
 
-        // Remove existing detailed feedback if it exists
         if (data.detailedFeedback) {
             delete data.detailedFeedback[fileName];
             chrome.storage.local.set({ detailedFeedback: data.detailedFeedback }, () => {
@@ -244,7 +273,6 @@ function refreshDetailedFeedback(fileName, detailedFeedbackDiv, button) {
             });
         }
 
-        // Fetch new detailed feedback
         chrome.runtime.sendMessage({ action: 'getDetailedFeedback', fileName: fileName }, (response) => {
             if (response && response.detailedFeedback) {
                 saveDetailedFeedbackToStorage(fileName, response.detailedFeedback);
