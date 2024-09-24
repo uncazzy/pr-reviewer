@@ -26,7 +26,16 @@ function openChatWithFeedback(fileName, feedback, fullContent, newCode, oldCode)
     // Placeholder message from the assistant
     const initialMessage = document.createElement('div');
     initialMessage.className = 'chat-message assistant-message ask-feedback'; // Use the same style for assistant
-    initialMessage.innerHTML = `<i class="fas fa-code-branch"></i> Ask me more about this feedback`;
+    // Icon container (separate from the message)
+    const iconContainer = document.createElement('div');
+    iconContainer.className = 'chat-icon-container';
+    iconContainer.innerHTML = '<i class="fas fa-code-branch"></i>'; // Icon outside the chat bubble
+    initialMessage.appendChild(iconContainer);
+    // Message text
+    const messageText = document.createElement('div');
+    messageText.className = 'chat-text';
+    messageText.textContent = 'Ask me more about this feedback';
+    initialMessage.appendChild(messageText);
     messagesContainer.appendChild(initialMessage);
 
     // Input and send button container

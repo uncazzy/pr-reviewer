@@ -32,11 +32,15 @@ function displayDetailedFeedback(fileName, feedback, oldCode, newCode, fullConte
     detailedFeedbackDiv.style.display = 'block';
     button.textContent = 'Collapse Feedback';
 
+    // Create a container for both the buttons (Refresh and Ask Follow-up)
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'button-container';
+
     const refreshButton = document.createElement('button');
     refreshButton.className = 'refresh-button';
     refreshButton.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh';
     refreshButton.addEventListener('click', () => refreshDetailedFeedback(detailedFeedbackDiv.id.replace('detailed-', ''), detailedFeedbackDiv, button));
-    detailedFeedbackDiv.insertBefore(refreshButton, detailedFeedbackDiv.firstChild);
+    buttonContainer.appendChild(refreshButton);
 
     // "Ask Follow-up" button with icon
     const askFollowUpButton = document.createElement('button');
@@ -45,7 +49,10 @@ function displayDetailedFeedback(fileName, feedback, oldCode, newCode, fullConte
     askFollowUpButton.addEventListener('click', () => {
         openChatWithFeedback(fileName, feedback, fullContent, newCode, oldCode);  // Pass all code data to chat
     });
-    detailedFeedbackDiv.appendChild(askFollowUpButton);
+    buttonContainer.appendChild(askFollowUpButton);
+
+    // Append button container below the detailed feedback
+    detailedFeedbackDiv.appendChild(buttonContainer);
 }
 
 
