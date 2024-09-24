@@ -34,7 +34,14 @@ h1, .heading {
 
 .section h2 {
     font-size: 20px;
-    margin-bottom: 10px;
+}
+
+.section p {
+    margin-top: 0;
+}
+
+a {
+  color: #007acc
 }
 
 h2 {
