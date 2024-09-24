@@ -4,8 +4,7 @@ let extractedData = [];
 // Listener for messages from contentScript.js
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.files) {
-        console.log('Received files in background.js:', message.files);
-        extractedData = message.files; // Store for later use
+        extractedData = message.files;
 
         // Save extractedData to local storage
         chrome.storage.local.set({ 'extractedData': extractedData }, () => {
@@ -20,38 +19,53 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 async function processFiles(files) {
     const results = [];
     try {
-        const promises = files.map(file =>
-            analyzeCodeWithGPT(file.fileName, file.oldCode, file.newCode, file.fullContent)
-                .then(feedback => {
-                    const parsedFeedback = parseFeedback(feedback);
-                    return {
-                        fileName: file.fileName,
-                        status: parsedFeedback.status,
-                        issue: parsedFeedback.issue,
-                        index: file.index,
-                    };
-                })
-                .catch(error => {
-                    console.error(`Error processing file ${file.fileName}:`, error);
-                    return { fileName: file.fileName, status: 'Error', issue: error.message };
-                })
-        );
+        // First, retrieve the current PR URL from chrome.storage.local
+        chrome.storage.local.get('currentPrUrl', (data) => {
+            const prUrl = data.currentPrUrl || 'Unknown PR URL'; // Default to a placeholder if not found
 
-        const settledPromises = await Promise.allSettled(promises);
-        settledPromises.forEach(result => {
-            if (result.status === 'fulfilled') {
-                results.push(result.value);
-            } else {
-                console.warn('File processing failed:', result.reason);
-            }
+            // Map over the files to analyze them concurrently
+            const promises = files.map(file =>
+                analyzeCodeWithGPT(file.fileName, file.oldCode, file.newCode, file.fullContent)
+                    .then(feedback => {
+                        const parsedFeedback = parseFeedback(feedback);
+                        return {
+                            fileName: file.fileName,
+                            status: parsedFeedback.status,
+                            issue: parsedFeedback.issue,
+                            index: file.index,
+                        };
+                    })
+                    .catch(error => {
+                        console.error(`Error processing file ${file.fileName}:`, error);
+                        return { fileName: file.fileName, status: 'Error', issue: error.message };
+                    })
+            );
+
+            // Process the promises
+            Promise.allSettled(promises).then(settledPromises => {
+                settledPromises.forEach(result => {
+                    if (result.status === 'fulfilled') {
+                        results.push(result.value);
+                    } else {
+                        console.warn('File processing failed:', result.reason);
+                    }
+                });
+
+                // Save the results along with the PR URL after all processing is complete
+                chrome.storage.local.set({ 'prResults': results, 'prUrl': prUrl, 'processingComplete': true }, () => {
+                    console.log('Results and PR URL updated');
+                });
+            }).catch(error => {
+                console.error('Processing error:', error);
+                chrome.storage.local.set({ 'error': error.message || error });
+            });
         });
-
-        chrome.storage.local.set({ 'prResults': results, 'processingComplete': true });
     } catch (error) {
-        console.error('Processing error:', error);
+        console.error('Unexpected error:', error);
         chrome.storage.local.set({ 'error': error.message || error });
     }
 }
+
 
 // Helper function to retry with exponential backoff
 async function retryWithBackoff(fn, retries = 3, delay = 500) {
