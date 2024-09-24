@@ -57,10 +57,26 @@ async function processFiles(files) {
     }
 }
 
+// Helper function to retry with exponential backoff
+async function retryWithBackoff(fn, retries = 3, delay = 500) {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+            return await fn();
+        } catch (error) {
+            if (attempt < retries) {
+                console.warn(`Attempt ${attempt} failed. Retrying in ${delay}ms...`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                delay *= 2; // Exponential backoff
+            } else {
+                throw error; // Rethrow the error after max retries
+            }
+        }
+    }
+}
+
 // Function to send a code review request to OpenAI
 async function analyzeCodeWithGPT(fileName, oldCode, newCode, fullFileContent) {
-    console.log('Analyzing file in GPT function:', fileName);
-    console.log('Full file content length:', fullFileContent.length);
+    console.log(`Analyzing file: ${fileName}`);
 
     // Clean up code snippets
     oldCode = oldCode.trim();
@@ -99,7 +115,7 @@ Do not provide any additional details or explanations. Keep the response concise
 
     console.log('Prompt being sent to OpenAI:', prompt);
 
-    try {
+    const apiCall = async () => {
         // Retrieve API key & model from storage
         const apiKey = await getApiKey();
         const model = await getModel()
@@ -126,14 +142,13 @@ Do not provide any additional details or explanations. Keep the response concise
 
         const data = await response.json();
         if (data.error) {
-            console.error('OpenAI API error:', data.error);
-            throw `Error from OpenAI: ${data.error.message}`;
+            throw new Error(`OpenAI API Error: ${data.error.message}`);
         }
         return data.choices[0].message.content;
-    } catch (error) {
-        console.error('Error communicating with OpenAI:', error);
-        throw error;
-    }
+    };
+
+    // Retry the API call with exponential backoff
+    return retryWithBackoff(apiCall);
 }
 
 // Function to retrieve API key from storage
