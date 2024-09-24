@@ -167,7 +167,7 @@ function getModel() {
             if (data.openaiModel) {
                 resolve(data.openaiModel);
             } else {
-                reject('OpenAI model not found.');
+                resolve('gpt-4o-mini')
             }
         });
     });
