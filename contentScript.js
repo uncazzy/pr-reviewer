@@ -81,10 +81,12 @@
 
     if (extractedData.length === 0) {
         console.warn('No file data extracted.');
+    } else {
+        // Save extracted data to chrome.storage.local
+        chrome.storage.local.set({ extractedData }, () => {
+            console.log('Extracted data saved to local storage:', extractedData);
+        });
     }
-
-    // Send the extracted data to the background script
-    chrome.runtime.sendMessage({ files: extractedData });
 
     // Function to extract file information
     function extractFileInfo(file) {
@@ -137,5 +139,8 @@
             fullContent
         };
     }
+
+    // Send the extracted data to the background script
+    chrome.runtime.sendMessage({ files: extractedData });
 
 })();

@@ -1,0 +1,89 @@
+/* Chat container styles */
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background-color: #252526;
+    padding: 20px;
+    border: 1px solid #333;
+    border-radius: 5px;
+    color: #d4d4d4;
+    height: 400px; /* Set fixed height */
+    position: relative;
+}
+
+/* Close button ("X") */
+.close-chat {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #d4d4d4;
+    cursor: pointer;
+    transition: color 0.3s;
+    z-index: 100; /* Ensures it's above all elements */
+}
+
+.close-chat:hover {
+    color: #ff4b4b;
+}
+
+/* Messages container (scrollable) */
+.messages-container {
+    flex-grow: 1;  /* Take available space */
+    overflow-y: auto;
+    background-color: #1e1e1e;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #333;
+}
+
+/* Style individual messages */
+.chat-message {
+    margin-bottom: 10px;
+    padding: 8px;
+    background-color: #333;
+    border-radius: 5px;
+    color: #fff;
+    max-width: 80%;
+}
+
+/* Input container with the send button */
+.chat-input-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    background-color: #1e1e1e;
+    border: 1px solid #333;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+/* Fixing the input bar and send button */
+.chat-input {
+    flex: 1;
+    background-color: transparent;
+    color: #d4d4d4;
+    border: none;
+    outline: none;
+    padding: 10px;
+    font-family: inherit;
+    font-size: 14px;
+    resize: none;
+}
+
+.send-button {
+    background-color: #007acc;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.send-button:hover {
+    background-color: #005f9e;
+}

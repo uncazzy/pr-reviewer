@@ -3,15 +3,19 @@ function fetchAndDisplayDetailedFeedback(fileName, detailedFeedbackDiv, button) 
     detailedFeedbackDiv.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading detailed feedback...</div>';
 
     chrome.storage.local.get('extractedData', (data) => {
-        if (!data.extractedData || !data.extractedData.find(file => file.fileName === fileName)) {
+        const fileData = data.extractedData && data.extractedData.find(file => file.fileName === fileName);
+
+        if (!fileData) {
             detailedFeedbackDiv.innerHTML = '<p class="error-message">File data not found. Please re-analyze the PR.</p>';
             return;
         }
 
+        const { oldCode, newCode, fullContent } = fileData;
+
         chrome.runtime.sendMessage({ action: 'getDetailedFeedback', fileName: fileName }, (response) => {
             if (response && response.detailedFeedback) {
                 saveDetailedFeedbackToStorage(fileName, response.detailedFeedback);
-                displayDetailedFeedback(response.detailedFeedback, detailedFeedbackDiv, button);
+                displayDetailedFeedback(response.detailedFeedback, oldCode, newCode, fullContent, detailedFeedbackDiv, button);
             } else {
                 detailedFeedbackDiv.innerHTML = '<p class="error-message">Failed to load detailed feedback.</p>';
             }
@@ -19,7 +23,7 @@ function fetchAndDisplayDetailedFeedback(fileName, detailedFeedbackDiv, button) 
     });
 }
 
-function displayDetailedFeedback(feedback, detailedFeedbackDiv, button) {
+function displayDetailedFeedback(feedback, oldCode, newCode, fullContent, detailedFeedbackDiv, button) {
     const parsedContent = marked.parse(feedback);
     detailedFeedbackDiv.innerHTML = parsedContent;
     detailedFeedbackDiv.querySelectorAll('pre code').forEach((block) => {
@@ -33,7 +37,17 @@ function displayDetailedFeedback(feedback, detailedFeedbackDiv, button) {
     refreshButton.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh';
     refreshButton.addEventListener('click', () => refreshDetailedFeedback(detailedFeedbackDiv.id.replace('detailed-', ''), detailedFeedbackDiv, button));
     detailedFeedbackDiv.insertBefore(refreshButton, detailedFeedbackDiv.firstChild);
+
+    // "Ask Follow-up" button with icon
+    const askFollowUpButton = document.createElement('button');
+    askFollowUpButton.className = 'follow-up-button';
+    askFollowUpButton.innerHTML = '<i class="fas fa-comments"></i> Ask Follow-up';
+    askFollowUpButton.addEventListener('click', () => {
+        openChatWithFeedback(feedback, fullContent, newCode, oldCode);  // Pass all code data to chat
+    });
+    detailedFeedbackDiv.appendChild(askFollowUpButton);
 }
+
 
 function collapseDetailedFeedback(detailedFeedbackDiv, button) {
     detailedFeedbackDiv.style.display = 'none';
