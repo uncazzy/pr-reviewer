@@ -46,18 +46,23 @@ function checkForResults(currentUrl) {
     // Extract the base part of the URL up to the PR number (e.g., /pull/3)
     const baseUrl = currentUrl.split('/pull/')[0] + "/pull/" + currentUrl.split('/pull/')[1].split('/')[0];
     chrome.storage.local.get(['prResults', 'prUrl'], (data) => {
-        // Extract base URL from saved prUrl to compare
-        const savedBaseUrl = data.prUrl.split('/pull/')[0] + "/pull/" + data.prUrl.split('/pull/')[1].split('/')[0];
-        // Compare the base parts of the URLs
-        if (data.prResults && baseUrl === savedBaseUrl) {
-            displaySavedResults(data.prResults);
+        // Check if prUrl exists before splitting it
+        if (data.prUrl) {
+            // Extract base URL from saved prUrl to compare
+            const savedBaseUrl = data.prUrl.split('/pull/')[0] + "/pull/" + data.prUrl.split('/pull/')[1].split('/')[0];
+            // Compare the base parts of the URLs
+            if (data.prResults && baseUrl === savedBaseUrl) {
+                displaySavedResults(data.prResults);
+            } else {
+                console.log('No saved results for this PR.');
+                resultDiv.style.display = 'none';
+            }
         } else {
-            console.log('No saved results for this PR.');
+            console.log('No saved prUrl found.');
             resultDiv.style.display = 'none';
         }
     });
 }
-
 
 function displaySavedResults(results) {
     if (!Array.isArray(results) || results.length === 0) {
