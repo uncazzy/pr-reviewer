@@ -22,7 +22,7 @@ function initializePopup() {
 function checkGitHubPRPage() {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         const currentUrl = tabs[0].url;
-        const isPRPage = /^https:\/\/github\.com\/[^/]+\/[^/]+\/pull\/\d+/.test(currentUrl);
+        const isPRPage = /^https:\/\/github\.com\/[^/]+\/[^/]+\/pull\/\d+(\/(commits|checks|files))?$/.test(currentUrl);
         analyzeButton.disabled = !isPRPage;
 
         if (isPRPage) {
