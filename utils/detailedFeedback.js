@@ -23,7 +23,7 @@ function fetchAndDisplayDetailedFeedback(fileName, detailedFeedbackDiv, button) 
     });
 }
 
-function displayDetailedFeedback(feedback, oldCode, newCode, fullContent, detailedFeedbackDiv, button) {
+function displayDetailedFeedback(fileName, feedback, oldCode, newCode, fullContent, detailedFeedbackDiv, button) {
     const parsedContent = marked.parse(feedback);
     detailedFeedbackDiv.innerHTML = parsedContent;
     detailedFeedbackDiv.querySelectorAll('pre code').forEach((block) => {
@@ -43,7 +43,7 @@ function displayDetailedFeedback(feedback, oldCode, newCode, fullContent, detail
     askFollowUpButton.className = 'follow-up-button';
     askFollowUpButton.innerHTML = '<i class="fas fa-comments"></i> Ask Follow-up';
     askFollowUpButton.addEventListener('click', () => {
-        openChatWithFeedback(feedback, fullContent, newCode, oldCode);  // Pass all code data to chat
+        openChatWithFeedback(fileName, feedback, fullContent, newCode, oldCode);  // Pass all code data to chat
     });
     detailedFeedbackDiv.appendChild(askFollowUpButton);
 }

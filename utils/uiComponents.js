@@ -75,8 +75,9 @@ function expandFeedback(fileName, button, detailedFeedbackDiv) {
             const { oldCode, newCode, fullContent } = fileData;
 
             if (data.detailedFeedback && data.detailedFeedback[fileName]) {
+                console.log("DATA", data)
                 // Pass feedback and additional code information to displayDetailedFeedback
-                displayDetailedFeedback(data.detailedFeedback[fileName], oldCode, newCode, fullContent, detailedFeedbackDiv, button);
+                displayDetailedFeedback(fileName, data.detailedFeedback[fileName], oldCode, newCode, fullContent, detailedFeedbackDiv, button);
             } else {
                 fetchAndDisplayDetailedFeedback(fileName, detailedFeedbackDiv, button);
             }

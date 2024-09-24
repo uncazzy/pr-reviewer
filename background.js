@@ -66,7 +66,6 @@ async function processFiles(files) {
     }
 }
 
-
 // Helper function to retry with exponential backoff
 async function retryWithBackoff(fn, retries = 3, delay = 500) {
     for (let attempt = 1; attempt <= retries; attempt++) {
@@ -159,32 +158,6 @@ Do not provide any additional details or explanations. Keep the response concise
 
     // Retry the API call with exponential backoff
     return retryWithBackoff(apiCall);
-}
-
-// Function to retrieve API key from storage
-function getApiKey() {
-    return new Promise((resolve, reject) => {
-        chrome.storage.local.get('openaiApiKey', (data) => {
-            if (data.openaiApiKey) {
-                resolve(data.openaiApiKey);
-            } else {
-                reject('OpenAI API key not found.');
-            }
-        });
-    });
-}
-
-// Function to retrieve OpenAI model from storage
-function getModel() {
-    return new Promise((resolve, reject) => {
-        chrome.storage.local.get('openaiModel', (data) => {
-            if (data.openaiModel) {
-                resolve(data.openaiModel);
-            } else {
-                resolve('gpt-4o-mini')
-            }
-        });
-    });
 }
 
 // Function to parse the feedback from GPT-4
