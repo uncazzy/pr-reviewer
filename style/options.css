@@ -96,6 +96,10 @@ button:hover .donate-button {
 }
 
 #status {
-    margin-top: 15px;
     font-style: italic;
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    margin-top: 15px;
+    max-width: 75%;
 }
