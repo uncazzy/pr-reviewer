@@ -16,43 +16,39 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 });
 
-// Function to process files sequentially
+// Function to process files concurrently with controlled concurrency (using Promise.allSettled)
 async function processFiles(files) {
     const results = [];
     try {
-        for (const file of files) {
-            console.log('Analyzing file:', file.fileName);
-            const feedback = await analyzeCodeWithGPT(file.fileName, file.oldCode, file.newCode, file.fullContent);
+        const promises = files.map(file =>
+            analyzeCodeWithGPT(file.fileName, file.oldCode, file.newCode, file.fullContent)
+                .then(feedback => {
+                    const parsedFeedback = parseFeedback(feedback);
+                    return {
+                        fileName: file.fileName,
+                        status: parsedFeedback.status,
+                        issue: parsedFeedback.issue,
+                        index: file.index,
+                    };
+                })
+                .catch(error => {
+                    console.error(`Error processing file ${file.fileName}:`, error);
+                    return { fileName: file.fileName, status: 'Error', issue: error.message };
+                })
+        );
 
-            // Parse the feedback to extract the status and issue
-            const parsedFeedback = parseFeedback(feedback);
-
-            // Collect results for saving later
-            results.push({
-                fileName: file.fileName,
-                status: parsedFeedback.status,
-                issue: parsedFeedback.issue,
-                index: file.index
-            });
-
-            // Update the results in storage after each file
-            chrome.storage.local.get('currentPrUrl', (data) => {
-                chrome.storage.local.set({
-                    'prResults': results,
-                    'prUrl': data.currentPrUrl
-                }, () => {
-                    console.log('Results updated');
-                });
-            });
-        }
-
-        // After processing all files, notify that processing is complete
-        chrome.storage.local.set({ 'processingComplete': true }, () => {
-            console.log('Processing complete');
+        const settledPromises = await Promise.allSettled(promises);
+        settledPromises.forEach(result => {
+            if (result.status === 'fulfilled') {
+                results.push(result.value);
+            } else {
+                console.warn('File processing failed:', result.reason);
+            }
         });
+
+        chrome.storage.local.set({ 'prResults': results, 'processingComplete': true });
     } catch (error) {
-        console.error(error);
-        // Send error message to popup
+        console.error('Processing error:', error);
         chrome.storage.local.set({ 'error': error.message || error });
     }
 }
