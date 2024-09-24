@@ -9,7 +9,7 @@
 </head>
 
 <body>
-    <h1><i class="fas fa-cog"></i> PR Code Reviewer Options</h1>
+    <h1 class="heading"><i class="fas fa-cog "></i> PR Code Reviewer Options</h1>
 
     <!-- Overview Section -->
     <div class="section">
@@ -26,8 +26,11 @@
         <h2>API Configuration</h2>
         <label for="apiKey">OpenAI API Key:</label>
         <input type="text" id="apiKey" placeholder="Enter your OpenAI API Key">
-        <button id="saveApiKey">Save API Key</button>
-        <button id="clearApiKey">Clear API Key</button>
+        <div>
+            <button id="saveApiKey">Save API Key</button>
+            <button id="clearApiKey">Clear API Key</button>
+        </div>
+
 
         <label for="modelSelect">OpenAI Model:</label>
         <select id="modelSelect">
@@ -48,7 +51,7 @@
     <!-- Donate Section -->
     <div class="section">
         <h2>Support the Project</h2>
-        <button id="donateButton"><i class="fas fa-heart"></i> Donate</button>
+        <button id="donateButton"><i class="fas fa-heart donate-button"></i> Donate</button>
     </div>
 
     <div id="status"></div>
