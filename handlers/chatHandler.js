@@ -23,10 +23,10 @@ function openChatWithFeedback(fileName, feedback, fullContent, newCode, oldCode)
     messagesContainer.className = 'messages-container';
     chatContainer.appendChild(messagesContainer);
 
-    // Placeholder message at the start
+    // Placeholder message from the assistant
     const initialMessage = document.createElement('div');
-    initialMessage.className = 'chat-message';
-    initialMessage.textContent = 'Ask me more about this feedback';
+    initialMessage.className = 'chat-message assistant-message ask-feedback'; // Use the same style for assistant
+    initialMessage.innerHTML = `<i class="fas fa-code-branch"></i> Ask me more about this feedback`;
     messagesContainer.appendChild(initialMessage);
 
     // Input and send button container
@@ -43,10 +43,10 @@ function openChatWithFeedback(fileName, feedback, fullContent, newCode, oldCode)
     sendButton.textContent = 'Send';
     sendButton.addEventListener('click', () => {
         if (chatInput.value.trim() !== "") {
-            // Create a new message
+            // Create a new user message
             const userMessage = document.createElement('div');
-            userMessage.className = 'chat-message';
-            userMessage.textContent = chatInput.value.trim();
+            userMessage.className = 'chat-message user-message'; // Add a user icon class
+            userMessage.innerHTML = `<i class="fas fa-user"></i> ${marked.parse((chatInput.value.trim()))}`;
             messagesContainer.appendChild(userMessage);
 
             // Clear input
@@ -55,8 +55,8 @@ function openChatWithFeedback(fileName, feedback, fullContent, newCode, oldCode)
             // Automatically scroll to the bottom
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-            // Send message to the LLM
-            sendMessageToLLM(fileName, feedback, fullContent, newCode, oldCode, userMessage.textContent);
+            // Send message to the LLM and render the assistant response
+            sendMessageToLLM(fileName, feedback, fullContent, newCode, oldCode, userMessage.textContent, messagesContainer);
         }
     });
     chatInputContainer.appendChild(sendButton);
@@ -208,10 +208,10 @@ Do not assess the updated lines of code in isolation. Always evaluate them in th
                         const delta = parsedData.choices[0].delta;
 
                         if (delta && delta.content) {
-                            // Append the content to the assistantMessage
                             assistantMessage += delta.content;
-                            assistantMessageDiv.textContent = assistantMessage;  // Update the message div with new content
+                            assistantMessageDiv.innerHTML = `<i class="fas fa-code-branch"></i> ${marked.parse((assistantMessage))}`;
                         }
+
                     } catch (err) {
                         console.error('Error parsing chunk:', err);
                     }
