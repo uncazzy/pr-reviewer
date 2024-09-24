@@ -1,3 +1,34 @@
+.follow-up-button {
+    background-color: #007acc;
+    color: #f1f1f1;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.follow-up-button i {
+    font-size: 16px; /* Icon size */
+}
+
+.follow-up-button:hover {
+    background-color: #005f9e;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.follow-up-button:active {
+    background-color: #004a7a;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+
+
 /* Chat container styles */
 .chat-container {
     display: flex;

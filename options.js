@@ -7,8 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const clearStorageButton = document.getElementById('clearStorage');
     const statusDiv = document.getElementById('status');
     const donateButton = document.getElementById('donateButton');
-    const feedbackInput = document.getElementById('feedback');
-    const submitFeedbackButton = document.getElementById('submitFeedback');
 
     donateButton.addEventListener('click', handleDonation);
 
