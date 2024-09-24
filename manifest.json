@@ -3,7 +3,6 @@
     "name": "PR Code Reviewer",
     "version": "1.0",
     "permissions": [
-        "activeTab",
         "scripting",
         "storage"
     ],
