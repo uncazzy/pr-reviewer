@@ -48,7 +48,7 @@ function displayDetailedFeedback(fileName, feedback, oldCode, newCode, fullConte
     // Refresh button
     const refreshButton = document.createElement('button');
     refreshButton.className = 'refresh-button';
-    refreshButton.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh';
+    refreshButton.innerHTML = '<i class="fas fa-sync-alt"></i>';
     refreshButton.addEventListener('click', () => refreshDetailedFeedback(detailedFeedbackDiv.id.replace('detailed-', ''), detailedFeedbackDiv, button));
     buttonContainer.appendChild(refreshButton);
 
