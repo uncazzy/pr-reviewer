@@ -169,6 +169,11 @@ h1 .accent {
     border-radius: 5px;
 }
 
+.button-container {
+    display: flex;
+    justify-content: space-between;
+}
+
 pre {
     background-color: #1b1b1b;
     color: #d4d4d4;
@@ -211,7 +216,7 @@ code {
 }
 
 .refresh-button {
-    margin-bottom: 10px;
+    margin: 10px;
     padding: 5px 10px;
     background-color: #f0f0f0;
     border: none;

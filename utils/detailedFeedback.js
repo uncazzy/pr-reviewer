@@ -36,13 +36,7 @@ function displayDetailedFeedback(fileName, feedback, oldCode, newCode, fullConte
     const buttonContainer = document.createElement('div');
     buttonContainer.className = 'button-container';
 
-    const refreshButton = document.createElement('button');
-    refreshButton.className = 'refresh-button';
-    refreshButton.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh';
-    refreshButton.addEventListener('click', () => refreshDetailedFeedback(detailedFeedbackDiv.id.replace('detailed-', ''), detailedFeedbackDiv, button));
-    buttonContainer.appendChild(refreshButton);
-
-    // "Ask Follow-up" button with icon
+    // "Ask Follow-up" button
     const askFollowUpButton = document.createElement('button');
     askFollowUpButton.className = 'follow-up-button';
     askFollowUpButton.innerHTML = '<i class="fas fa-comments"></i> Ask Follow-up';
@@ -50,6 +44,13 @@ function displayDetailedFeedback(fileName, feedback, oldCode, newCode, fullConte
         openChatWithFeedback(fileName, feedback, fullContent, newCode, oldCode);  // Pass all code data to chat
     });
     buttonContainer.appendChild(askFollowUpButton);
+
+    // Refresh button
+    const refreshButton = document.createElement('button');
+    refreshButton.className = 'refresh-button';
+    refreshButton.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh';
+    refreshButton.addEventListener('click', () => refreshDetailedFeedback(detailedFeedbackDiv.id.replace('detailed-', ''), detailedFeedbackDiv, button));
+    buttonContainer.appendChild(refreshButton);
 
     // Append button container below the detailed feedback
     detailedFeedbackDiv.appendChild(buttonContainer);
