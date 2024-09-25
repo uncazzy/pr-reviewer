@@ -1,90 +1,143 @@
 function openChatWithFeedback(fileName, feedback, fullContent, newCode, oldCode) {
-    // Hide the "Analyze PR" button
-    document.getElementById('analyze').style.display = 'none';
+    // Retrieve existing chat history for this file
+    chrome.storage.local.get(['chatHistory'], (data) => {
+        messages = data.chatHistory && data.chatHistory[fileName] ? data.chatHistory[fileName] : [];
 
-    const resultDiv = document.getElementById('result');
-    resultDiv.style.display = 'flex';
-    resultDiv.style.flexDirection = 'column';
-    resultDiv.style.flexGrow = '1';
-    resultDiv.style.padding = 0;
-    resultDiv.innerHTML = '';
+        // Hide the "Analyze PR" button
+        document.getElementById('analyze').style.display = 'none';
 
-    // Chat container
-    const chatContainer = document.createElement('div');
-    chatContainer.className = 'chat-container';
+        // Result div
+        const resultDiv = document.getElementById('result');
+        resultDiv.style.display = 'flex';
+        resultDiv.style.flexDirection = 'column';
+        resultDiv.style.flexGrow = '1';
+        resultDiv.style.padding = 0;
+        resultDiv.innerHTML = '';
 
-    // Add close ("X") button at the top right
-    const closeButton = document.createElement('button');
-    closeButton.className = 'close-chat';
-    closeButton.innerHTML = '&times;'; // "X" symbol
-    closeButton.addEventListener('click', () => {
-        location.reload(); // Go back to original view
-    });
-    chatContainer.appendChild(closeButton);
+        // Chat container
+        const chatContainer = document.createElement('div');
+        chatContainer.className = 'chat-container';
 
-    // Create a scrollable messages container
-    const messagesContainer = document.createElement('div');
-    messagesContainer.className = 'messages-container';
-    chatContainer.appendChild(messagesContainer);
+        // Create chat header
+        const chatHeader = document.createElement('div');
+        chatHeader.className = 'chat-header';
 
-    // Placeholder message from the assistant
-    const initialMessage = document.createElement('div');
-    initialMessage.className = 'chat-message assistant-message ask-feedback'; // Use the same style for assistant
-    // Icon container (separate from the message)
-    const iconContainer = document.createElement('div');
-    iconContainer.className = 'chat-icon-container';
-    iconContainer.innerHTML = '<i class="fas fa-code-branch"></i>'; // Icon outside the chat bubble
-    initialMessage.appendChild(iconContainer);
-    // Message text
-    const messageText = document.createElement('div');
-    messageText.className = 'chat-text';
-    messageText.textContent = 'Ask me whatever you want to know about this feedback.\n\nWhat do you want to know?';
-    initialMessage.appendChild(messageText);
-    messagesContainer.appendChild(initialMessage);
+        // File name display
+        const fileNameDisplay = document.createElement('div');
+        fileNameDisplay.className = 'chat-file-name';
+        fileNameDisplay.innerHTML = `Chatting about: <strong>${fileName}</strong>`;
+        chatHeader.appendChild(fileNameDisplay);
 
-    // Input and send button container
-    const chatInputContainer = document.createElement('div');
-    chatInputContainer.className = 'chat-input-container';
+        // Buttons container
+        const chatHeaderButtons = document.createElement('div');
+        chatHeaderButtons.className = 'chat-header-buttons';
 
-    const chatInput = document.createElement('textarea');
-    chatInput.className = 'chat-input';
-    chatInput.placeholder = 'Ask a follow-up question...';
-    chatInputContainer.appendChild(chatInput);
+        // Close button
+        const closeButton = document.createElement('button');
+        closeButton.className = 'close-chat';
+        closeButton.innerHTML = '<i class="fas fa-times"></i>'; // Use an icon
+        closeButton.addEventListener('click', () => {
+            location.reload(); // Go back to original view
+        });
+        chatHeaderButtons.appendChild(closeButton);
 
-    const sendButton = document.createElement('button');
-    sendButton.className = 'send-button';
-    sendButton.textContent = 'Send';
-    sendButton.addEventListener('click', () => {
-        if (chatInput.value.trim() !== "") {
-            // Create a new user message
-            const userMessage = document.createElement('div');
-            userMessage.className = 'chat-message user-message'; // Add a user icon class
-            userMessage.innerHTML = `<i class="fas fa-user"></i> ${marked.parse((chatInput.value.trim()))}`;
-            messagesContainer.appendChild(userMessage);
+        // Clear Chat button
+        const clearChatButton = document.createElement('button');
+        clearChatButton.className = 'clear-chat-button';
+        clearChatButton.innerHTML = '<i class="fas fa-trash-alt"></i>';
+        clearChatButton.addEventListener('click', () => {
+            clearChatHistory(fileName, messagesContainer);
+        });
+        chatHeaderButtons.appendChild(clearChatButton);
 
-            // Clear input
-            chatInput.value = '';
+        // Append buttons container to chat header
+        chatHeader.appendChild(chatHeaderButtons);
 
-            // Automatically scroll to the bottom
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        // Append chat header to chat container
+        chatContainer.appendChild(chatHeader);
 
-            // Send message to the LLM and render the assistant response
-            sendMessageToLLM(fileName, feedback, fullContent, newCode, oldCode, userMessage.textContent, messagesContainer);
+        // Messages container
+        const messagesContainer = document.createElement('div');
+        messagesContainer.className = 'messages-container';
+        chatContainer.appendChild(messagesContainer);
+
+        // Append chat container to result div
+        resultDiv.appendChild(chatContainer);
+
+        // Render existing messages
+        messages.forEach((message) => {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${message.role}-message`;
+            messageDiv.innerHTML = `<i class="fas fa-${message.role === 'user' ? 'user' : 'robot'}"></i> ${marked.parse(message.content)}`;
+            messagesContainer.appendChild(messageDiv);
+        });
+
+        // Scroll to the bottom after rendering messages
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+        // If there are no messages, display the initial assistant message
+        if (messages.length === 0) {
+            const initialMessage = document.createElement('div');
+            initialMessage.className = 'chat-message assistant-message ask-feedback';
+            initialMessage.innerHTML = `<i class="fas fa-robot"></i> Ask me whatever you want to know about this feedback.\n\nWhat do you want to know?`;
+            messagesContainer.appendChild(initialMessage);
         }
+
+        // Input and send button container
+        const chatInputContainer = document.createElement('div');
+        chatInputContainer.className = 'chat-input-container';
+
+        const chatInput = document.createElement('textarea');
+        chatInput.className = 'chat-input';
+        chatInput.placeholder = 'Ask a follow-up question...';
+        chatInputContainer.appendChild(chatInput);
+
+        const sendButton = document.createElement('button');
+        sendButton.className = 'send-button';
+        sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>'; // Use an icon
+        sendButton.addEventListener('click', () => {
+            if (chatInput.value.trim() !== "") {
+                handleUserMessage(chatInput.value.trim(), fileName, feedback, fullContent, newCode, oldCode, messagesContainer);
+                chatInput.value = '';
+            }
+        });
+        chatInputContainer.appendChild(sendButton);
+
+        // Append input and send button container to the chat container
+        chatContainer.appendChild(chatInputContainer);
+
+        // Event listener for Enter key to send message
+        chatInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                if (chatInput.value.trim() !== "") {
+                    handleUserMessage(chatInput.value.trim(), fileName, feedback, fullContent, newCode, oldCode, messagesContainer);
+                    chatInput.value = '';
+                }
+            }
+        });
     });
-    chatInputContainer.appendChild(sendButton);
+}
 
-    // Append input and send button container to the chat container
-    chatContainer.appendChild(chatInputContainer);
+// Helper function to handle user messages
+function handleUserMessage(messageContent, fileName, feedback, fullContent, newCode, oldCode, messagesContainer) {
+    // Create a new user message
+    const userMessage = document.createElement('div');
+    userMessage.className = 'chat-message user-message';
+    userMessage.innerHTML = `<i class="fas fa-user"></i> ${marked.parse(messageContent)}`;
+    messagesContainer.appendChild(userMessage);
 
-    // Append chat container to result div
-    resultDiv.appendChild(chatContainer);
+    // Automatically scroll to the bottom
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+    // Send message to the LLM and render the assistant response
+    sendMessageToLLM(fileName, feedback, fullContent, newCode, oldCode, messageContent, messagesContainer);
 }
 
 // Initialize messages array to keep track of all exchanges
 let messages = [];
 
-async function sendMessageToLLM(fileName, detailedFeedback, fullContent, newCode, oldCode, userQuestion) {
+async function sendMessageToLLM(fileName, detailedFeedback, fullContent, newCode, oldCode, userQuestion, messagesContainer) {
     // First, retrieve the `prResult` from `chrome.storage.local`
     const prResult = await new Promise((resolve, reject) => {
         chrome.storage.local.get('prResults', (data) => {
@@ -194,8 +247,8 @@ Do not assess the updated lines of code in isolation. Always evaluate them in th
 
         // Create a new message element to show the streaming response
         const assistantMessageDiv = document.createElement('div');
-        assistantMessageDiv.className = 'chat-message';
-        document.querySelector('.messages-container').appendChild(assistantMessageDiv);
+        assistantMessageDiv.className = 'chat-message assistant-message';
+        messagesContainer.appendChild(assistantMessageDiv);
 
         while (!done) {
             const { value, done: readerDone } = await reader.read();
@@ -223,6 +276,9 @@ Do not assess the updated lines of code in isolation. Always evaluate them in th
                         if (delta && delta.content) {
                             assistantMessage += delta.content;
                             assistantMessageDiv.innerHTML = `<i class="fas fa-code-branch"></i> ${marked.parse((assistantMessage))}`;
+                            assistantMessageDiv.querySelectorAll('pre code').forEach((block) => {
+                                hljs.highlightElement(block);
+                            });
                         }
 
                     } catch (err) {
@@ -232,13 +288,41 @@ Do not assess the updated lines of code in isolation. Always evaluate them in th
             }
         }
 
+        // Scroll to the bottom after updating the assistant's message
+        assistantMessageDiv.scrollIntoView({ behavior: 'smooth' });
+
         // Add the assistant response to the messages array for continuity in future interactions
         messages.push({
             role: 'assistant',
             content: assistantMessage
         });
 
+        // Save the updated messages array to chrome.storage.local
+        chrome.storage.local.get(['chatHistory'], (data) => {
+            let chatHistory = data.chatHistory || {};
+            chatHistory[fileName] = messages;
+            chrome.storage.local.set({ chatHistory });
+        });
+
     } catch (error) {
         console.error('Error sending message to LLM:', error);
+    }
+}
+
+function clearChatHistory(fileName, messagesContainer) {
+    if (confirm('Are you sure you want to clear the chat history?')) {
+        // Clear messages array
+        messages = [];
+
+        // Remove chat history from storage
+        chrome.storage.local.get(['chatHistory'], (data) => {
+            let chatHistory = data.chatHistory || {};
+            delete chatHistory[fileName];
+            chrome.storage.local.set({ chatHistory }, () => {
+                // Clear the messages displayed in the UI
+                messagesContainer.innerHTML = '';
+                // Optionally, you can re-initialize the chat with the initial assistant message
+            });
+        });
     }
 }

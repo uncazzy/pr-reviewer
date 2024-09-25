@@ -40,36 +40,77 @@
     flex-grow: 1; 
 }
 
-/* Close button ("X") */
-.close-chat {
-    position: absolute;
-    top: 10px;
-    right: 10px;
+/* Chat Header */
+.chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #333;
+    padding: 10px;
+    border-bottom: 1px solid #444;
+}
+
+.chat-file-name {
+    font-size: 18px;
+    font-weight: normal;
+    color: #ffffff;
+    margin: 0;
+}
+
+.chat-header-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.close-chat,
+.clear-chat-button {
     background: none;
     border: none;
-    font-size: 18px;
     color: #d4d4d4;
     cursor: pointer;
+    font-size: 18px;
     transition: color 0.3s;
 }
 
-.close-chat:hover {
+.close-chat:hover,
+.clear-chat-button:hover {
     color: #ff4b4b;
 }
 
-/* Messages container */
+.close-chat i,
+.clear-chat-button i {
+    pointer-events: none;
+}
+
+.clear-chat-button {
+    position: absolute;
+    top: 7px;
+    right: 50px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.clear-chat-button:hover {
+    background-color: #c82333;
+}
+
+.clear-chat-button i {
+    margin-right: 5px;
+}
+
+/* Messages Container */
 .messages-container {
     flex-grow: 1;
     overflow-y: auto;
     background-color: #1e1e1e;
     padding: 10px;
-    margin: 5px;
-    border-radius: 5px;
-    border: 1px solid #333;
-    margin-bottom: 10px; /* Add space above the input container */
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start; /* Align content to the top initially */
+    border-bottom: 1px solid #444;
 }
 
 /* User and Assistant message styling */
@@ -111,28 +152,26 @@
     border-radius: 4px;
     color: #d4d4d4;
     font-family: 'Courier New', Courier, monospace;
-    margin-bottom: 6px; /* Add some margin but keep it small */
+    margin-bottom: 6px;
     overflow-x: auto;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    max-width: 100%;
 }
 
-/* User message specific styles */
+/* Assistant and User Messages */
 .user-message {
-    background-color: #007acc;
-    color: white;
-    border-radius: 10px 10px 0 10px;
     align-self: flex-end;
+    background-color: #005f9e;
+    color: #fff;
+    border-radius: 10px 10px 0 10px;
 }
 
-/* Assistant message specific styles */
 .assistant-message {
-    background-color: #333;
+    align-self: flex-start;
+    background-color: #444;
     color: #d4d4d4;
     border-radius: 10px 10px 10px 0;
-    align-self: flex-start;
-    width: auto;
-    max-width: 80%; /* Prevent assistant messages from being too wide */
-    word-wrap: break-word; /* Ensure long text wraps to the next line */
-    white-space: pre-wrap; /* Maintain formatting with new lines */
 }
 
 /* Icons styling */
@@ -143,34 +182,26 @@
     flex-shrink: 0;
 }
 
-/* Input container with the send button */
+/* Chat Input Container */
 .chat-input-container {
     display: flex;
-    gap: 10px;
     align-items: center;
-    background-color: #1e1e1e;
-    border: 1px solid #333;
-    border-radius: 5px;
-    padding: 5px;
-    position: relative;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 10; /* Ensure the input stays above other elements */
+    background-color: #333;
+    padding: 10px;
 }
 
 /* Input bar */
 .chat-input {
-    flex: 1;
-    background-color: transparent;
+    flex-grow: 1;
+    background-color: #1e1e1e;
     color: #d4d4d4;
-    border: none;
-    outline: none;
+    border: 1px solid #444;
+    border-radius: 5px;
     padding: 10px;
-    font-family: inherit;
     font-size: 14px;
     resize: none;
     min-height: 40px;
+    margin-right: 10px;
 }
 
 /* Send button */
@@ -179,14 +210,23 @@
     color: white;
     border: none;
     padding: 10px 15px;
-    margin-right: 5px;
     border-radius: 5px;
     cursor: pointer;
+    font-size: 16px;
     transition: background-color 0.3s;
 }
 
 .send-button:hover {
     background-color: #005f9e;
+}
+
+.send-button i {
+    pointer-events: none;
+}
+
+/* Adjust icons in messages */
+.chat-message i {
+    margin-right: 5px;
 }
 
 /* Markdown pre-formatted text */
