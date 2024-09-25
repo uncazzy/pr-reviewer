@@ -31,14 +31,13 @@
 .chat-container {
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Ensure content stays spaced with input at the bottom */
+    justify-content: space-between;
     background-color: #252526;
-    padding: 20px;
     border: 1px solid #333;
     border-radius: 5px;
     color: #d4d4d4;
-    height: 400px; /* Full height for the chat container */
     position: relative;
+    flex-grow: 1; 
 }
 
 /* Close button ("X") */
@@ -64,6 +63,7 @@
     overflow-y: auto;
     background-color: #1e1e1e;
     padding: 10px;
+    margin: 5px;
     border-radius: 5px;
     border: 1px solid #333;
     margin-bottom: 10px; /* Add space above the input container */
@@ -179,6 +179,7 @@
     color: white;
     border: none;
     padding: 10px 15px;
+    margin-right: 5px;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s;

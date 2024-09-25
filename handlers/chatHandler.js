@@ -3,6 +3,10 @@ function openChatWithFeedback(fileName, feedback, fullContent, newCode, oldCode)
     document.getElementById('analyze').style.display = 'none';
 
     const resultDiv = document.getElementById('result');
+    resultDiv.style.display = 'flex';
+    resultDiv.style.flexDirection = 'column';
+    resultDiv.style.flexGrow = '1';
+    resultDiv.style.padding = 0;
     resultDiv.innerHTML = '';
 
     // Chat container
