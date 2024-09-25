@@ -116,6 +116,7 @@
 /* User and Assistant message styling */
 .chat-message {
     display: flex;
+    flex-direction: row;
     margin-bottom: 10px;
     max-width: 95%;
 }
@@ -176,9 +177,6 @@
 .user-message .message-content {
     background-color: #007acc;
     color: #fff;
-}
-
-.user-message .message-content {
     border-radius: 10px 10px 0 10px;
 }
 

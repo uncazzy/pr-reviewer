@@ -3,8 +3,9 @@ function openChatWithFeedback(fileName, feedback, fullContent, newCode, oldCode)
     chrome.storage.local.get(['chatHistory'], (data) => {
         messages = data.chatHistory && data.chatHistory[fileName] ? data.chatHistory[fileName] : [];
 
-        // Hide the "Analyze PR" button
+        // Hide the "Analyze PR" & Settings buttons
         document.getElementById('analyze').style.display = 'none';
+        document.getElementById('settings-button').style.display = 'none'
 
         // Result div
         const resultDiv = document.getElementById('result');
@@ -66,34 +67,7 @@ function openChatWithFeedback(fileName, feedback, fullContent, newCode, oldCode)
 
         // Render existing messages
         messages.forEach((message) => {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `chat-message ${message.role}-message`;
-
-            // Create avatar
-            const avatar = document.createElement('div');
-            avatar.className = 'avatar';
-            avatar.innerHTML = `<i class="fas fa-${message.role === 'user' ? 'user' : 'code-branch'}"></i>`;
-
-            // Create message content
-            const messageContentDiv = document.createElement('div');
-            messageContentDiv.className = 'message-content';
-            messageContentDiv.innerHTML = marked.parse(message.content);
-
-            // Apply syntax highlighting
-            messageContentDiv.querySelectorAll('pre code').forEach((block) => {
-                hljs.highlightElement(block);
-            });
-
-            // Assemble message
-            if (message.role === 'user') {
-                messageDiv.appendChild(messageContentDiv);
-                messageDiv.appendChild(avatar);
-            } else {
-                messageDiv.appendChild(avatar);
-                messageDiv.appendChild(messageContentDiv);
-            }
-
-            messagesContainer.appendChild(messageDiv);
+            renderMessage(message, messagesContainer);
         });
 
         // Scroll to the bottom after rendering messages
@@ -126,7 +100,7 @@ function openChatWithFeedback(fileName, feedback, fullContent, newCode, oldCode)
 
         const sendButton = document.createElement('button');
         sendButton.className = 'send-button';
-        sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>'; // Use an icon
+        sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
         sendButton.addEventListener('click', () => {
             if (chatInput.value.trim() !== "") {
                 handleUserMessage(chatInput.value.trim(), fileName, feedback, fullContent, newCode, oldCode, messagesContainer);
@@ -217,7 +191,7 @@ async function sendMessageToLLM(fileName, detailedFeedback, fullContent, newCode
     // Chat-specific system prompt
     const systemPrompt = {
         role: 'system',
-        content: `You are assisting the user in a real-time chat interaction. Provide concise, focused responses. If the user asks follow-up questions, keep your answers to the point and avoid long explanations unless specifically requested. Avoid walls of text, and break down explanations into digestible parts.`
+        content: `You are assisting the user in a real-time chat interaction. Provide concise, focused responses. If the user asks follow-up questions, keep your answers to the point and avoid long explanations unless specifically requested. Avoid walls of text, and break down explanations into digestible parts. This interaction revolves around the following file:\n\n${fileName}\n\n${fullContent}\n\nYour replies should all be oriented around the code contained within this file, and nothing else. If the user asks unrelated questions, ask them to focus on this file and the feedback for it.`
     };
 
     // Create the initial prompt with full context for detailed feedback
@@ -299,7 +273,7 @@ Do not assess the updated lines of code in isolation. Always evaluate them in th
             },
             body: JSON.stringify({
                 model: model,
-                messages: messages,
+                messages: apiMessages,
                 stream: true,
                 max_tokens: 1000,
                 temperature: 0.2
@@ -328,6 +302,9 @@ Do not assess the updated lines of code in isolation. Always evaluate them in th
 
         messagesContainer.appendChild(assistantMessageDiv);
 
+        // Scroll to the bottom initially
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
         while (!done) {
             const { value, done: readerDone } = await reader.read();
             done = readerDone;
@@ -353,10 +330,11 @@ Do not assess the updated lines of code in isolation. Always evaluate them in th
 
                         if (delta && delta.content) {
                             assistantMessage += delta.content;
-                            assistantMessageDiv.innerHTML = `<i class="fas fa-code-branch"></i> ${marked.parse((assistantMessage))}`;
-                            assistantMessageDiv.querySelectorAll('pre code').forEach((block) => {
+                            messageContentDiv.innerHTML = marked.parse(assistantMessage);
+                            messageContentDiv.querySelectorAll('pre code').forEach((block) => {
                                 hljs.highlightElement(block);
                             });
+                            messagesContainer.scrollTop = messagesContainer.scrollHeight;
                         }
 
                     } catch (err) {
@@ -417,11 +395,16 @@ function clearChatHistory(fileName, messagesContainer) {
                 chrome.storage.local.get(['chatHistory'], (data) => {
                     let chatHistory = data.chatHistory || {};
                     chatHistory[fileName] = messages;
-                    chrome.storage.local.set({ chatHistory });
-                });
+                    chrome.storage.local.set({ chatHistory }, () => {
+                        // Render the welcome message
+                        renderMessage(welcomeMessage, messagesContainer);
 
-                // Render the welcome message (similar to message rendering in `openChatWithFeedback`)
+                        // Scroll to the bottom after rendering the welcome message
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    });
+                });
             });
         });
     }
 }
+
