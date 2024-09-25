@@ -1,3 +1,29 @@
+// Function to retrieve API key from storage
+function getApiKey() {
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.get('openaiApiKey', (data) => {
+            if (data.openaiApiKey) {
+                resolve(data.openaiApiKey);
+            } else {
+                reject('OpenAI API key not found.');
+            }
+        });
+    });
+}
+
+// Function to retrieve OpenAI model from storage
+function getModel() {
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.get('openaiModel', (data) => {
+            if (data.openaiModel) {
+                resolve(data.openaiModel);
+            } else {
+                resolve('gpt-4o-mini')
+            }
+        });
+    });
+}
+
 // Store extractedData globally
 let extractedData = [];
 
