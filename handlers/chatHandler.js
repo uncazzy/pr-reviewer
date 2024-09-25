@@ -38,7 +38,7 @@ function openChatWithFeedback(fileName, feedback, fullContent, newCode, oldCode)
     // Message text
     const messageText = document.createElement('div');
     messageText.className = 'chat-text';
-    messageText.textContent = 'Ask me more about this feedback';
+    messageText.textContent = 'Ask me whatever you want to know about this feedback.\n\nWhat do you want to know?';
     initialMessage.appendChild(messageText);
     messagesContainer.appendChild(initialMessage);
 
