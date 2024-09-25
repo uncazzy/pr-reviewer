@@ -68,19 +68,51 @@ function openChatWithFeedback(fileName, feedback, fullContent, newCode, oldCode)
         messages.forEach((message) => {
             const messageDiv = document.createElement('div');
             messageDiv.className = `chat-message ${message.role}-message`;
-            messageDiv.innerHTML = `<i class="fas fa-${message.role === 'user' ? 'user' : 'robot'}"></i> ${marked.parse(message.content)}`;
+
+            // Create avatar
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar';
+            avatar.innerHTML = `<i class="fas fa-${message.role === 'user' ? 'user' : 'code-branch'}"></i>`;
+
+            // Create message content
+            const messageContentDiv = document.createElement('div');
+            messageContentDiv.className = 'message-content';
+            messageContentDiv.innerHTML = marked.parse(message.content);
+
+            // Apply syntax highlighting
+            messageContentDiv.querySelectorAll('pre code').forEach((block) => {
+                hljs.highlightElement(block);
+            });
+
+            // Assemble message
+            if (message.role === 'user') {
+                messageDiv.appendChild(messageContentDiv);
+                messageDiv.appendChild(avatar);
+            } else {
+                messageDiv.appendChild(avatar);
+                messageDiv.appendChild(messageContentDiv);
+            }
+
             messagesContainer.appendChild(messageDiv);
         });
 
         // Scroll to the bottom after rendering messages
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-        // If there are no messages, display the initial assistant message
+        // If there is no existing messages, initialize with the assistant's welcome message
         if (messages.length === 0) {
-            const initialMessage = document.createElement('div');
-            initialMessage.className = 'chat-message assistant-message ask-feedback';
-            initialMessage.innerHTML = `<i class="fas fa-robot"></i> Ask me whatever you want to know about this feedback.\n\nWhat do you want to know?`;
-            messagesContainer.appendChild(initialMessage);
+            const welcomeMessage = {
+                role: 'assistant',
+                content: `<p><strong>Hello!</strong> I'm here to help you with the code changes in <strong>${fileName}</strong>. Feel free to ask any questions or request further explanations about the code review.</p>`
+            };
+            messages.push(welcomeMessage);
+
+            // Save the welcome message to chat history
+            chrome.storage.local.get(['chatHistory'], (data) => {
+                let chatHistory = data.chatHistory || {};
+                chatHistory[fileName] = messages;
+                chrome.storage.local.set({ chatHistory });
+            });
         }
 
         // Input and send button container
@@ -121,16 +153,44 @@ function openChatWithFeedback(fileName, feedback, fullContent, newCode, oldCode)
 
 // Helper function to handle user messages
 function handleUserMessage(messageContent, fileName, feedback, fullContent, newCode, oldCode, messagesContainer) {
-    // Create a new user message
-    const userMessage = document.createElement('div');
-    userMessage.className = 'chat-message user-message';
-    userMessage.innerHTML = `<i class="fas fa-user"></i> ${marked.parse(messageContent)}`;
-    messagesContainer.appendChild(userMessage);
+    // Create a new user message object
+    const userMessage = { role: 'user', content: messageContent };
 
-    // Automatically scroll to the bottom
+    // Add the user message to the messages array
+    messages.push(userMessage);
+
+    // Save messages to storage
+    chrome.storage.local.get(['chatHistory'], (data) => {
+        let chatHistory = data.chatHistory || {};
+        chatHistory[fileName] = messages;
+        chrome.storage.local.set({ chatHistory });
+    });
+
+    // Render the user message in the UI
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `chat-message user-message`;
+
+    // Create avatar
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar';
+    avatar.innerHTML = `<i class="fas fa-user"></i>`;
+
+    // Create message content
+    const messageContentDiv = document.createElement('div');
+    messageContentDiv.className = 'message-content';
+    messageContentDiv.innerHTML = marked.parse(messageContent);
+
+    // Assemble message
+    messageDiv.appendChild(messageContentDiv);
+    messageDiv.appendChild(avatar);
+
+    // Append the message to the messages container
+    messagesContainer.appendChild(messageDiv);
+
+    // Scroll to the bottom
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-    // Send message to the LLM and render the assistant response
+    // Send the message to the LLM and render the assistant's response
     sendMessageToLLM(fileName, feedback, fullContent, newCode, oldCode, messageContent, messagesContainer);
 }
 
@@ -150,6 +210,9 @@ async function sendMessageToLLM(fileName, detailedFeedback, fullContent, newCode
             }
         });
     });
+
+    // Prepare the messages to send to OpenAI API
+    let apiMessages = []; // Messages sent to the LLM, including system and initial prompts
 
     // Chat-specific system prompt
     const systemPrompt = {
@@ -193,28 +256,31 @@ Do not assess the updated lines of code in isolation. Always evaluate them in th
 `
     };
 
-    // Add the system prompt to the messages array only once (if it’s the first interaction)
-    if (messages.length === 0) {
-        messages.push(systemPrompt);
-    }
+    // Retrieve apiMessages from storage or initialize them
+    let apiMessagesHistory = {};
+    let storedApiMessages = [];
 
-    // Push the initial context (feedback request and LLM's detailed feedback response)
-    if (messages.length === 1) {
-        // Add the initial prompt for feedback followed by the LLM's detailed feedback response
-        messages.push(initialPrompt);
-        messages.push({
-            role: 'assistant',
-            content: detailedFeedback  // This is the response from the LLM for detailed feedback
+    await new Promise((resolve) => {
+        chrome.storage.local.get(['apiMessagesHistory'], (data) => {
+            apiMessagesHistory = data.apiMessagesHistory || {};
+            storedApiMessages = apiMessagesHistory[fileName] || [];
+            resolve();
         });
-    }
-
-    // Add the user's follow-up question to the messages array
-    messages.push({
-        role: 'user',
-        content: userQuestion
     });
 
-    console.log("Sending to LLM: ", messages);
+    if (storedApiMessages.length === 0) {
+        // First time, initialize apiMessages
+        apiMessages = [systemPrompt, initialPrompt, { role: 'assistant', content: detailedFeedback }];
+    } else {
+        // Use stored apiMessages
+        apiMessages = storedApiMessages;
+    }
+
+    // Add the user's latest question
+    apiMessages.push({ role: 'user', content: userQuestion });
+
+    // Log the messages sent to LLM
+    console.log("Sending to LLM: ", apiMessages);
 
     try {
         // Retrieve API key & model from storage
@@ -248,6 +314,18 @@ Do not assess the updated lines of code in isolation. Always evaluate them in th
         // Create a new message element to show the streaming response
         const assistantMessageDiv = document.createElement('div');
         assistantMessageDiv.className = 'chat-message assistant-message';
+
+        // Create avatar and message content
+        const avatar = document.createElement('div');
+        avatar.className = 'avatar';
+        avatar.innerHTML = '<i class="fas fa-code-branch"></i>';
+
+        const messageContentDiv = document.createElement('div');
+        messageContentDiv.className = 'message-content';
+
+        assistantMessageDiv.appendChild(avatar);
+        assistantMessageDiv.appendChild(messageContentDiv);
+
         messagesContainer.appendChild(assistantMessageDiv);
 
         while (!done) {
@@ -291,17 +369,21 @@ Do not assess the updated lines of code in isolation. Always evaluate them in th
         // Scroll to the bottom after updating the assistant's message
         assistantMessageDiv.scrollIntoView({ behavior: 'smooth' });
 
-        // Add the assistant response to the messages array for continuity in future interactions
-        messages.push({
-            role: 'assistant',
-            content: assistantMessage
-        });
+        // Add assistant's response to messages array for display
+        messages.push({ role: 'assistant', content: assistantMessage });
 
-        // Save the updated messages array to chrome.storage.local
-        chrome.storage.local.get(['chatHistory'], (data) => {
+        // Add assistant's response to apiMessages
+        apiMessages.push({ role: 'assistant', content: assistantMessage });
+
+        // Save messages and apiMessages to storage
+        chrome.storage.local.get(['chatHistory', 'apiMessagesHistory'], (data) => {
             let chatHistory = data.chatHistory || {};
+            let apiMessagesHistory = data.apiMessagesHistory || {};
+
             chatHistory[fileName] = messages;
-            chrome.storage.local.set({ chatHistory });
+            apiMessagesHistory[fileName] = apiMessages;
+
+            chrome.storage.local.set({ chatHistory, apiMessagesHistory });
         });
 
     } catch (error) {
@@ -314,14 +396,31 @@ function clearChatHistory(fileName, messagesContainer) {
         // Clear messages array
         messages = [];
 
-        // Remove chat history from storage
-        chrome.storage.local.get(['chatHistory'], (data) => {
+        // Remove chat history and apiMessages from storage
+        chrome.storage.local.get(['chatHistory', 'apiMessagesHistory'], (data) => {
             let chatHistory = data.chatHistory || {};
+            let apiMessagesHistory = data.apiMessagesHistory || {};
             delete chatHistory[fileName];
-            chrome.storage.local.set({ chatHistory }, () => {
+            delete apiMessagesHistory[fileName];
+            chrome.storage.local.set({ chatHistory, apiMessagesHistory }, () => {
                 // Clear the messages displayed in the UI
                 messagesContainer.innerHTML = '';
-                // Optionally, you can re-initialize the chat with the initial assistant message
+
+                // Initialize with assistant's welcome message
+                const welcomeMessage = {
+                    role: 'assistant',
+                    content: `<p><strong>Hello!</strong> I'm here to help you with the code changes in <strong>${fileName}</strong>. Feel free to ask any questions or request further explanations about the code review.</p>`
+                };
+                messages.push(welcomeMessage);
+
+                // Save the welcome message to chat history
+                chrome.storage.local.get(['chatHistory'], (data) => {
+                    let chatHistory = data.chatHistory || {};
+                    chatHistory[fileName] = messages;
+                    chrome.storage.local.set({ chatHistory });
+                });
+
+                // Render the welcome message (similar to message rendering in `openChatWithFeedback`)
             });
         });
     }

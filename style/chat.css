@@ -116,15 +116,8 @@
 /* User and Assistant message styling */
 .chat-message {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
     margin-bottom: 10px;
-    padding: 8px;
-    border-radius: 5px;
-    max-width: 80%; /* Adjust max-width to avoid stretching across the screen */
-    word-wrap: break-word; /* Allow text to wrap */
-    white-space: pre-wrap; /* Keep formatting */
+    max-width: 95%;
 }
 
 /* Override margins and paddings for common elements inside messages */
@@ -160,18 +153,55 @@
 }
 
 /* Assistant and User Messages */
+.assistant-message {
+    align-self: flex-start;
+}
+
 .user-message {
+    flex-direction: row-reverse;
     align-self: flex-end;
-    background-color: #005f9e;
+}
+
+/* Message content common styles */
+.message-content {
+    background-color: #333;
+    color: #d4d4d4;
+    border-radius: 10px;
+    padding: 10px;
+    max-width: calc(100% - 60px); /* To prevent content from overlapping avatar */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.user-message .message-content {
+    background-color: #007acc;
     color: #fff;
+}
+
+.user-message .message-content {
     border-radius: 10px 10px 0 10px;
 }
 
-.assistant-message {
-    align-self: flex-start;
-    background-color: #444;
-    color: #d4d4d4;
+.assistant-message .message-content {
     border-radius: 10px 10px 10px 0;
+}
+
+/* Avatars */
+.avatar {
+    width: 40px;
+    height: 40px;
+    background-color: #555;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 5px;
+    flex-shrink: 0;
+}
+
+.user-message .avatar {
+    margin-left: 10px;
 }
 
 /* Icons styling */
@@ -226,7 +256,7 @@
 
 /* Adjust icons in messages */
 .chat-message i {
-    margin-right: 5px;
+    margin-right: 0px;
 }
 
 /* Markdown pre-formatted text */
@@ -238,6 +268,9 @@
     font-family: 'Courier New', Courier, monospace;
     margin: 0;
     overflow-x: auto;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    max-width: 100%;
 }
 
 /* Make sure the assistant's initial message matches the normal assistant message */
