@@ -2,7 +2,7 @@ import os
 import tkinter as tk
 from tkinter import filedialog, messagebox
 
-# Function to read all the code from files in the selected directories or files
+# Function to recursively read all the code from files in the selected directories or files
 def extract_code(files_or_dirs):
     concatenated_code = ""
     for path in files_or_dirs:
@@ -18,7 +18,7 @@ def extract_code(files_or_dirs):
                 for file in files:
                     file_path = os.path.join(root, file)
                     # Add filtering for .js, .ts, and .py files
-                    if file_path.endswith((".py", ".js", ".ts")):
+                    if file_path.endswith((".py", ".js", ".ts", ".html", ".json", ".css")):
                         concatenated_code += f"\n# ----- Start of file: {file_path} -----\n"
                         with open(file_path, 'r', encoding='utf-8') as f:
                             concatenated_code += f.read() + "\n"
@@ -32,17 +32,23 @@ def save_to_file(concatenated_code):
         f.write(concatenated_code)
     messagebox.showinfo("Success", f"Code saved successfully to {save_path}")
 
-# Function to allow the user to select directories and files
-def select_files_or_dirs():
+# Function to allow the user to select both files and directories
+def select_files_and_dirs():
     # Ask user to select files
-    files = filedialog.askopenfilenames(title="Select Files", filetypes=[("Supported files", "*.py *.js *.ts *.html *.json *.css" ), ("All files", "*.*")])
+    files = filedialog.askopenfilenames(title="Select Files", filetypes=[("Supported files", "*.py *.js *.ts *.html *.json *.css"), ("All files", "*.*")])
 
     # Ask user to select directories
-    directories = filedialog.askdirectory(title="Select Directory", mustexist=True)
-    
+    directories = []
+    while True:
+        directory = filedialog.askdirectory(title="Select a Directory (or Cancel to finish)")
+        if directory:
+            directories.append(directory)
+        else:
+            break  # Stop when user cancels
+
+    # Combine selected files and directories into one list
     all_paths = list(files)  # Convert file selection to a list
-    if directories:
-        all_paths.append(directories)  # Add the selected directories to the list
+    all_paths.extend(directories)  # Add the selected directories to the list
 
     return all_paths
 
@@ -52,7 +58,7 @@ def main():
     root.title("Code Extractor")
 
     # Label
-    label = tk.Label(root, text="Select files or directories to extract code from", font=("Helvetica", 14))
+    label = tk.Label(root, text="Select files and/or directories to extract code from", font=("Helvetica", 14))
     label.pack(pady=10)
 
     # Button to select files or directories
@@ -67,7 +73,7 @@ def main():
 
 # Function that handles the selection and concatenation process
 def run_extraction(root):
-    files_or_dirs = select_files_or_dirs()
+    files_or_dirs = select_files_and_dirs()
     if files_or_dirs:
         concatenated_code = extract_code(files_or_dirs)
         if concatenated_code:
