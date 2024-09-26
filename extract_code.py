@@ -25,13 +25,12 @@ def extract_code(files_or_dirs):
                         concatenated_code += f"# ----- End of file: {file_path} -----\n"
     return concatenated_code
 
-# Function to save the concatenated code to a file
+# Function to save the concatenated code to a file in the current directory
 def save_to_file(concatenated_code):
-    save_path = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("Text file", "*.txt")])
-    if save_path:
-        with open(save_path, 'w', encoding='utf-8') as f:
-            f.write(concatenated_code)
-        messagebox.showinfo("Success", "Code saved successfully!")
+    save_path = os.path.join(os.getcwd(), "All Code in PlainText.txt")
+    with open(save_path, 'w', encoding='utf-8') as f:
+        f.write(concatenated_code)
+    messagebox.showinfo("Success", f"Code saved successfully to {save_path}")
 
 # Function to allow the user to select directories and files
 def select_files_or_dirs():
