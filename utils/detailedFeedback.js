@@ -22,6 +22,8 @@ function fetchAndDisplayDetailedFeedback(fileName, detailedFeedbackDiv, button) 
     });
 }
 
+// detailedFeedback.js
+
 function displayDetailedFeedback(fileName, feedback, oldCode, newCode, fullContent, detailedFeedbackDiv, button) {
     const parsedContent = marked.parse(feedback);
     detailedFeedbackDiv.innerHTML = parsedContent;
@@ -39,7 +41,7 @@ function displayDetailedFeedback(fileName, feedback, oldCode, newCode, fullConte
     const askFollowUpButton = document.createElement('button');
     askFollowUpButton.className = 'follow-up-button';
     askFollowUpButton.innerHTML = '<i class="fas fa-comments"></i> Ask Follow-up';
-    askFollowUpButton.title = 'Chat and ask questions about this file'
+    askFollowUpButton.title = 'Chat and ask questions about this file';
     askFollowUpButton.addEventListener('click', () => {
         openChatWithFeedback(fileName, feedback, fullContent, newCode, oldCode);  // Pass all code data to chat
     });
@@ -61,18 +63,48 @@ function displayDetailedFeedback(fileName, feedback, oldCode, newCode, fullConte
     refreshButton.className = 'refresh-button';
     refreshButton.innerHTML = '<i class="fas fa-sync-alt"></i>';
     refreshButton.title = 'Refresh Feedback';
-    refreshButton.addEventListener('click', () => collapseDetailedFeedback(detailedFeedbackDiv.id.replace('detailed-', ''), detailedFeedbackDiv, button));
+    refreshButton.addEventListener('click', () => refreshDetailedFeedback(fileName, detailedFeedbackDiv, button));
     collapseAndRefreshButtonContainer.appendChild(refreshButton);
 
     // Append collapse & refresh container to main button container
-    buttonContainer.appendChild(collapseAndRefreshButtonContainer)
+    buttonContainer.appendChild(collapseAndRefreshButtonContainer);
 
     // Append button container below the detailed feedback
     detailedFeedbackDiv.appendChild(buttonContainer);
 
-    // Scroll detailedFeedbackDiv  into view
-    detailedFeedbackDiv.scrollIntoView({ behavior: 'smooth' });
+    // **New Code: Conditional Scrolling Based on Item Index**
+    // Find the parent container that holds all file-feedback items
+    const resultContainer = document.getElementById('result');
+    const allFileFeedbackDivs = Array.from(resultContainer.querySelectorAll('.file-feedback'));
+
+    // Find the index of the current file-feedback div
+    const currentFileFeedbackDiv = detailedFeedbackDiv.closest('.file-feedback');
+    const currentIndex = allFileFeedbackDivs.indexOf(currentFileFeedbackDiv);
+
+    // Define how many top items need special scroll handling (e.g., first 2)
+    const topItemThreshold = 2;
+
+    if (currentIndex !== -1 && currentIndex < topItemThreshold) {
+        // If the item is among the first few, apply scroll offset
+
+        // Calculate the header height
+        const header = document.querySelector('.header');
+        const headerHeight = header ? header.offsetHeight : 0;
+
+        // Calculate the position of the detailedFeedbackDiv relative to the document
+        const elementPosition = detailedFeedbackDiv.getBoundingClientRect().top + window.pageYOffset;
+
+        // Scroll to the element's position minus the header height
+        window.scrollTo({
+            top: elementPosition - headerHeight - 10, // Additional offset for better visibility
+            behavior: 'smooth'
+        });
+    } else {
+        // For other items, use standard scrollIntoView
+        detailedFeedbackDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 }
+
 
 
 function collapseDetailedFeedback(detailedFeedbackDiv, button) {
