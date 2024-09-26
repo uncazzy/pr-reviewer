@@ -215,15 +215,23 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 // Function to get detailed feedback
 async function getDetailedFeedback(fileName) {
     return new Promise((resolve, reject) => {
-        chrome.storage.local.get(['extractedData', 'prResults'], async (data) => {
+        chrome.storage.local.get(['extractedData', 'prResults', 'detailedFeedback'], async (data) => {
             const extractedData = data.extractedData || [];
             const prResults = data.prResults || [];
-            
-            const fileData = extractedData.find(file => 
+            const detailedFeedbacks = data.detailedFeedback || {};
+
+            // Check if detailed feedback already exists
+            if (detailedFeedbacks[fileName]) {
+                console.log(`Retrieving stored detailed feedback for ${fileName}`);
+                resolve(detailedFeedbacks[fileName]);
+                return;
+            }
+
+            const fileData = extractedData.find(file =>
                 file.fileName === fileName || file.fileName === fileName.replace(/\\/g, '')
             );
             const initialFeedback = prResults.find(result => result.fileName === fileName);
-            
+
             if (!fileData) {
                 reject('File data not found.');
                 return;
@@ -303,7 +311,14 @@ Keep your response concise and to the point. Use markdown formatting for code sn
                     console.error('OpenAI API error:', data.error);
                     reject(`Error from OpenAI: ${data.error.message}`);
                 } else {
-                    resolve(data.choices[0].message.content);
+                    const detailedFeedback = data.choices[0].message.content;
+                    // Store the detailed feedback
+                    detailedFeedbacks[fileName] = detailedFeedback;
+                    chrome.storage.local.set({ 'detailedFeedback': detailedFeedbacks }, () => {
+                        console.log(`Detailed feedback for ${fileName} stored successfully.`);
+                    });
+                    // Resolve with the detailed feedback
+                    resolve(detailedFeedback);
                 }
             } catch (error) {
                 console.error('Error fetching detailed feedback from OpenAI:', error);

@@ -14,8 +14,7 @@ function fetchAndDisplayDetailedFeedback(fileName, detailedFeedbackDiv, button) 
 
         chrome.runtime.sendMessage({ action: 'getDetailedFeedback', fileName: fileName }, (response) => {
             if (response && response.detailedFeedback) {
-                saveDetailedFeedbackToStorage(fileName, response.detailedFeedback);
-                displayDetailedFeedback(response.detailedFeedback, oldCode, newCode, fullContent, detailedFeedbackDiv, button);
+                displayDetailedFeedback(fileName, response.detailedFeedback, oldCode, newCode, fullContent, detailedFeedbackDiv, button);
             } else {
                 detailedFeedbackDiv.innerHTML = '<p class="error-message">Failed to load detailed feedback.</p>';
             }
@@ -100,8 +99,15 @@ function refreshDetailedFeedback(fileName, detailedFeedbackDiv, button) {
 
         chrome.runtime.sendMessage({ action: 'getDetailedFeedback', fileName: fileName }, (response) => {
             if (response && response.detailedFeedback) {
-                saveDetailedFeedbackToStorage(fileName, response.detailedFeedback);
-                displayDetailedFeedback(response.detailedFeedback, detailedFeedbackDiv, button);
+                displayDetailedFeedback(
+                    fileName,
+                    response.detailedFeedback,
+                    matchingFile.oldCode,
+                    matchingFile.newCode,
+                    matchingFile.fullContent,
+                    detailedFeedbackDiv,
+                    button
+                );
             } else {
                 detailedFeedbackDiv.innerHTML = '<p class="error-message">Failed to load detailed feedback.</p>';
             }
