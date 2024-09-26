@@ -53,6 +53,9 @@ function displayDetailedFeedback(fileName, feedback, oldCode, newCode, fullConte
 
     // Append button container below the detailed feedback
     detailedFeedbackDiv.appendChild(buttonContainer);
+
+    // Scroll detailedFeedbackDiv  into view
+    detailedFeedbackDiv.scrollIntoView({ behavior: 'smooth' });
 }
 
 
@@ -108,9 +111,13 @@ function refreshDetailedFeedback(fileName, detailedFeedbackDiv, button) {
                     detailedFeedbackDiv,
                     button
                 );
+
+                // Scroll detailedFeedbackDiv into view
+                detailedFeedbackDiv.scrollIntoView({ behavior: 'smooth' });
             } else {
                 detailedFeedbackDiv.innerHTML = '<p class="error-message">Failed to load detailed feedback.</p>';
             }
         });
+
     });
 }
