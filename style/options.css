@@ -94,14 +94,6 @@ button:hover .donate-button {
     display: flex;
 }
 
-#clearStorage {
-    background-color: #dc3545;
-}
-
-#clearStorage:hover {
-    background-color: #c82333;
-}
-
 #status {
     font-style: italic;
     display: flex;
@@ -109,4 +101,46 @@ button:hover .donate-button {
     margin: auto;
     margin-top: 15px;
     max-width: 75%;
+}
+
+#about-section {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+
+#about-section h2 {
+    margin-top: 0;
+    color: #333;
+}
+
+#donate-button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+}
+
+#donate-button:hover {
+    background-color: #218838;
+}
+
+#clearStorage {
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+#clearStorage:hover {
+    background-color: #c82333;
 }
