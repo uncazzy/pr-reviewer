@@ -216,7 +216,7 @@ code {
     background-color: #c82333;
 }
 
-.refresh-button {
+.refresh-button, .collapse-button {
     margin: 10px;
     padding: 5px 10px;
     background-color: #f0f0f0;
@@ -225,7 +225,11 @@ code {
     cursor: pointer;
 }
 
-.refresh-button:hover {
+.collapse-button {
+    margin-right: 0px;
+}
+
+.refresh-button:hover, .collapse-button:hover {
     background-color: #e0e0e0;
 }
 

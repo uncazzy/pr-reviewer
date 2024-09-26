@@ -39,17 +39,33 @@ function displayDetailedFeedback(fileName, feedback, oldCode, newCode, fullConte
     const askFollowUpButton = document.createElement('button');
     askFollowUpButton.className = 'follow-up-button';
     askFollowUpButton.innerHTML = '<i class="fas fa-comments"></i> Ask Follow-up';
+    askFollowUpButton.title = 'Chat and ask questions about this file'
     askFollowUpButton.addEventListener('click', () => {
         openChatWithFeedback(fileName, feedback, fullContent, newCode, oldCode);  // Pass all code data to chat
     });
     buttonContainer.appendChild(askFollowUpButton);
 
+    // Collapse & Refresh buttons container
+    const collapseAndRefreshButtonContainer = document.createElement('div');
+
+    // Collapse Feedback button
+    const collapseButton = document.createElement('button');
+    collapseButton.className = 'collapse-button';
+    collapseButton.innerHTML = '<i class="fas fa-times"></i>';
+    collapseButton.title = 'Collapse Feedback';
+    collapseButton.addEventListener('click', () => collapseDetailedFeedback(detailedFeedbackDiv, button));
+    collapseAndRefreshButtonContainer.appendChild(collapseButton);
+
     // Refresh button
     const refreshButton = document.createElement('button');
     refreshButton.className = 'refresh-button';
     refreshButton.innerHTML = '<i class="fas fa-sync-alt"></i>';
-    refreshButton.addEventListener('click', () => refreshDetailedFeedback(detailedFeedbackDiv.id.replace('detailed-', ''), detailedFeedbackDiv, button));
-    buttonContainer.appendChild(refreshButton);
+    refreshButton.title = 'Refresh Feedback';
+    refreshButton.addEventListener('click', () => collapseDetailedFeedback(detailedFeedbackDiv.id.replace('detailed-', ''), detailedFeedbackDiv, button));
+    collapseAndRefreshButtonContainer.appendChild(refreshButton);
+
+    // Append collapse & refresh container to main button container
+    buttonContainer.appendChild(collapseAndRefreshButtonContainer)
 
     // Append button container below the detailed feedback
     detailedFeedbackDiv.appendChild(buttonContainer);
