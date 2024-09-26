@@ -22,6 +22,28 @@
             feedback, making code reviews faster and more efficient.</p>
     </div>
 
+    <!-- How It Works Section -->
+    <div class="section">
+        <h2>How It Works</h2>
+        <p>The extension operates by analyzing the code within the <strong>Files</strong> section of a GitHub Pull
+            Request. It extracts the affected files, including any additions, deletions, or modifications, and sends
+            this information to OpenAI's GPT-4 for analysis. The feedback provided is based solely on the code changes
+            present in the PR and does not require the extension to access the entire repository's codebase.</p>
+        <p>Importantly, only the code from the files affected by the PR is processed. If a file contains proprietary or
+            sensitive code, you should refrain from using the extension on that specific file to maintain
+            confidentiality.</p>
+    </div>
+
+    <!-- Disclaimer Section -->
+    <div class="section">
+        <h2>Disclaimer</h2>
+        <p>By using PR Code Reviewer, you agree that the code snippets from your Pull Requests are sent to OpenAI's
+            servers for analysis. OpenAI may process this data in accordance with their <a
+                href="https://openai.com/policies/privacy-policy" target="_blank">Privacy Policy</a>.</p>
+        <p>Ensure that you do not use this extension on repositories containing sensitive, proprietary, or confidential
+            code unless you have the appropriate permissions and consent.</p>
+    </div>
+
     <!-- API Configuration Section -->
     <div class="section">
         <h2>API Configuration</h2>
