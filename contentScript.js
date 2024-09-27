@@ -90,7 +90,7 @@
 
     // Function to extract file information
     function extractFileInfo(file) {
-        const fileNameElement = file.querySelector('.file-info a');
+        const fileNameElement = file.querySelector('.file-info .Truncate a');
         if (!fileNameElement) {
             console.warn('File name element not found');
             return null;
