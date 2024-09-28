@@ -1,4 +1,4 @@
-import { createFileFeedback } from "../../utils/uiComponents.js"
+import { createFileFeedback } from '../../components/index.js';
 
 // Function to check for existing PR results in storage and display them
 export function checkForResults(currentUrl, resultDiv) {
