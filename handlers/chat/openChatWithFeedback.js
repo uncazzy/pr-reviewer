@@ -14,8 +14,7 @@ export function openChatWithFeedback(fileName, feedback, fullContent, newCode, o
         resultDiv.innerHTML = ''; // Clear existing content
 
         // Create chat container and retrieve messagesContainer for further use
-        const chatContainer = createChatContainer(fileName);
-        const messagesContainer = chatContainer.querySelector('.messages-container');
+        const { chatContainer, messagesContainer } = createChatContainer(fileName);
 
         resultDiv.appendChild(chatContainer);
 
@@ -32,16 +31,20 @@ function createChatContainer(fileName) {
     const chatContainer = document.createElement('div');
     chatContainer.className = 'chat-container';
 
-    // Create messages container first so we can pass it as a reference
+    // Create chat header first
+    const chatHeader = createChatHeader(fileName);
+
+    // Create messages container
     const messagesContainer = document.createElement('div');
     messagesContainer.className = 'messages-container';
-    chatContainer.appendChild(messagesContainer);
 
-    // Create chat header with messagesContainer as parameter
-    const chatHeader = createChatHeader(fileName, messagesContainer);
+    // Append chatHeader first
     chatContainer.appendChild(chatHeader);
 
-    return chatContainer;
+    // Append messagesContainer after chatHeader
+    chatContainer.appendChild(messagesContainer);
+
+    return { chatContainer, messagesContainer };
 }
 
 // Updated chat header creation function with messagesContainer as parameter
