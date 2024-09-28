@@ -1,4 +1,4 @@
-import { getApiKey, getModel } from '../modules/storage.js';
+import { getApiKey, getModel } from '../modules/storage/index.js';
 import { renderMessage } from "../helpers/renderMessage.js"
 
 export function openChatWithFeedback(fileName, feedback, fullContent, newCode, oldCode) {

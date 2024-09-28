@@ -1,5 +1,5 @@
 import { getDetailedFeedback } from './getDetailedFeedback.js';
-import { setInStorage } from '../storage/setInStorage.js';
+import { setInStorage, getFromStorage } from '../storage/index.js';
 import { displayDetailedFeedback } from './displayDetailedFeedback.js';
 
 export async function fetchAndDisplayDetailedFeedback(fileName, detailedFeedbackDiv, button) {

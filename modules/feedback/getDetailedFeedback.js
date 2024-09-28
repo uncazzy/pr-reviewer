@@ -1,4 +1,4 @@
-import { getFromStorage, setInStorage } from '../storage.js';
+import { getFromStorage, setInStorage } from '../storage/index.js';
 import { createDetailedFeedbackPrompt } from '../../prompts/detailedFeedbackPrompt.js';
 import { fetchDetailedFeedbackFromOpenAI } from './fetchDetailedFeedbackFromOpenAI.js';
 

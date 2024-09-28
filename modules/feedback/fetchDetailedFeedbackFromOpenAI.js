@@ -1,4 +1,4 @@
-import { getApiKey, getModel } from '../storage/getFromStorage.js';
+import { getApiKey, getModel } from '../storage/index.js';
 
 export async function fetchDetailedFeedbackFromOpenAI(prompt) {
     try {

@@ -1,6 +1,6 @@
 import { initializeFeedbackListener } from "./modules/feedback/messageListener.js"
-import { getDetailedFeedback } from "./modules/feedback.js";
-import { getApiKey, getModel, setInStorage, getCurrentPrUrl } from './modules/storage.js';
+import { getDetailedFeedback } from "./modules/feedback/getDetailedFeedback.js";
+import { getApiKey, getModel, setInStorage, getCurrentPrUrl } from './modules/storage/index.js';
 import { createReviewPrompt } from "./prompts/reviewPrompt.js"
 
 // Initialize the listener for feedback-related messages

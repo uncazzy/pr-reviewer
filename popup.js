@@ -1,5 +1,5 @@
 
-import { handleStorageChanges } from './modules/storage.js';
+import { handleStorageChanges } from './modules/storage/index.js';
 import { handleAnalyzeClick } from "./handlers/analyzeClickHandler.js"
 import { checkForResults } from "./modules/result/result.js"
 
