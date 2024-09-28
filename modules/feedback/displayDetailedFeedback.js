@@ -1,4 +1,4 @@
-import { openChatWithFeedback } from '../../handlers/chatHandler.js';
+import { openChatWithFeedback } from '../../handlers/chat/index.js';
 import { collapseDetailedFeedback } from './collapseDetailedFeedback.js';
 import { refreshDetailedFeedback } from './refreshDetailedFeedback.js';
 

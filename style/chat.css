@@ -31,13 +31,12 @@
 .chat-container {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    height: 100vh;
     background-color: #252526;
     border: 1px solid #333;
     border-radius: 5px;
     color: #d4d4d4;
     position: relative;
-    flex-grow: 1; 
 }
 
 /* Chat Header */
@@ -48,6 +47,23 @@
     background-color: #333;
     padding: 10px;
     border-bottom: 1px solid #444;
+    width: 100%;
+    position: sticky; /* Stick the header to the top of chat-container */
+    top: 0;
+    z-index: 10; /* Make sure header stays above other elements */
+}
+
+.header-content-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.chat-header-buttons {
+    display: flex;
+    align-items: center; /* Center buttons vertically */
+    gap: 10px;
 }
 
 .chat-file-name {
@@ -83,9 +99,6 @@
 }
 
 .clear-chat-button {
-    position: absolute;
-    top: 7px;
-    right: 50px;
     background-color: #dc3545;
     color: white;
     border: none;
@@ -106,11 +119,12 @@
 
 /* Messages Container */
 .messages-container {
-    flex-grow: 1;
-    overflow-y: auto;
+    flex-grow: 1; /* Allow messages container to take remaining height */
+    overflow-y: auto; /* Enable scrolling only within the messages container */
     background-color: #1e1e1e;
     padding: 10px;
-    border-bottom: 1px solid #444;
+    height: auto; /* Auto height for content */
+    border-bottom: 1px solid #444; /* Separate messages from the input bar */
 }
 
 /* User and Assistant message styling */
@@ -216,6 +230,11 @@
     align-items: center;
     background-color: #333;
     padding: 10px;
+    border-top: 1px solid #444;
+    position: relative; /* Remove sticky positioning to avoid overlapping */
+    bottom: 0;
+    width: 100%;
+    z-index: 10; /* Ensure it stays above other elements */
 }
 
 /* Input bar */
@@ -276,3 +295,4 @@
     background-color: #333; /* Ensure consistency with other assistant messages */
     color: #d4d4d4;
 }
+
