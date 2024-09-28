@@ -1,4 +1,4 @@
-function renderMessage(message, messagesContainer) {
+export function renderMessage(message, messagesContainer) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `chat-message ${message.role}-message`;
 

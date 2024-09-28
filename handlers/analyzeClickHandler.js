@@ -1,11 +1,17 @@
-function handleAnalyzeClick() {
+export function handleAnalyzeClick(loadingDiv, analyzeButton, resultDiv) {
     chrome.storage.local.get('openaiApiKey', (data) => {
         if (!data.openaiApiKey) {
             alert('Please set your OpenAI API Key in the extension options.');
             return;
         }
 
+        if (!resultDiv) {
+            console.error('resultDiv is not defined');
+            return;
+        }
+
         chrome.storage.local.remove(['prResults', 'processingComplete', 'extractedData'], () => {
+
             resultDiv.innerHTML = '';
             resultDiv.style.display = 'none';
             loadingDiv.style.display = 'block';

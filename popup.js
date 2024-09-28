@@ -1,11 +1,15 @@
-// Constants
+
+import { handleStorageChanges } from './modules/storage.js';
+import { handleAnalyzeClick } from "./handlers/analyzeClickHandler.js"
+import { checkForResults } from "./modules/result/result.js"
+
 const analyzeButton = document.getElementById('analyze');
 const resultDiv = document.getElementById('result');
 const loadingDiv = document.getElementById('loading');
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', initializePopup);
-analyzeButton.addEventListener('click', handleAnalyzeClick);
+analyzeButton.addEventListener('click', () => handleAnalyzeClick(loadingDiv, analyzeButton, resultDiv));
 chrome.storage.onChanged.addListener(handleStorageChanges);
 
 const settingsButton = document.getElementById('settings-button');
@@ -26,7 +30,7 @@ function checkGitHubPRPage() {
         analyzeButton.disabled = !isPRPage;
 
         if (isPRPage) {
-            checkForResults(currentUrl);
+            checkForResults(currentUrl, resultDiv);
         } else {
             resultDiv.innerHTML = '<p>Please navigate to a GitHub pull request page to use this extension.</p>';
         }

@@ -1,30 +1,155 @@
-function fetchAndDisplayDetailedFeedback(fileName, detailedFeedbackDiv, button) {
-    detailedFeedbackDiv.style.display = 'block';
-    detailedFeedbackDiv.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading detailed feedback...</div>';
+import { getApiKey, getModel, getFromStorage, setInStorage } from './storage.js';
+import { createDetailedFeedbackPrompt } from '../prompts/detailedFeedbackPrompt.js';
+import { openChatWithFeedback } from '../handlers/chatHandler.js';
 
-    chrome.storage.local.get('extractedData', (data) => {
-        const fileData = data.extractedData && data.extractedData.find(file => file.fileName === fileName);
+// Listener for getDetailedFeedback messages
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === 'getDetailedFeedback') {
+        getDetailedFeedback(message.fileName)
+            .then((feedback) => sendResponse({ detailedFeedback: feedback }))
+            .catch((error) => {
+                console.error('Error in getDetailedFeedback:', error);
+                sendResponse({ error: 'Failed to get detailed feedback' });
+            });
+        return true; // Indicates that the response is sent asynchronously
+    }
+});
 
-        if (!fileData) {
-            detailedFeedbackDiv.innerHTML = '<p class="error-message">File data not found. Please re-analyze the PR.</p>';
+// Function to get detailed feedback
+export async function getDetailedFeedback(fileName) {
+    try {
+        const data = await getFromStorage(['extractedData', 'prResults', 'detailedFeedback']);
+        const extractedData = data.extractedData || [];
+        const prResults = data.prResults || [];
+        const detailedFeedbacks = data.detailedFeedback || {};
+
+        // Check if detailed feedback already exists
+        if (detailedFeedbacks[fileName]) {
+            console.log(`Retrieving stored detailed feedback for ${fileName}`);
+            return detailedFeedbacks[fileName];
+        }
+
+        const fileData = extractedData.find((file) => file.fileName === fileName || file.fileName === fileName.replace(/\\/g, ''));
+        const initialFeedback = prResults.find((result) => result.fileName === fileName);
+
+        if (!fileData) throw new Error('File data not found.');
+
+        // Create the detailed review prompt
+        const prompt = createDetailedFeedbackPrompt(fileName, fileData, initialFeedback);
+
+        // Get the detailed feedback from OpenAI
+        const detailedFeedback = await fetchDetailedFeedbackFromOpenAI(prompt);
+
+        // Store the detailed feedback and return
+        detailedFeedbacks[fileName] = detailedFeedback;
+        await setInStorage('detailedFeedback', detailedFeedbacks);
+        return detailedFeedback;
+    } catch (error) {
+        console.error('Error fetching detailed feedback:', error);
+        throw new Error('Failed to get detailed feedback.');
+    }
+}
+
+
+// Helper function to fetch detailed feedback from OpenAI
+async function fetchDetailedFeedbackFromOpenAI(prompt) {
+    try {
+        const apiKey = await getApiKey();
+        const model = await getModel();
+        if (!apiKey) throw new Error('OpenAI API key not found.');
+
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${apiKey}`,
+            },
+            body: JSON.stringify({
+                model: model,
+                messages: [
+                    { role: 'system', content: 'You are an expert code reviewer with in-depth knowledge of software development best practices, security considerations, and performance optimization. Your role is to provide detailed, actionable feedback on the provided code changes.' },
+                    { role: 'user', content: prompt },
+                ],
+                max_tokens: 1000,
+                temperature: 0.2,
+            }),
+        });
+
+        const data = await response.json();
+        if (data.error) throw new Error(`OpenAI API Error: ${data.error.message}`);
+        return data.choices[0].message.content;
+    } catch (error) {
+        console.error('Error fetching detailed feedback from OpenAI:', error);
+        throw new Error('Failed to fetch detailed feedback from OpenAI.');
+    }
+}
+
+export async function fetchAndDisplayDetailedFeedback(fileName, detailedFeedbackDiv, button) {
+    try {
+        console.log(`Fetching and displaying detailed feedback for: ${fileName}`);
+
+        // Set initial loading state
+        detailedFeedbackDiv.style.display = 'block';
+        detailedFeedbackDiv.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading detailed feedback...</div>';
+
+        // Retrieve extractedData and detailedFeedback from storage
+        console.log('Retrieving extractedData and detailedFeedback from storage...');
+        const storageData = await getFromStorage(['extractedData', 'detailedFeedback']);
+
+        // Debug: Log the entire storage data object
+        console.log('Full Storage Data Retrieved:', storageData);
+
+        // Check if `detailedFeedback` exists in the storageData object, if not, initialize it
+        const extractedData = storageData.extractedData || [];
+        let detailedFeedback = storageData.detailedFeedback || {};
+
+        // Log the retrieved values for debugging purposes
+        console.log('Retrieved extractedData:', extractedData);
+        console.log('Retrieved detailedFeedback:', detailedFeedback);
+
+        // Check if the file data is available
+        if (!extractedData || extractedData.length === 0) {
+            detailedFeedbackDiv.innerHTML = '<p class="error-message">No extracted data available. Please re-analyze the PR.</p>';
+            console.error('No extractedData found in storage.');
             return;
         }
 
-        const { oldCode, newCode, fullContent } = fileData;
+        // Find the file data for the given fileName
+        const fileData = extractedData.find(file => file.fileName === fileName);
+        if (!fileData) {
+            detailedFeedbackDiv.innerHTML = '<p class="error-message">File data not found. Please re-analyze the PR.</p>';
+            console.error('File data not found for:', fileName);
+            return;
+        }
 
-        chrome.runtime.sendMessage({ action: 'getDetailedFeedback', fileName: fileName }, (response) => {
-            if (response && response.detailedFeedback) {
-                displayDetailedFeedback(fileName, response.detailedFeedback, oldCode, newCode, fullContent, detailedFeedbackDiv, button);
-            } else {
-                detailedFeedbackDiv.innerHTML = '<p class="error-message">Failed to load detailed feedback.</p>';
-            }
-        });
-    });
+        // Destructure the file data for detailed feedback display
+        const { oldCode, newCode, fullContent } = fileData;
+        console.log('Found file data:', fileData);
+
+        // Check if detailed feedback already exists for this file in storage
+        if (detailedFeedback && detailedFeedback[fileName]) {
+            console.log(`Using cached detailed feedback for ${fileName}`);
+            displayDetailedFeedback(fileName, detailedFeedback[fileName], oldCode, newCode, fullContent, detailedFeedbackDiv, button);
+        } else {
+            // No detailed feedback found, generate it using OpenAI API
+            console.log(`Fetching detailed feedback for ${fileName} from OpenAI...`);
+            const detailedFeedbackResponse = await getDetailedFeedback(fileName);
+
+            // Update storage with the new detailed feedback
+            console.log(`Storing detailed feedback for ${fileName} in local storage.`);
+            detailedFeedback[fileName] = detailedFeedbackResponse;
+            await setInStorage('detailedFeedback', detailedFeedback);
+
+            // Display the detailed feedback
+            displayDetailedFeedback(fileName, detailedFeedbackResponse, oldCode, newCode, fullContent, detailedFeedbackDiv, button);
+        }
+    } catch (error) {
+        console.error('Error fetching or displaying detailed feedback:', error);
+        detailedFeedbackDiv.innerHTML = '<p class="error-message">Failed to retrieve or generate detailed feedback. Please try again later.</p>';
+    }
 }
 
-// detailedFeedback.js
-
-function displayDetailedFeedback(fileName, feedback, oldCode, newCode, fullContent, detailedFeedbackDiv, button) {
+export function displayDetailedFeedback(fileName, feedback, oldCode, newCode, fullContent, detailedFeedbackDiv, button) {
     const parsedContent = marked.parse(feedback);
     detailedFeedbackDiv.innerHTML = parsedContent;
     detailedFeedbackDiv.querySelectorAll('pre code').forEach((block) => {
@@ -105,7 +230,7 @@ function displayDetailedFeedback(fileName, feedback, oldCode, newCode, fullConte
     }
 }
 
-function collapseDetailedFeedback(detailedFeedbackDiv, button) {
+export function collapseDetailedFeedback(detailedFeedbackDiv, button) {
     // Hide the detailed feedback
     detailedFeedbackDiv.style.display = 'none';
     button.textContent = 'Expand Feedback';

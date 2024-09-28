@@ -1,4 +1,6 @@
-function createFileFeedback(message) {
+import { fetchAndDisplayDetailedFeedback, displayDetailedFeedback, collapseDetailedFeedback } from "../modules/feedback.js"
+
+export function createFileFeedback(message, resultDiv) {
     const fileDiv = document.createElement('div');
     fileDiv.className = 'file-feedback';
 
@@ -9,7 +11,7 @@ function createFileFeedback(message) {
     const detailedFeedbackDiv = createDetailedFeedbackDiv(message.fileName);
 
     fileDiv.append(fileName, statusDiv, issueDiv, expandButton, detailedFeedbackDiv);
-    resultDiv.appendChild(fileDiv);
+    resultDiv.appendChild(fileDiv); // Use the passed resultDiv reference here
 }
 
 function createFileName(fileName) {

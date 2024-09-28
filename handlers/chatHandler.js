@@ -1,4 +1,7 @@
-function openChatWithFeedback(fileName, feedback, fullContent, newCode, oldCode) {
+import { getApiKey, getModel } from '../modules/storage.js';
+import { renderMessage } from "../helpers/renderMessage.js"
+
+export function openChatWithFeedback(fileName, feedback, fullContent, newCode, oldCode) {
     // Retrieve existing chat history for this file
     chrome.storage.local.get(['chatHistory'], (data) => {
         messages = data.chatHistory && data.chatHistory[fileName] ? data.chatHistory[fileName] : [];
