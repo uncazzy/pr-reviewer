@@ -1,6 +1,10 @@
+import { initializeFeedbackListener } from "./modules/feedback/messageListener.js"
+import { getDetailedFeedback } from "./modules/feedback.js";
 import { getApiKey, getModel, setInStorage, getCurrentPrUrl } from './modules/storage.js';
 import { createReviewPrompt } from "./prompts/reviewPrompt.js"
-import { getDetailedFeedback } from './modules/feedback.js';
+
+// Initialize the listener for feedback-related messages
+initializeFeedbackListener();
 
 // Store extractedData globally
 let extractedData = [];
