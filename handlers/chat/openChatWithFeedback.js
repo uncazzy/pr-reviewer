@@ -19,7 +19,7 @@ export function openChatWithFeedback(fileName, feedback, fullContent, newCode, o
         resultDiv.appendChild(chatContainer);
 
         // Render existing messages in the messagesContainer
-        renderExistingMessages(messagesContainer, chatMessages.value);
+        renderExistingMessages(fileName, messagesContainer, chatMessages.value);
 
         // Setup input container with the messagesContainer
         setupChatInput(chatContainer, messagesContainer, fileName, feedback, fullContent, newCode, oldCode);
@@ -124,7 +124,17 @@ function createButton(className, innerHTML, onClick) {
 }
 
 // Render existing messages in the UI
-function renderExistingMessages(messagesContainer, messages) {
-    messages.forEach((message) => renderMessage(message, messagesContainer));
+function renderExistingMessages(fileName, messagesContainer, messages) {
+    if (messages.length === 0) {
+        // Render the welcome message
+        const welcomeMessage = {
+            role: 'assistant',
+            content: `<p><strong>Hello!</strong> I'm here to help you with the code changes in <strong>${fileName}</strong>. Feel free to ask any questions or request further explanations about the code review.</p>`,
+        };
+        renderMessage(welcomeMessage, messagesContainer);
+    } else {
+        messages.forEach((message) => renderMessage(message, messagesContainer));
+    }
+    // Scroll to the bottom of the messages container
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
