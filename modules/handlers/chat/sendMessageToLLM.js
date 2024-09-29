@@ -1,4 +1,4 @@
-import { getApiKey, getModel } from '../../modules/storage/index.js';
+import { getApiKey, getModel } from '../../storage/index.js';
 import { chatMessages } from './chatUtils.js';
 import { createChatPrompt, createSystemPrompt } from '../../prompts/chatPrompt.js';
 

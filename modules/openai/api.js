@@ -1,6 +1,6 @@
 import { getApiKey, getModel } from '../storage/index.js';
 import { retryWithBackoff } from './retryWithBackoff.js';
-import { createReviewPrompt } from '../../prompts/reviewPrompt.js';
+import { createReviewPrompt } from '../prompts/reviewPrompt.js';
 
 // Function to send a code review request to OpenAI
 export async function analyzeCodeWithGPT(fileName, oldCode, newCode, fullFileContent) {

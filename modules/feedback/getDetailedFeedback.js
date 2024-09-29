@@ -1,5 +1,5 @@
 import { getFromStorage, setInStorage } from '../storage/index.js';
-import { createDetailedFeedbackPrompt } from '../../prompts/detailedFeedbackPrompt.js';
+import { createDetailedFeedbackPrompt } from '../prompts/detailedFeedbackPrompt.js';
 import { fetchDetailedFeedbackFromOpenAI } from './fetchDetailedFeedbackFromOpenAI.js';
 
 export async function getDetailedFeedback(fileName) {

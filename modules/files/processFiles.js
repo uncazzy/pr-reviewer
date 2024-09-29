@@ -1,5 +1,4 @@
-import { setInStorage } from '../storage/index.js';
-import { getCurrentPrUrl } from '../storage/getCurrentPrUrl.js';
+import { setInStorage , getCurrentPrUrl} from '../storage/index.js';
 import { analyzeCodeWithGPT } from '../openai/api.js';
 import { parseFeedback } from '../feedback/parseFeedback.js';
 
