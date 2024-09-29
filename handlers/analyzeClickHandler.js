@@ -51,7 +51,7 @@ export function handleAnalyzeClick(loadingDiv, analyzeButton, resultDiv) {
                         // Already on the '/files' tab, execute the content script directly
                         chrome.scripting.executeScript({
                             target: { tabId: currentTab.id },
-                            files: ['contentScript.js']
+                            files: ['dist/contentScript.bundle.js']
                         }, () => {
                             console.log("Content script executed on /files tab");
                         });

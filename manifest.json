@@ -30,7 +30,8 @@
     "web_accessible_resources": [
         {
             "resources": [
-                "libs/*"
+                "libs/*",
+                "dist/*"
             ],
             "matches": [
                 "https://github.com/*"
