@@ -79,7 +79,6 @@ body {
 .chat-header-buttons {
     display: flex;
     align-items: center;
-    gap: 10px;
 }
 
 .chat-file-name {
@@ -89,47 +88,32 @@ body {
     margin: 0;
 }
 
-.chat-header-buttons {
-    display: flex;
-    gap: 10px;
-}
-
 .close-chat,
-.clear-chat-button {
+.new-chat-button {
     background: none;
     border: none;
     color: #d4d4d4;
     cursor: pointer;
     font-size: 18px;
     transition: color 0.3s;
+    padding: 8px;
+}
+
+.close-chat {
+    font-size: 24px;
 }
 
 .close-chat:hover,
-.clear-chat-button:hover {
-    color: #ff4b4b;
+.new-chat-button:hover {
+    color: #696060;
 }
 
 .close-chat i,
-.clear-chat-button i {
+.new-chat-button i {
     pointer-events: none;
 }
 
-.clear-chat-button {
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s;
-}
-
-.clear-chat-button:hover {
-    background-color: #c82333;
-}
-
-.clear-chat-button i {
+.new-chat-button i {
     margin-right: 5px;
 }
 

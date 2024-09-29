@@ -70,11 +70,13 @@ function createChatHeader(fileName, messagesContainer) {
 
     // Close button
     const closeButton = createButton('close-chat', '<i class="fas fa-times"></i>', () => location.reload());
+    closeButton.title = "Close chat"
     chatHeaderButtons.appendChild(closeButton);
 
     // Clear Chat History button
-    const clearChatButton = createButton('clear-chat-button', '<i class="fas fa-trash-alt"></i>', () => clearChatHistory(fileName, messagesContainer));
-    chatHeaderButtons.appendChild(clearChatButton);
+    const newChatButton = createButton('new-chat-button', '<i class="fa-solid fa-rotate-right"></i>', () => clearChatHistory(fileName, messagesContainer));
+    newChatButton.title = "Start new chat"
+    chatHeaderButtons.appendChild(newChatButton);
 
     // Append the buttons container to the header
     headerContentContainer.appendChild(chatHeaderButtons);
@@ -99,6 +101,7 @@ function setupChatInput(chatContainer, messagesContainer, fileName, feedback, fu
             chatInput.value = '';
         }
     });
+    sendButton.title = "Send message"
     chatInputContainer.appendChild(sendButton);
 
     chatInput.addEventListener('keydown', (event) => {
