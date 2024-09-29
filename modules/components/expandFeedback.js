@@ -1,4 +1,4 @@
-import { fetchAndDisplayDetailedFeedback, displayDetailedFeedback, collapseDetailedFeedback } from '../modules/feedback/index.js';
+import { fetchAndDisplayDetailedFeedback, displayDetailedFeedback, collapseDetailedFeedback } from '../feedback/index.js';
 
 export function expandFeedback(fileName, button, detailedFeedbackDiv) {
     if (detailedFeedbackDiv.style.display === 'none' || detailedFeedbackDiv.style.display === '') {

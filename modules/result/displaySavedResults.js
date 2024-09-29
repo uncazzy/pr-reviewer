@@ -1,4 +1,4 @@
-import { createFileFeedback } from '../../components/index.js';
+import { createFileFeedback } from '../components/index.js';
 
 export function displaySavedResults(results, resultDiv) {
   if (!resultDiv) {
