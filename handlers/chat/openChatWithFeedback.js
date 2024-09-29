@@ -1,4 +1,4 @@
-import { renderMessage } from "../../helpers/renderMessage.js";
+import { renderMessage } from "./renderMessage.js";
 import { clearChatHistory } from './clearChatHistory.js';
 import { handleUserMessage } from './handleUserMessage.js';
 import { chatMessages } from './chatUtils.js'; // Import shared messages array

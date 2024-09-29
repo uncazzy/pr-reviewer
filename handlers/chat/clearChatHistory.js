@@ -1,4 +1,4 @@
-import { renderMessage } from '../../helpers/renderMessage.js';
+import { renderMessage } from './renderMessage.js';
 import { chatMessages, clearChatMessages } from './chatUtils.js';
 
 // Utility function to render the welcome message

@@ -1,4 +1,4 @@
-import { renderMessage } from "../../helpers/renderMessage.js";
+import { renderMessage } from "./renderMessage.js";
 import { sendMessageToLLM } from './sendMessageToLLM.js';
 import { chatMessages } from './chatUtils.js';
 
