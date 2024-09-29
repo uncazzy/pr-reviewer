@@ -1,7 +1,7 @@
 
 import { handleAnalyzeClick } from './handlers/analyzeClick/index.js'
 import { handleStorageChanges } from './modules/storage/index.js';
-import { checkForResults } from "./modules/result/result.js"
+import { checkForResults } from "./modules/result/index.js"
 
 const analyzeButton = document.getElementById('analyze');
 const resultDiv = document.getElementById('result');

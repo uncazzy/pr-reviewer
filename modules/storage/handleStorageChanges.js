@@ -1,5 +1,5 @@
 
-import { displaySavedResults } from '../result/result.js'
+import { displaySavedResults } from '../result/index.js'
 
 export function handleStorageChanges(changes, area) {
     if (area === 'local') {
