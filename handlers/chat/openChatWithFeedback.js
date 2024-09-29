@@ -31,12 +31,13 @@ function createChatContainer(fileName) {
     const chatContainer = document.createElement('div');
     chatContainer.className = 'chat-container';
 
-    // Create chat header first
-    const chatHeader = createChatHeader(fileName);
-
     // Create messages container
     const messagesContainer = document.createElement('div');
     messagesContainer.className = 'messages-container';
+
+    // Create chat header first
+    const chatHeader = createChatHeader(fileName, messagesContainer);
+
 
     // Append chatHeader first
     chatContainer.appendChild(chatHeader);

@@ -63,9 +63,10 @@ body {
     justify-content: space-between;
     align-items: center;
     background-color: #333;
-    padding: 10px;
+    padding: 12px;
     border-bottom: 1px solid #444;
     width: 100%;
+    z-index: 2000
 }
 
 .header-content-container {
