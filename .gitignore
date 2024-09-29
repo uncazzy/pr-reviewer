@@ -1,2 +1,4 @@
 /dist/
 /node_modules/
+directory_structure.py
+get_files.py
