@@ -5,7 +5,7 @@ import { chatMessages } from './chatUtils.js';
 export function handleUserMessage(messageContent, fileName, feedback, fullContent, newCode, oldCode, messagesContainer) {
     // Create a new user message object and push it to chatMessages array
     const userMessage = { role: 'user', content: messageContent };
-    chatMessages.push(userMessage); // No need for .value, as chatMessages is a direct array
+    chatMessages.push(userMessage);
 
     // Save the updated chat history to local storage
     chrome.storage.local.get(['chatHistory'], (data) => {

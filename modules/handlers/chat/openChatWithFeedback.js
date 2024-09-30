@@ -5,7 +5,10 @@ import { chatMessages } from './chatUtils.js'; // Import shared messages array
 
 export function openChatWithFeedback(fileName, feedback, fullContent, newCode, oldCode) {
     chrome.storage.local.get(['chatHistory'], (data) => {
-        chatMessages.value = data.chatHistory && data.chatHistory[fileName] ? data.chatHistory[fileName] : [];
+
+        chatMessages.length = 0; // Clear the array
+        const storedMessages = data.chatHistory && data.chatHistory[fileName] ? data.chatHistory[fileName] : [];
+        chatMessages.push(...storedMessages);
 
         document.getElementById('analyze').style.display = 'none';
         document.getElementById('settings-button').style.display = 'none';
@@ -19,7 +22,7 @@ export function openChatWithFeedback(fileName, feedback, fullContent, newCode, o
         resultDiv.appendChild(chatContainer);
 
         // Render existing messages in the messagesContainer
-        renderExistingMessages(fileName, messagesContainer, chatMessages.value);
+        renderExistingMessages(fileName, messagesContainer, chatMessages);
 
         // Setup input container with the messagesContainer
         setupChatInput(chatContainer, messagesContainer, fileName, feedback, fullContent, newCode, oldCode);
