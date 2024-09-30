@@ -30,10 +30,9 @@
 .chat-message pre,
 .chat-message code {
     background-color: var(--background-color);
-    padding: var(--padding-extra-small);
+    padding: var(--padding-small);
     border-radius: var(--border-radius);
     color: var(--text-color);
-    font-family: var(--monospace-font);
     margin-bottom: var(--padding-small);
     overflow-x: auto;
     word-wrap: break-word;
