@@ -1,0 +1,86 @@
+@import url('../variables.css');
+
+/* Messages Container */
+.messages-container {
+    flex-grow: 1;
+    overflow-y: auto;
+    background-color: var(--background-color);
+    padding: var(--padding-medium);
+    min-height: 0;
+    box-sizing: border-box;
+}
+
+/* Chat Messages */
+.chat-message {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: var(--padding-small);
+    max-width: 95%;
+}
+
+/* Specific Elements in Messages */
+.chat-message h3,
+.chat-message p,
+.chat-message pre,
+.chat-message code {
+    margin: 0;
+    padding: 0;
+}
+
+.chat-message pre,
+.chat-message code {
+    background-color: var(--background-color);
+    padding: var(--padding-extra-small);
+    border-radius: var(--border-radius);
+    color: var(--text-color);
+    font-family: var(--monospace-font);
+    margin-bottom: var(--padding-small);
+    overflow-x: auto;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    max-width: 100%;
+}
+
+/* Assistant and User Messages */
+.assistant-message {
+    align-self: flex-start;
+}
+
+.user-message {
+    flex-direction: row-reverse;
+    align-self: flex-end;
+}
+
+/* Message Content */
+.message-content {
+    background-color: #333;
+    color: var(--text-color);
+    border-radius: var(--border-radius);
+    padding: var(--padding-medium);
+    max-width: calc(100% - 60px);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.user-message .message-content {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+/* Avatars */
+.avatar {
+    width: 40px;
+    height: 40px;
+    background-color: #555;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 5px;
+    flex-shrink: 0;
+}
+
+.user-message .avatar {
+    margin-left: var(--padding-small);
+}

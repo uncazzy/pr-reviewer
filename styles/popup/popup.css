@@ -1,0 +1,54 @@
+@import url('../variables.css');
+@import url('./popup-header.css');
+@import url('./popup-content.css');
+
+/* General Body and Typography */
+html, body {
+    width: 600px; 
+    height: 600px;
+    display: flex;
+    flex-direction: column;
+}
+
+body {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+/* Analyze Button */
+#analyze {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: var(--padding-medium);
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 16px;
+    cursor: pointer;
+    margin-bottom: 15px;
+    transition: background-color var(--transition-duration);
+}
+
+#analyze i {
+    margin-right: var(--padding-small);
+}
+
+#analyze:hover {
+    background-color: var(--primary-hover-color);
+}
+
+#analyze:disabled {
+    background-color: #555;
+    cursor: not-allowed;
+}
+
+/* Button Container */
+.button-container {
+    display: flex;
+    justify-content: space-between;
+}

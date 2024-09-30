@@ -1,0 +1,64 @@
+@import url('../variables.css');
+@import url('options-form.css');
+
+/* General Body and Typography */
+body {
+    padding: var(--padding-large);
+}
+
+/* Headings */
+h1 {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: var(--padding-medium);
+    color: #ffffff;
+    text-align: center;
+}
+
+.section {
+    background-color: var(--secondary-background-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: var(--padding-medium);
+    margin: auto;
+    margin-bottom: var(--padding-medium);
+    max-width: 75%;
+}
+
+.section h2 {
+    font-size: 20px;
+    color: var(--primary-color);
+}
+
+.section p {
+    margin-top: 0;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+/* About Section */
+#about-section {
+    padding: var(--padding-large);
+    background-color: #f9f9f9;
+    border-radius: var(--border-radius);
+    margin-top: var(--padding-large);
+}
+
+#about-section h2 {
+    margin-top: 0;
+    color: #333;
+}
+
+/* Status Message */
+#status {
+    font-style: italic;
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    margin-top: 15px;
+    max-width: 75%;
+}
+
+button:hover .donate-button {
+    color: red;
+}

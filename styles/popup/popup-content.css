@@ -1,0 +1,164 @@
+@import url('../variables.css'); /* Import variables */
+
+/* Main Content Styles */
+#result {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--secondary-background-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+/* File Feedback Container */
+.file-feedback {
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: var(--padding-medium);
+    margin-bottom: var(--padding-medium);
+}
+
+.file-name {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: var(--secondary-color);
+}
+
+/* Feedback Labels */
+.feedback-label {
+    max-width: fit-content;
+    border-radius: var(--border-radius);
+    margin-bottom: 5px;
+    padding: var(--padding-small);
+}
+
+.looks-good {
+    background-color: var(--success-color);
+}
+
+.requires-changes {
+    background-color: var(--danger-color);
+}
+
+/* Status Badge Styles */
+.status-badge {
+    border-radius: var(--border-radius-pill);
+    padding: 5px 10px;
+    font-size: 12px;
+    color: #fff;
+    display: inline-block;
+    margin-left: 10px;
+}
+
+/* Feedback Content */
+.feedback-content {
+    margin-top: var(--padding-small);
+}
+
+/* Expand Button */
+.expand-button {
+    background: none;
+    color: var(--tertiary-color);
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: var(--padding-small);
+}
+
+.expand-button:hover {
+    text-decoration: underline;
+}
+
+/* Detailed Feedback */
+.detailed-feedback {
+    display: none;
+    margin-top: var(--padding-small);
+    padding: var(--padding-medium);
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+}
+
+/* Error Message */
+.error-message {
+    color: var(--danger-color);
+    margin-top: var(--padding-small);
+}
+
+/* Loading Spinner */
+#loading {
+    display: none;
+    text-align: center;
+}
+
+#loading i {
+    font-size: 32px;
+    animation: spin 1s linear infinite;
+    color: var(--primary-color);
+}
+
+/* Keyframes for Spinner */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Loading Container */
+.loading {
+    text-align: center;
+    padding: var(--padding-medium);
+}
+
+.loading i {
+    margin-right: 5px;
+}
+
+/* Refresh and Collapse Buttons */
+.refresh-button, .collapse-button {
+    margin: var(--padding-small);
+    padding: var(--padding-small) var(--padding-medium);
+    background-color: #f0f0f0;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+}
+
+.collapse-button {
+    margin-right: 0px;
+}
+
+.refresh-button:hover, .collapse-button:hover {
+    background-color: #e0e0e0;
+}
+
+/* Settings Button */
+.settings-button {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    background-color: #f0f0f0;
+    border: none;
+    border-radius: 50%;
+    width: 30px; 
+    height: 30px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease;
+}
+
+.settings-button i {
+    font-size: 16px;
+    color: #333;
+}
+
+.settings-button:hover {
+    background-color: #e0e0e0;
+}

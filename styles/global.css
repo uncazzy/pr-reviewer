@@ -1,0 +1,105 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');
+@import url('./variables.css');
+
+/* Global Box-Sizing Reset */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+/* Ensure html and body take full height */
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-family);
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+/* Anchor Links */
+a {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Shared Button Styles */
+.button {
+    background-color: var(--primary-color);
+    color: var(--button-text-color);
+    border: none;
+    border-radius: var(--border-radius);
+    padding: var(--padding-small) var(--padding-medium);
+    font-size: 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: var(--box-shadow-light);
+    transition: background-color var(--transition-duration) var(--transition-timing),
+        box-shadow var(--transition-duration) var(--transition-timing);
+}
+
+.button:hover {
+    background-color: var(--primary-hover-color);
+    box-shadow: var(--box-shadow-heavy);
+}
+
+.button:active {
+    background-color: var(--primary-active-color);
+    box-shadow: var(--box-shadow-light);
+}
+
+.button--icon i {
+    font-size: 16px;
+}
+
+.button--danger {
+    background-color: var(--danger-color);
+    color: #fff;
+}
+
+.button--danger:hover {
+    background-color: #c82333;
+}
+
+.button--disabled {
+    background-color: #555;
+    cursor: not-allowed;
+}
+
+/* Common Container */
+.container {
+    padding: var(--padding-medium);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+}
+
+/* Additional Shared Styles */
+.loading {
+    text-align: center;
+    padding: var(--padding-medium);
+}
+
+.loading i {
+    margin-right: 5px;
+    font-size: 32px;
+    animation: spin 1s linear infinite;
+    color: var(--primary-color);
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Import Component-Specific CSS Files */
+@import url('options/options.css');
+@import url('popup/popup.css');
+@import url('chat/chat.css')
