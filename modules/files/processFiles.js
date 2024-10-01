@@ -1,14 +1,12 @@
-import { setInStorage , getCurrentPrUrl} from '../storage/index.js';
+import { setInStorage } from '../storage/index.js';
 import { analyzeCodeWithGPT } from '../openai/api.js';
 import { parseFeedback } from '../feedback/parseFeedback.js';
 
-// Function to process files concurrently with controlled concurrency (using Promise.allSettled)
-export async function processFiles(files) {
+// Function to process files concurrently
+export async function processFiles(selectedFiles, prUrl) {
   const results = [];
   try {
-    const prUrl = await getCurrentPrUrl().catch(() => 'Unknown PR URL'); // Default to placeholder if not found
-
-    const promises = files.map((file) =>
+    const promises = selectedFiles.map((file) =>
       analyzeCodeWithGPT(file.fileName, file.oldCode, file.newCode, file.fullContent)
         .then((feedback) => {
           const parsedFeedback = parseFeedback(feedback);
@@ -26,10 +24,18 @@ export async function processFiles(files) {
       }
     });
 
-    // Save results and PR URL to storage
-    await setInStorage('prResults', results);
-    await setInStorage('prUrl', prUrl);
+    // Retrieve existing allPrResults from storage
+    const { allPrResults = {} } = await chrome.storage.local.get('allPrResults');
+
+    // Update the allPrResults object with the new results for the current PR
+    allPrResults[prUrl] = results;
+
+    // Save updated allPrResults to storage
+    await setInStorage('allPrResults', allPrResults);
+
+    // Save processingComplete flag
     await setInStorage('processingComplete', true);
+
     console.log('Results and PR URL updated');
   } catch (error) {
     console.error('Unexpected error:', error);

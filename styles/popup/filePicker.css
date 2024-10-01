@@ -1,0 +1,32 @@
+#file-picker {
+    margin: 20px;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+#file-picker form {
+    display: flex;
+    flex-direction: column;
+}
+
+#reanalyze {
+    margin-top: 10px;
+}
+
+.file-picker-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.file-picker-item input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+.file-picker-item label {
+    flex-grow: 1;
+    word-break: break-all;
+}

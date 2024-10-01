@@ -1,20 +1,20 @@
 import { displaySavedResults } from './displaySavedResults.js';
-import { compareBaseUrls } from './compareBaseUrls.js';
 
 export function checkForResults(currentUrl, resultDiv) {
-  chrome.storage.local.get(['prResults', 'prUrl'], (data) => {
-    if (data.prUrl && data.prResults) {
-      const isSamePR = compareBaseUrls(currentUrl, data.prUrl);
-      if (isSamePR) {
-        // Display stored results if they match the current PR
-        displaySavedResults(data.prResults, resultDiv);
-      } else {
-        console.log('No saved results for this PR.');
-        resultDiv.style.display = 'none';
-      }
-    } else {
-      console.log('No saved prUrl or prResults found.');
-      resultDiv.style.display = 'none';
-    }
-  });
+    return new Promise((resolve) => {
+        chrome.storage.local.get(['allPrResults'], (data) => {
+            const allPrResults = data.allPrResults || {};
+            const prResults = allPrResults[currentUrl];
+
+            if (prResults) {
+                // Display stored results if they exist for the current PR
+                displaySavedResults(prResults, resultDiv);
+                resolve(true);
+            } else {
+                console.log('No saved results for this PR.');
+                resultDiv.style.display = 'none';
+                resolve(false);
+            }
+        });
+    });
 }

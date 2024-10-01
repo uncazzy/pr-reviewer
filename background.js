@@ -1,7 +1,6 @@
 import { initializeFeedbackListener } from "./modules/feedback/messageListener.js";
 import { getDetailedFeedback } from "./modules/feedback/getDetailedFeedback.js";
 import { setInStorage } from './modules/storage/index.js';
-import { processFiles } from './modules/files/processFiles.js';
 
 // Initialize the listener for feedback-related messages
 initializeFeedbackListener();
@@ -20,7 +19,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       .then(() => console.log('Extracted data saved to local storage'))
       .catch(console.error);
 
-    processFiles(message.files);
   } else if (message.action === 'getDetailedFeedback') {
     // Handle the message for getting detailed feedback (detailedFeedback.js)
     getDetailedFeedback(message.fileName)

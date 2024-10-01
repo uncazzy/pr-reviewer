@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="libs/highlight/styles/default.min.css"> <!-- Highlight.js Theme -->
     <link rel="stylesheet" href="styles/global.css"> <!-- Include global styles -->
     <link rel="stylesheet" href="styles/popup/popup.css"> <!-- Include specific popup styles -->
+    <link rel="stylesheet" href="styles/popup/filePicker.css">
     <link rel="stylesheet" href="styles/chat/chat.css">
 </head>
 
@@ -19,11 +20,18 @@
             <i class="fas fa-play"></i> Analyze PR Code
         </button>
 
+        <button id="reanalyze" class="button" style="display: none;">
+            <i class="fas fa-redo"></i> Re-analyze PR
+        </button>
+
         <div id="loading">
             <i class="fas fa-spinner"></i>
             <p>Analyzing...</p>
         </div>
     </div>
+
+    <!-- File Picker Section -->
+    <div id="file-picker"></div>
 
     <!-- Results Section -->
     <div id="result"></div>
@@ -39,7 +47,7 @@
     <script src="libs/highlight/languages/javascript.min.js"></script>
     <script src="libs/highlight/languages/css.min.js"></script>
     <script src="libs/highlight/languages/python.min.js"></script>
-    <script src="libs/highlight/languages/typescript.min.js"></script> 
+    <script src="libs/highlight/languages/typescript.min.js"></script>
     <script src="popup.js" type="module"></script>
 </body>
 
