@@ -1,32 +1,121 @@
+@import url('../variables.css');
+
+/* Container Styles */
 #file-picker {
-    margin: 20px;
-    max-height: 200px;
+    margin: var(--padding-medium);
+    max-height: 400px;
     overflow-y: auto;
-    border: 1px solid #ddd;
-    padding: 10px;
-    border-radius: 5px;
+    border: 1px solid var(--border-color-light);
+    padding: var(--padding-small);
+    border-radius: var(--border-radius);
+    background-color: var(--secondary-background-color);
+    box-shadow: var(--box-shadow-light);
 }
 
-#file-picker form {
-    display: flex;
-    flex-direction: column;
+/* Search Bar Styles */
+#file-picker-search {
+    width: 100%;
+    padding: var(--padding-small);
+    margin-bottom: var(--padding-small);
+    border: 1px solid var(--border-color-light);
+    border-radius: var(--border-radius);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-family: var(--font-family);
 }
 
-#reanalyze {
-    margin-top: 10px;
-}
-
+/* File Item Styles */
 .file-picker-item {
     display: flex;
     align-items: center;
-    margin-bottom: 8px;
+    padding: var(--padding-extra-small) var(--padding-small);
+    border-radius: var(--border-radius);
+    transition: background-color var(--transition-duration) var(--transition-timing),
+        box-shadow var(--transition-duration) var(--transition-timing);
+    cursor: pointer;
 }
 
+.file-picker-item:hover {
+    background-color: var(--primary-hover-color);
+    box-shadow: var(--box-shadow-light);
+}
+
+/* Checkbox Styles */
 .file-picker-item input[type="checkbox"] {
-    margin-right: 10px;
+    margin-right: var(--padding-small);
+    transform: scale(1.2);
+    cursor: pointer;
 }
 
+/* Label Styles */
 .file-picker-item label {
     flex-grow: 1;
     word-break: break-all;
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+/* Icon Styles */
+.file-picker-item .file-icon {
+    margin-right: var(--padding-small);
+    font-size: 16px;
+    color: var(--secondary-color);
+}
+
+/* Folder Styles */
+.folder {
+    margin-left: var(--padding-small);
+}
+
+.folder .folder-header {
+    display: flex;
+    align-items: center;
+    padding: var(--padding-extra-small) var(--padding-small);
+    cursor: pointer;
+    font-weight: bold;
+    color: var(--text-color);
+}
+
+.folder .folder-header:hover {
+    background-color: var(--primary-hover-color);
+    border-radius: var(--border-radius);
+}
+
+.folder .folder-content {
+    margin-left: var(--padding-small);
+    display: none;
+    /* Collapsed by default */
+}
+
+/* Open Folder Icon */
+.folder.open .folder-content {
+    display: block;
+}
+
+.folder.open .folder-header .folder-icon {
+    transform: rotate(90deg);
+}
+
+/* Folder Icon */
+.folder-icon {
+    margin-right: var(--padding-small);
+    transition: transform var(--transition-duration) var(--transition-timing);
+}
+
+/* Scrollbar Styles */
+#file-picker::-webkit-scrollbar {
+    width: 8px;
+}
+
+#file-picker::-webkit-scrollbar-track {
+    background: var(--secondary-background-color);
+}
+
+#file-picker::-webkit-scrollbar-thumb {
+    background: var(--border-color-light);
+    border-radius: var(--border-radius);
+}
+
+#file-picker::-webkit-scrollbar-thumb:hover {
+    background: var(--border-color);
 }

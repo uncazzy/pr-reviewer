@@ -53,13 +53,51 @@ export async function createFilePicker(filePickerDiv) {
         checkbox.value = file.fileName;
         checkbox.checked = true;
 
+        const iconSpan = document.createElement('span');
+        iconSpan.className = 'file-icon';
+
+        // Determine the file extension
+        const fileExtension = file.fileName.split('.').pop().toLowerCase();
+
+        // Assign an icon based on file extension
+        switch (fileExtension) {
+            case 'js':
+                iconSpan.innerHTML = '<i class="fab fa-js-square"></i>';
+                break;
+            case 'css':
+                iconSpan.innerHTML = '<i class="fab fa-css3-alt"></i>';
+                break;
+            case 'html':
+                iconSpan.innerHTML = '<i class="fab fa-html5"></i>';
+                break;
+            case 'py':
+                iconSpan.innerHTML = '<i class="fab fa-python"></i>';
+                break;
+            case 'java':
+                iconSpan.innerHTML = '<i class="fab fa-java"></i>';
+                break;
+            default:
+                iconSpan.innerHTML = '<i class="fas fa-file-alt"></i>';
+        }
+
         const label = document.createElement('label');
         label.htmlFor = `file-${file.index}`;
         label.textContent = file.fileName;
 
         fileDiv.appendChild(checkbox);
+        fileDiv.appendChild(iconSpan);
         fileDiv.appendChild(label);
         form.appendChild(fileDiv);
+
+        // Event listener for individual checkboxes
+        checkbox.addEventListener('change', () => {
+            if (!checkbox.checked) {
+                selectAllCheckbox.checked = false;
+            } else {
+                const allChecked = [...form.querySelectorAll('input[name="files"]')].every(cb => cb.checked);
+                selectAllCheckbox.checked = allChecked;
+            }
+        });
     });
 
     // Append the form to the file picker div

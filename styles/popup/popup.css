@@ -1,6 +1,7 @@
 @import url('../variables.css');
 @import url('./popup-header.css');
 @import url('./popup-content.css');
+@import url('./filePicker.css');
 
 /* General Body and Typography */
 html, body {
