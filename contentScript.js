@@ -1,7 +1,8 @@
 import {
     expandAllFiles,
     extractAllFilesData,
-    sendExtractedData
+    sendExtractedData,
+    waitForFilesToBePresent
 } from './modules/contentScript/index.js';
 
 (async function () {
@@ -15,7 +16,10 @@ import {
         });
     }
 
-    console.log('DOM fully loaded, expanding files...');
+    console.log('DOM fully loaded, waiting for files to be present...');
+    await waitForFilesToBePresent();
+
+    console.log('Files are present, expanding files...');
 
     // Expand all files before extracting
     await expandAllFiles();

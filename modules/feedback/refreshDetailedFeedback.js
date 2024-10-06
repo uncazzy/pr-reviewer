@@ -1,59 +1,58 @@
-import { displayDetailedFeedback } from "./displayDetailedFeedback.js"
+import { displayDetailedFeedback } from "./displayDetailedFeedback.js";
+import { getFromStorage, setInStorage } from '../storage/index.js';
+import { getDetailedFeedback } from './getDetailedFeedback.js';
+import { getCurrentPrUrl } from './getCurrentPrUrl.js';
 
-export function refreshDetailedFeedback(fileName, detailedFeedbackDiv, button) {
+export async function refreshDetailedFeedback(fileName, detailedFeedbackDiv, button) {
     detailedFeedbackDiv.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Refreshing detailed feedback...</div>';
 
-    chrome.storage.local.get(['detailedFeedback', 'extractedData'], (data) => {
-        console.log("Full data from storage:", data);
-        console.log("Searching for fileName:", fileName);
+    try {
+        const data = await getFromStorage(['extractedDataByPr']);
+        const extractedDataByPr = data.extractedDataByPr || {};
 
-        if (!data.extractedData || !Array.isArray(data.extractedData)) {
-            console.log("extractedData is not an array or is undefined:", data.extractedData);
-            detailedFeedbackDiv.innerHTML = '<p class="error-message">File data not found. Please re-analyze the PR.</p>';
+        const baseUrl = await getCurrentPrUrl();
+
+        if (!baseUrl) {
+            detailedFeedbackDiv.innerHTML = '<p class="error-message">PR URL not found. Please ensure you are on a PR page.</p>';
+            console.error('Unable to retrieve current PR URL.');
             return;
         }
 
-        console.log("extractedData array:", data.extractedData);
+        const prData = extractedDataByPr[baseUrl] || {};
+        const extractedData = prData.extractedData || [];
+        let detailedFeedbacks = prData.detailedFeedback || {};
 
-        const matchingFile = data.extractedData.find(file => {
-            console.log("Comparing:", file.fileName, "with", fileName);
-            console.log("Stripped comparison:", file.fileName, "with", fileName.replace(/\\/g, ''));
-            return file.fileName === fileName || file.fileName === fileName.replace(/\\/g, '');
-        });
+        const matchingFile = extractedData.find(file => file.fileName === fileName || file.fileName === fileName.replace(/\\/g, ''));
 
         if (!matchingFile) {
-            console.log("No matching file found");
             detailedFeedbackDiv.innerHTML = '<p class="error-message">File data not found. Please re-analyze the PR.</p>';
             return;
         }
 
-        console.log("Matching file found:", matchingFile);
+        // Remove existing detailed feedback
+        delete detailedFeedbacks[fileName];
 
-        if (data.detailedFeedback) {
-            delete data.detailedFeedback[fileName];
-            chrome.storage.local.set({ detailedFeedback: data.detailedFeedback }, () => {
-                console.log('Removed existing detailed feedback for:', fileName);
-            });
-        }
+        // Save the updated detailed feedback back to storage
+        prData.detailedFeedback = detailedFeedbacks;
+        extractedDataByPr[baseUrl] = prData;
+        await setInStorage('extractedDataByPr', extractedDataByPr);
 
-        chrome.runtime.sendMessage({ action: 'getDetailedFeedback', fileName: fileName }, (response) => {
-            if (response && response.detailedFeedback) {
-                displayDetailedFeedback(
-                    fileName,
-                    response.detailedFeedback,
-                    matchingFile.oldCode,
-                    matchingFile.newCode,
-                    matchingFile.fullContent,
-                    detailedFeedbackDiv,
-                    button
-                );
+        // Fetch new detailed feedback
+        const detailedFeedback = await getDetailedFeedback(fileName, baseUrl);
+        displayDetailedFeedback(
+            fileName,
+            detailedFeedback,
+            matchingFile.oldCode,
+            matchingFile.newCode,
+            matchingFile.fullContent,
+            detailedFeedbackDiv,
+            button
+        );
 
-                // Scroll detailedFeedbackDiv into view
-                detailedFeedbackDiv.scrollIntoView({ behavior: 'smooth' });
-            } else {
-                detailedFeedbackDiv.innerHTML = '<p class="error-message">Failed to load detailed feedback.</p>';
-            }
-        });
+        detailedFeedbackDiv.scrollIntoView({ behavior: 'smooth' });
 
-    });
+    } catch (error) {
+        console.error('Error refreshing detailed feedback:', error);
+        detailedFeedbackDiv.innerHTML = '<p class="error-message">Failed to refresh detailed feedback. Please try again later.</p>';
+    }
 }

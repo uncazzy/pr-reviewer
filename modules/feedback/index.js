@@ -6,7 +6,7 @@ import { displayDetailedFeedback } from './displayDetailedFeedback.js';
 import { collapseDetailedFeedback } from './collapseDetailedFeedback.js';
 import { refreshDetailedFeedback } from './refreshDetailedFeedback.js';
 import { parseFeedback } from "./parseFeedback.js"
-
+import { getCurrentPrUrl } from './getCurrentPrUrl.js'
 export {
     getDetailedFeedback,
     fetchDetailedFeedbackFromOpenAI,
@@ -15,5 +15,6 @@ export {
     collapseDetailedFeedback,
     refreshDetailedFeedback,
     initializeFeedbackListener,
-    parseFeedback
+    parseFeedback,
+    getCurrentPrUrl
 };

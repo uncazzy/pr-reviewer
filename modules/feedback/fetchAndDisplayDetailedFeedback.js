@@ -1,6 +1,8 @@
-import { getDetailedFeedback } from './getDetailedFeedback.js';
+
 import { setInStorage, getFromStorage } from '../storage/index.js';
+import { getDetailedFeedback } from './getDetailedFeedback.js';
 import { displayDetailedFeedback } from './displayDetailedFeedback.js';
+import { getCurrentPrUrl } from './getCurrentPrUrl.js'
 
 export async function fetchAndDisplayDetailedFeedback(fileName, detailedFeedbackDiv, button) {
     try {
@@ -10,10 +12,22 @@ export async function fetchAndDisplayDetailedFeedback(fileName, detailedFeedback
         detailedFeedbackDiv.style.display = 'block';
         detailedFeedbackDiv.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading detailed feedback...</div>';
 
-        // Retrieve extractedData and detailedFeedback from storage
-        const storageData = await getFromStorage(['extractedData', 'detailedFeedback']);
-        const extractedData = storageData.extractedData || [];
-        let detailedFeedback = storageData.detailedFeedback || {};
+        // Retrieve extractedDataByPr from storage
+        const storageData = await getFromStorage(['extractedDataByPr']);
+        const extractedDataByPr = storageData.extractedDataByPr || {};
+
+        // Get the base PR URL dynamically
+        const baseUrl = await getCurrentPrUrl();
+
+        if (!baseUrl) {
+            detailedFeedbackDiv.innerHTML = '<p class="error-message">PR URL not found. Please ensure you are on a PR page.</p>';
+            console.error('Unable to retrieve current PR URL.');
+            return;
+        }
+
+        const prData = extractedDataByPr[baseUrl] || {};
+        const extractedData = prData.extractedData || [];
+        let detailedFeedback = prData.detailedFeedback || {};
 
         if (!extractedData || extractedData.length === 0) {
             detailedFeedbackDiv.innerHTML = '<p class="error-message">No extracted data available. Please re-analyze the PR.</p>';
@@ -33,9 +47,14 @@ export async function fetchAndDisplayDetailedFeedback(fileName, detailedFeedback
             console.log(`Using cached detailed feedback for ${fileName}`);
             displayDetailedFeedback(fileName, detailedFeedback[fileName], oldCode, newCode, fullContent, detailedFeedbackDiv, button);
         } else {
-            const detailedFeedbackResponse = await getDetailedFeedback(fileName);
+            const detailedFeedbackResponse = await getDetailedFeedback(fileName, baseUrl);
             detailedFeedback[fileName] = detailedFeedbackResponse;
-            await setInStorage('detailedFeedback', detailedFeedback);
+
+            // Save updated detailedFeedback back to storage
+            prData.detailedFeedback = detailedFeedback;
+            extractedDataByPr[baseUrl] = prData;
+            await setInStorage('extractedDataByPr', extractedDataByPr);
+
             displayDetailedFeedback(fileName, detailedFeedbackResponse, oldCode, newCode, fullContent, detailedFeedbackDiv, button);
         }
     } catch (error) {

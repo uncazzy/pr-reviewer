@@ -2,12 +2,19 @@ import { getFromStorage, setInStorage } from '../storage/index.js';
 import { createDetailedFeedbackPrompt } from '../prompts/detailedFeedbackPrompt.js';
 import { fetchDetailedFeedbackFromOpenAI } from './fetchDetailedFeedbackFromOpenAI.js';
 
-export async function getDetailedFeedback(fileName) {
+export async function getDetailedFeedback(fileName, baseUrl) {
     try {
-        const data = await getFromStorage(['extractedData', 'prResults', 'detailedFeedback']);
-        const extractedData = data.extractedData || [];
-        const prResults = data.prResults || [];
-        const detailedFeedbacks = data.detailedFeedback || {};
+        const data = await getFromStorage(['extractedDataByPr']);
+        const extractedDataByPr = data.extractedDataByPr || {};
+
+        if (!baseUrl) {
+            throw new Error('PR URL not provided.');
+        }
+
+        const prData = extractedDataByPr[baseUrl] || {};
+        const extractedData = prData.extractedData || [];
+        const prResults = prData.results || [];
+        let detailedFeedbacks = prData.detailedFeedback || {};
 
         if (detailedFeedbacks[fileName]) {
             console.log(`Retrieving stored detailed feedback for ${fileName}`);
@@ -24,7 +31,12 @@ export async function getDetailedFeedback(fileName) {
         const detailedFeedback = await fetchDetailedFeedbackFromOpenAI(prompt);
 
         detailedFeedbacks[fileName] = detailedFeedback;
-        await setInStorage('detailedFeedback', detailedFeedbacks);
+
+        // Save updated detailedFeedback back to storage
+        prData.detailedFeedback = detailedFeedbacks;
+        extractedDataByPr[baseUrl] = prData;
+        await setInStorage('extractedDataByPr', extractedDataByPr);
+
         return detailedFeedback;
     } catch (error) {
         console.error('Error fetching detailed feedback:', error);
