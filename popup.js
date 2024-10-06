@@ -1,6 +1,7 @@
 import { handleAnalyzeClick } from './modules/handlers/analyzeClick/index.js';
 import { handleStorageChanges, setInStorage } from './modules/storage/index.js';
-import { getBaseUrl, checkForResults } from "./modules/result/index.js";
+import { getBaseUrl, checkForResults  } from "./modules/result/index.js";
+import { createFilePicker } from './modules/components/index.js';
 
 const analyzeButton = document.getElementById('analyze');
 const reanalyzeButton = document.getElementById('reanalyze');
@@ -28,14 +29,21 @@ settingsButton.addEventListener('click', () => {
 
 // Initialization
 async function initializePopup() {
-    const hasResults = await checkGitHubPRPage();
+    const { hasResults, hasExtractedData } = await checkGitHubPRPage();
 
     if (hasResults) {
         analyzeButton.style.display = 'none';
         reanalyzeButton.style.display = 'inline-block';
+        filePickerDiv.style.display = 'none';
+    } else if (hasExtractedData) {
+        analyzeButton.style.display = 'inline-block';
+        reanalyzeButton.style.display = 'none';
+        await displayFilePicker();
     } else {
         analyzeButton.style.display = 'inline-block';
         reanalyzeButton.style.display = 'none';
+        filePickerDiv.style.display = 'none';
+        resultDiv.innerHTML = '<p>Please click "Analyze PR" to extract files and start the analysis.</p>';
     }
 
     initializeSyntaxHighlighting();
@@ -50,17 +58,12 @@ async function checkGitHubPRPage() {
             analyzeButton.disabled = !isPRPage;
 
             if (isPRPage) {
-                const hasResults = await checkForResults(currentUrl, resultDiv, filePickerDiv);
-                if (!hasResults) {
-                    // Proceed normally
-                } else {
-                    filePickerDiv.style.display = 'none';
-                }
-                resolve(hasResults);
+                const { hasResults, hasExtractedData } = await checkForResults(currentUrl, resultDiv, filePickerDiv);
+                resolve({ hasResults, hasExtractedData });
             } else {
                 resultDiv.innerHTML = '<p>Please navigate to a GitHub pull request page to use this extension.</p>';
                 filePickerDiv.style.display = 'none';
-                resolve(false);
+                resolve({ hasResults: false, hasExtractedData: false });
             }
         });
     });
@@ -74,30 +77,43 @@ function initializeSyntaxHighlighting() {
     }
 }
 
-// Helper function to wait for extractedData to be available
-function waitForExtractedData(baseUrl) {
-    return new Promise((resolve, reject) => {
-        const maxAttempts = 20; // Wait up to 10 seconds
-        let attempts = 0;
+async function checkForExtractedData() {
+    return new Promise((resolve) => {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            const currentTab = tabs[0];
+            const currentUrl = currentTab.url;
+            const baseUrl = getBaseUrl(currentUrl);
 
-        const checkData = () => {
-            chrome.storage.local.get('extractedDataByPr', (data) => {
+            chrome.storage.local.get(['extractedDataByPr'], (data) => {
                 const extractedDataByPr = data.extractedDataByPr || {};
                 const prData = extractedDataByPr[baseUrl];
-                const extractedData = prData ? prData.extractedData : null;
-                if (extractedData && extractedData.length > 0) {
-                    resolve();
-                } else {
-                    attempts++;
-                    if (attempts < maxAttempts) {
-                        setTimeout(checkData, 500);
-                    } else {
-                        reject('Timed out waiting for extractedData.');
-                    }
-                }
+                const hasExtractedData = prData && prData.extractedData && prData.extractedData.length > 0;
+                resolve(hasExtractedData);
             });
-        };
-        checkData();
+        });
+    });
+}
+
+async function displayFilePicker() {
+    chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
+        const currentTab = tabs[0];
+        const currentUrl = currentTab.url;
+        const baseUrl = getBaseUrl(currentUrl);
+
+        chrome.storage.local.get(['extractedDataByPr'], async (data) => {
+            const extractedDataByPr = data.extractedDataByPr || {};
+            const prData = extractedDataByPr[baseUrl];
+            const extractedData = prData ? prData.extractedData : null;
+
+            if (extractedData && extractedData.length > 0) {
+                await createFilePicker(filePickerDiv, extractedData);
+                filePickerDiv.style.display = 'block';
+                analyzeButton.textContent = 'Start Analysis';
+                analyzeButton.dataset.state = 'readyToAnalyze';
+            } else {
+                filePickerDiv.style.display = 'none';
+            }
+        });
     });
 }
 
@@ -109,13 +125,15 @@ async function resetUI() {
         });
     });
 
-    const basePrUrl = getBaseUrl(currentUrl)
+    const basePrUrl = getBaseUrl(currentUrl);
 
     // Retrieve existing extractedDataByPr from storage
     const { extractedDataByPr = {} } = await chrome.storage.local.get(['extractedDataByPr']);
 
-    // Remove results and extractedData for the current PR
-    delete extractedDataByPr[basePrUrl];
+    // Remove results for the current PR but keep extractedData
+    if (extractedDataByPr[basePrUrl]) {
+        delete extractedDataByPr[basePrUrl].results;
+    }
 
     // Save updated data back to storage
     await setInStorage('extractedDataByPr', extractedDataByPr);
@@ -129,9 +147,16 @@ async function resetUI() {
     resultDiv.innerHTML = '';
     resultDiv.style.display = 'none';
     filePickerDiv.innerHTML = '';
-    filePickerDiv.style.display = 'none';
     analyzeButton.disabled = false;
     analyzeButton.style.display = 'inline-block';
-    analyzeButton.textContent = 'Analyze PR';
+    analyzeButton.textContent = 'Start Analysis';
     reanalyzeButton.style.display = 'none';
+
+    // Display file picker if extracted data exists
+    const hasExtractedData = await checkForExtractedData();
+    if (hasExtractedData) {
+        await displayFilePicker();
+    } else {
+        filePickerDiv.style.display = 'none';
+    }
 }

@@ -1,5 +1,4 @@
 import { displaySavedResults } from './displaySavedResults.js';
-import { createFilePicker } from '../components/createFilePicker.js';
 import { getBaseUrl } from './getBaseUrl.js';
 
 export function checkForResults(currentUrl, resultDiv, filePickerDiv) {
@@ -10,19 +9,23 @@ export function checkForResults(currentUrl, resultDiv, filePickerDiv) {
             const extractedDataByPr = data.extractedDataByPr || {};
             const prData = extractedDataByPr[baseUrl];
 
-            if (prData && prData.results && prData.results.length > 0) {
+            const hasResults = prData && prData.results && prData.results.length > 0;
+            const hasExtractedData = prData && prData.extractedData && prData.extractedData.length > 0;
+
+            if (hasResults) {
                 // Display saved results
                 const results = prData.results;
                 displaySavedResults(results, resultDiv);
                 resultDiv.style.display = 'block';
                 if (filePickerDiv) filePickerDiv.style.display = 'none';
-                resolve(true); // Indicate that results exist
             } else {
                 // No results yet
                 resultDiv.style.display = 'none';
                 if (filePickerDiv) filePickerDiv.style.display = 'none';
-                resolve(false); // Indicate that results do not exist
             }
+
+            // Resolve both hasResults and hasExtractedData
+            resolve({ hasResults, hasExtractedData });
         });
     });
 }
