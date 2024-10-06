@@ -24,14 +24,19 @@ export async function processFiles(selectedFiles, prUrl) {
       }
     });
 
-    // Retrieve existing allPrResults from storage
-    const { allPrResults = {} } = await chrome.storage.local.get('allPrResults');
+    // Retrieve existing extractedDataByPr from storage
+    const { extractedDataByPr = {} } = await chrome.storage.local.get('extractedDataByPr');
 
-    // Update the allPrResults object with the new results for the current PR
-    allPrResults[prUrl] = results;
+    // Ensure prData exists
+    if (!extractedDataByPr[prUrl]) {
+      extractedDataByPr[prUrl] = {};
+    }
 
-    // Save updated allPrResults to storage
-    await setInStorage('allPrResults', allPrResults);
+    // Save the results
+    extractedDataByPr[prUrl].results = results;
+
+    // Save updated extractedDataByPr to storage
+    await setInStorage('extractedDataByPr', extractedDataByPr);
 
     // Save processingComplete flag
     await setInStorage('processingComplete', true);

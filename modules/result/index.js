@@ -1,9 +1,9 @@
 import { checkForResults } from './checkForResults.js';
 import { displaySavedResults } from './displaySavedResults.js';
-import { compareBaseUrls } from './compareBaseUrls.js';
+import { getBaseUrl } from './getBaseUrl.js';
 
 export {
   checkForResults,
   displaySavedResults,
-  compareBaseUrls,
+  getBaseUrl,
 };

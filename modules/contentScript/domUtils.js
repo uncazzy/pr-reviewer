@@ -8,23 +8,24 @@ export async function expandAllFiles() {
         const collapseButton = container.querySelector('button.js-collapse-diff');
 
         if (expandButton && expandButton.offsetParent !== null && !expandButton.hidden) {
-            // File is not expanded, so expand it
-            console.log("Expanding content...");
+            console.log(`Expanding file container...`);
             expandButton.click();
             expandedCount++;
-            // Wait for the content to load after expanding
-            await new Promise(resolve => setTimeout(resolve, 500));
+
+            // Wait for content to load after expanding
+            await new Promise(resolve => setTimeout(resolve, 1000));
         } else if (collapseButton && expandButton.hidden) {
-            // Content is already expanded, skip
-            console.log("Content already expanded, skipping...");
+            console.log("File is already expanded, skipping...");
         }
     }
 
     console.log(`Expanded ${expandedCount} out of ${fileContainers.length} files`);
 
-    // Wait for content to load if any files were expanded
     if (expandedCount > 0) {
+        console.log('Waiting for content to fully load after expanding...');
         await waitForContentLoad();
+    } else {
+        console.warn('No files were expanded. Maybe all files were already expanded.');
     }
 }
 

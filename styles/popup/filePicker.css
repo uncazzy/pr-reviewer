@@ -24,14 +24,64 @@
     font-family: var(--font-family);
 }
 
-/* File Item Styles */
+/* Filter Buttons */
+#file-type-filters {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: var(--padding-small);
+}
+
+.filter-button {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color-light);
+    border-radius: var(--border-radius-pill);
+    padding: var(--padding-extra-small) var(--padding-small);
+    margin-right: var(--padding-extra-small);
+    margin-bottom: var(--padding-extra-small);
+    cursor: pointer;
+    transition: background-color var(--transition-duration) var(--transition-timing);
+}
+
+.filter-button.active {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+/* Select/Deselect Buttons */
+#select-buttons-container {
+    display: flex;
+    margin-bottom: var(--padding-small);
+}
+
+#select-buttons-container button {
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: var(--border-radius);
+    padding: var(--padding-extra-small) var(--padding-small);
+    margin-right: var(--padding-small);
+    cursor: pointer;
+    transition: background-color var(--transition-duration) var(--transition-timing);
+}
+
+#select-buttons-container button:hover {
+    background-color: var(--primary-hover-color);
+}
+
+/* File List Styles */
+#file-list-container {
+    display: flex;
+    flex-direction: column;
+}
+
 .file-picker-item {
     display: flex;
     align-items: center;
     padding: var(--padding-extra-small) var(--padding-small);
     border-radius: var(--border-radius);
     transition: background-color var(--transition-duration) var(--transition-timing),
-        box-shadow var(--transition-duration) var(--transition-timing);
+                box-shadow var(--transition-duration) var(--transition-timing);
     cursor: pointer;
 }
 
@@ -62,60 +112,12 @@
     color: var(--secondary-color);
 }
 
-/* Folder Styles */
-.folder {
-    margin-left: var(--padding-small);
-}
-
-.folder .folder-header {
-    display: flex;
-    align-items: center;
+/* File Type Tag Styles */
+.file-type-tag {
+    background-color: var(--tertiary-color);
+    color: #fff;
+    border-radius: var(--border-radius-pill);
     padding: var(--padding-extra-small) var(--padding-small);
-    cursor: pointer;
-    font-weight: bold;
-    color: var(--text-color);
-}
-
-.folder .folder-header:hover {
-    background-color: var(--primary-hover-color);
-    border-radius: var(--border-radius);
-}
-
-.folder .folder-content {
     margin-left: var(--padding-small);
-    display: none;
-    /* Collapsed by default */
-}
-
-/* Open Folder Icon */
-.folder.open .folder-content {
-    display: block;
-}
-
-.folder.open .folder-header .folder-icon {
-    transform: rotate(90deg);
-}
-
-/* Folder Icon */
-.folder-icon {
-    margin-right: var(--padding-small);
-    transition: transform var(--transition-duration) var(--transition-timing);
-}
-
-/* Scrollbar Styles */
-#file-picker::-webkit-scrollbar {
-    width: 8px;
-}
-
-#file-picker::-webkit-scrollbar-track {
-    background: var(--secondary-background-color);
-}
-
-#file-picker::-webkit-scrollbar-thumb {
-    background: var(--border-color-light);
-    border-radius: var(--border-radius);
-}
-
-#file-picker::-webkit-scrollbar-thumb:hover {
-    background: var(--border-color);
+    font-size: 12px;
 }

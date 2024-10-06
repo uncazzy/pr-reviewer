@@ -1,54 +1,85 @@
-import { getFromStorage } from '../storage/index.js';
+export async function createFilePicker(filePickerDiv, extractedData) {
+    if (!filePickerDiv) {
+        console.error('filePickerDiv is not defined');
+        return;
+    }
 
-export async function createFilePicker(filePickerDiv) {
     // Clear any existing content
     filePickerDiv.innerHTML = '';
-
-    // Fetch the extracted data from storage
-    const { extractedData } = await getFromStorage('extractedData');
 
     if (!extractedData || extractedData.length === 0) {
         filePickerDiv.innerHTML = '<p>No files found to display.</p>';
         return;
     }
 
+    // Create a search bar
+    const searchInput = document.createElement('input');
+    searchInput.id = 'file-picker-search';
+    searchInput.type = 'text';
+    searchInput.placeholder = 'Search files...';
+
+    // Create file type filters
+    const fileTypes = [...new Set(extractedData.map(file => file.fileName.split('.').pop().toLowerCase()))];
+    const filterContainer = document.createElement('div');
+    filterContainer.id = 'file-type-filters';
+
+    fileTypes.forEach(type => {
+        const filterButton = document.createElement('button');
+        filterButton.className = 'filter-button';
+        filterButton.textContent = `.${type}`;
+        filterButton.dataset.type = type;
+        filterButton.addEventListener('click', () => {
+            toggleFileTypeFilter(type, filterButton);
+        });
+        filterContainer.appendChild(filterButton);
+    });
+
+    filePickerDiv.appendChild(searchInput);
+    filePickerDiv.appendChild(filterContainer);
+
     // Create a form to contain the checkboxes
     const form = document.createElement('form');
     form.id = 'file-picker-form';
 
-    // Create a "Select All" checkbox
-    const selectAllDiv = document.createElement('div');
-    selectAllDiv.className = 'file-picker-item';
+    // Create "Select All" and "Deselect All" buttons
+    const selectButtonsContainer = document.createElement('div');
+    selectButtonsContainer.id = 'select-buttons-container';
 
-    const selectAllCheckbox = document.createElement('input');
-    selectAllCheckbox.type = 'checkbox';
-    selectAllCheckbox.id = 'select-all';
-    selectAllCheckbox.checked = true;
-
-    const selectAllLabel = document.createElement('label');
-    selectAllLabel.htmlFor = 'select-all';
-    selectAllLabel.textContent = 'Select All';
-
-    selectAllDiv.appendChild(selectAllCheckbox);
-    selectAllDiv.appendChild(selectAllLabel);
-    form.appendChild(selectAllDiv);
-
-    // Event listener for "Select All" checkbox
-    selectAllCheckbox.addEventListener('change', () => {
-        const checkboxes = form.querySelectorAll('input[type="checkbox"]:not(#select-all)');
+    const selectAllButton = document.createElement('button');
+    selectAllButton.textContent = 'Select All';
+    selectAllButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        const checkboxes = form.querySelectorAll('input[type="checkbox"]');
         checkboxes.forEach(checkbox => {
-            checkbox.checked = selectAllCheckbox.checked;
+            checkbox.checked = true;
         });
     });
 
-    // Create checkboxes for each file
+    const deselectAllButton = document.createElement('button');
+    deselectAllButton.textContent = 'Deselect All';
+    deselectAllButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        const checkboxes = form.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+    });
+
+    selectButtonsContainer.appendChild(selectAllButton);
+    selectButtonsContainer.appendChild(deselectAllButton);
+    filePickerDiv.appendChild(selectButtonsContainer);
+
+    // Render file list
+    const fileListContainer = document.createElement('div');
+    fileListContainer.id = 'file-list-container';
+
     extractedData.forEach(file => {
         const fileDiv = document.createElement('div');
         fileDiv.className = 'file-picker-item';
+        fileDiv.dataset.type = file.fileName.split('.').pop().toLowerCase();
 
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
-        checkbox.id = `file-${file.index}`;
         checkbox.name = 'files';
         checkbox.value = file.fileName;
         checkbox.checked = true;
@@ -81,25 +112,43 @@ export async function createFilePicker(filePickerDiv) {
         }
 
         const label = document.createElement('label');
-        label.htmlFor = `file-${file.index}`;
         label.textContent = file.fileName;
+
+        // Add file type tag
+        const fileTypeTag = document.createElement('span');
+        fileTypeTag.className = 'file-type-tag';
+        fileTypeTag.textContent = `.${fileExtension}`;
 
         fileDiv.appendChild(checkbox);
         fileDiv.appendChild(iconSpan);
         fileDiv.appendChild(label);
-        form.appendChild(fileDiv);
+        fileDiv.appendChild(fileTypeTag);
+        fileListContainer.appendChild(fileDiv);
+    });
 
-        // Event listener for individual checkboxes
-        checkbox.addEventListener('change', () => {
-            if (!checkbox.checked) {
-                selectAllCheckbox.checked = false;
+    form.appendChild(fileListContainer);
+    filePickerDiv.appendChild(form);
+
+    // Search functionality
+    searchInput.addEventListener('input', () => {
+        const searchTerm = searchInput.value.toLowerCase();
+        const items = fileListContainer.querySelectorAll('.file-picker-item');
+        items.forEach(item => {
+            const label = item.querySelector('label');
+            if (label && label.textContent.toLowerCase().includes(searchTerm)) {
+                item.style.display = 'flex';
             } else {
-                const allChecked = [...form.querySelectorAll('input[name="files"]')].every(cb => cb.checked);
-                selectAllCheckbox.checked = allChecked;
+                item.style.display = 'none';
             }
         });
     });
 
-    // Append the form to the file picker div
-    filePickerDiv.appendChild(form);
+    // Filter functionality
+    function toggleFileTypeFilter(type, button) {
+        const isActive = button.classList.toggle('active');
+        const items = fileListContainer.querySelectorAll(`.file-picker-item[data-type="${type}"]`);
+        items.forEach(item => {
+            item.style.display = isActive ? 'none' : 'flex';
+        });
+    }
 }

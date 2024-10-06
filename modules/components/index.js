@@ -5,6 +5,7 @@ import { createExpandButton } from './createExpandButton.js';
 import { expandFeedback } from './expandFeedback.js';
 import { createDetailedFeedbackDiv } from './createDetailedFeedbackDiv.js';
 import { createFileFeedback } from './createFileFeedback.js';
+import { createFilePicker } from './createFilePicker.js'
 
 export {
     createFileName,
@@ -14,4 +15,5 @@ export {
     expandFeedback,
     createDetailedFeedbackDiv,
     createFileFeedback,
+    createFilePicker
 };

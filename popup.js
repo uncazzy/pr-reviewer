@@ -1,8 +1,6 @@
 import { handleAnalyzeClick } from './modules/handlers/analyzeClick/index.js';
-import { handleStorageChanges, getFromStorage, setInStorage } from './modules/storage/index.js';
-import { checkForResults } from "./modules/result/index.js";
-import { createFilePicker } from './modules/components/createFilePicker.js';
-import { executeContentScript } from './modules/handlers/analyzeClick/executeContentScript.js';
+import { handleStorageChanges, setInStorage } from './modules/storage/index.js';
+import { getBaseUrl, checkForResults } from "./modules/result/index.js";
 
 const analyzeButton = document.getElementById('analyze');
 const reanalyzeButton = document.getElementById('reanalyze');
@@ -14,8 +12,9 @@ const filePickerDiv = document.getElementById('file-picker');
 // Event Listeners
 document.addEventListener('DOMContentLoaded', initializePopup);
 analyzeButton.addEventListener('click', async () => {
-    await handleAnalyzeClick(loadingDiv, analyzeButton, resultDiv, filePickerDiv);
+    await handleAnalyzeClick(loadingDiv, analyzeButton, reanalyzeButton, resultDiv, filePickerDiv);
 });
+
 chrome.storage.onChanged.addListener(handleStorageChanges);
 
 reanalyzeButton.addEventListener('click', async () => {
@@ -30,6 +29,7 @@ settingsButton.addEventListener('click', () => {
 // Initialization
 async function initializePopup() {
     const hasResults = await checkGitHubPRPage();
+
     if (hasResults) {
         analyzeButton.style.display = 'none';
         reanalyzeButton.style.display = 'inline-block';
@@ -37,6 +37,7 @@ async function initializePopup() {
         analyzeButton.style.display = 'inline-block';
         reanalyzeButton.style.display = 'none';
     }
+
     initializeSyntaxHighlighting();
 }
 
@@ -49,23 +50,9 @@ async function checkGitHubPRPage() {
             analyzeButton.disabled = !isPRPage;
 
             if (isPRPage) {
-
-                // Check if results already exist
-                const hasResults = await checkForResults(currentUrl, resultDiv);
+                const hasResults = await checkForResults(currentUrl, resultDiv, filePickerDiv);
                 if (!hasResults) {
-                    // Execute content script to extract files
-                    await executeContentScript(currentTab.id);
-                    // Wait for extractedData to be available
-                    await waitForExtractedData();
-
-                    // Show the file picker
-                    const { extractedData } = await getFromStorage('extractedData');
-                    if (extractedData && extractedData.length > 0) {
-                        createFilePicker(filePickerDiv);
-                        filePickerDiv.style.display = 'block';
-                    } else {
-                        filePickerDiv.style.display = 'none';
-                    }
+                    // Proceed normally
                 } else {
                     filePickerDiv.style.display = 'none';
                 }
@@ -88,14 +75,17 @@ function initializeSyntaxHighlighting() {
 }
 
 // Helper function to wait for extractedData to be available
-function waitForExtractedData() {
+function waitForExtractedData(baseUrl) {
     return new Promise((resolve, reject) => {
         const maxAttempts = 20; // Wait up to 10 seconds
         let attempts = 0;
 
         const checkData = () => {
-            chrome.storage.local.get('extractedData', (data) => {
-                if (data.extractedData && data.extractedData.length > 0) {
+            chrome.storage.local.get('extractedDataByPr', (data) => {
+                const extractedDataByPr = data.extractedDataByPr || {};
+                const prData = extractedDataByPr[baseUrl];
+                const extractedData = prData ? prData.extractedData : null;
+                if (extractedData && extractedData.length > 0) {
                     resolve();
                 } else {
                     attempts++;
@@ -119,14 +109,16 @@ async function resetUI() {
         });
     });
 
-    // Retrieve existing allPrResults from storage
-    const { allPrResults = {} } = await chrome.storage.local.get('allPrResults');
+    const basePrUrl = getBaseUrl(currentUrl)
 
-    // Remove results for the current PR
-    delete allPrResults[currentUrl];
+    // Retrieve existing extractedDataByPr from storage
+    const { extractedDataByPr = {} } = await chrome.storage.local.get(['extractedDataByPr']);
 
-    // Save updated allPrResults to storage
-    await setInStorage('allPrResults', allPrResults);
+    // Remove results and extractedData for the current PR
+    delete extractedDataByPr[basePrUrl];
+
+    // Save updated data back to storage
+    await setInStorage('extractedDataByPr', extractedDataByPr);
 
     // Also remove processingComplete flag
     await new Promise((resolve) => {
@@ -140,5 +132,6 @@ async function resetUI() {
     filePickerDiv.style.display = 'none';
     analyzeButton.disabled = false;
     analyzeButton.style.display = 'inline-block';
+    analyzeButton.textContent = 'Analyze PR';
     reanalyzeButton.style.display = 'none';
 }
