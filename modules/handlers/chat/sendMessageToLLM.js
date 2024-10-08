@@ -1,24 +1,41 @@
 import { getApiKey, getModel } from '../../storage/index.js';
 import { chatMessages } from './chatUtils.js';
 import { createChatPrompt, createSystemPrompt } from '../../prompts/chatPrompt.js';
+import { getBaseUrl } from '../../result/index.js';
 
 export async function sendMessageToLLM(fileName, detailedFeedback, fullContent, newCode, oldCode, userQuestion, messagesContainer) {
-    // First, retrieve the `prResult` from `chrome.storage.local`
-    const prResult = await new Promise((resolve, reject) => {
-        chrome.storage.local.get('prResults', (data) => {
-            const prResults = data.prResults || [];
-            const result = prResults.find(pr => pr.fileName === fileName);
-            if (result) {
-                resolve(result);
-            } else {
-                reject('No prResult found for this file.');
-            }
+    let fileData = null;
+
+    try {
+        // Retrieve the `extractedDataByPr` and find the relevant file data using the base URL
+        const baseUrl = await new Promise((resolve) => {
+            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+                resolve(getBaseUrl(tabs[0].url));
+            });
         });
-    });
+
+        const data = await new Promise((resolve) => chrome.storage.local.get('extractedDataByPr', resolve));
+        const extractedDataByPr = data.extractedDataByPr || {};
+
+        // Get the specific PR data using the base URL
+        const prData = extractedDataByPr[baseUrl];
+        if (prData && prData.extractedData && prData.extractedData.length > 0) {
+            // Find the specific file data based on fileName
+            fileData = prData.extractedData.find(file => file.fileName === fileName);
+
+            if (!fileData) {
+                console.warn(`No extracted data found for file: ${fileName}. Proceeding without file context.`);
+            }
+        } else {
+            console.warn(`No extractedData found for baseUrl: ${baseUrl}. Proceeding without file context.`);
+        }
+    } catch (error) {
+        console.error('Error retrieving extracted data from storage:', error);
+    }
 
     // Prepare the system and initial prompts using the new prompt functions
     const systemPrompt = createSystemPrompt(fileName, fullContent);
-    const initialPrompt = createChatPrompt(fileName, fullContent, oldCode, newCode, prResult);
+    const initialPrompt = createChatPrompt(fileName, fullContent, oldCode, newCode, fileData);
 
     // Prepare the messages to send to OpenAI API
     let apiMessages = []; // Messages sent to the LLM, including system and initial prompts
