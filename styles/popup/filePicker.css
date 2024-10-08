@@ -81,7 +81,7 @@
     padding: var(--padding-extra-small) var(--padding-small);
     border-radius: var(--border-radius);
     transition: background-color var(--transition-duration) var(--transition-timing),
-                box-shadow var(--transition-duration) var(--transition-timing);
+        box-shadow var(--transition-duration) var(--transition-timing);
     cursor: pointer;
 }
 
