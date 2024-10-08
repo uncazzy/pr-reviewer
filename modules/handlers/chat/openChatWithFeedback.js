@@ -11,6 +11,7 @@ export function openChatWithFeedback(fileName, feedback, fullContent, newCode, o
         chatMessages.push(...storedMessages);
 
         document.getElementById('analyze').style.display = 'none';
+        document.getElementById('reanalyze').style.display = 'none';
         document.getElementById('settings-button').style.display = 'none';
 
         const resultDiv = document.getElementById('result');
