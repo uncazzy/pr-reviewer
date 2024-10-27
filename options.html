@@ -16,28 +16,34 @@
     <!-- Overview Section -->
     <div class="section">
         <h2>Overview</h2>
-        <p>PR Code Reviewer is a Chrome extension that helps streamline GitHub pull request reviews. By using OpenAI's GPT-4, it analyzes code changes and provides suggestions for improvements or potential issues.</p>
-        <p>The extension automatically extracts new code additions, old code removals or changes, and the full code context from the pull request. This data is then formatted into a prompt for GPT-4 to generate precise feedback, making code reviews faster and more efficient.</p>
+        <p>PR Code Reviewer is a Chrome extension for efficient GitHub pull request reviews. Powered by GPT-4, it
+            analyzes code changes and suggests improvements or flags issues.</p>
+        <p>The extension formats new, modified, or removed code into prompts for GPT-4 to deliver precise feedback,
+            speeding up the review process.</p>
     </div>
 
     <!-- How It Works Section -->
     <div class="section">
         <h2>How It Works</h2>
-        <p>The extension operates by analyzing the code within the <strong>Files</strong> section of a GitHub Pull Request. It extracts the affected files, including any additions, deletions, or modifications, and sends this information to OpenAI's GPT-4 for analysis. The feedback provided is based solely on the code changes present in the PR and does not require the extension to access the entire repository's codebase.</p>
-        <p>Importantly, only the code from the files affected by the PR is processed. If a file contains proprietary or sensitive code, you should refrain from using the extension on that specific file to maintain confidentiality.</p>
+        <p>The extension reviews code in the <strong>Files</strong> section of a GitHub PR, identifying additions,
+            deletions, and edits, which it sends to GPT-4. Feedback is based only on PR changes, maintaining repository
+            confidentiality.</p>
+        <p>For sensitive files, avoid using the extension to ensure privacy.</p>
     </div>
 
     <!-- Disclaimer Section -->
     <div class="section">
         <h2>Disclaimer</h2>
-        <p>By using PR Code Reviewer, you agree that the code snippets from your Pull Requests are sent to OpenAI's servers for analysis. OpenAI may process this data in accordance with their <a href="https://openai.com/policies/privacy-policy" target="_blank">Privacy Policy</a>.</p>
-        <p>Ensure that you do not use this extension on repositories containing sensitive, proprietary, or confidential code unless you have the appropriate permissions and consent.</p>
+        <p>Using PR Code Reviewer means code snippets from PRs are sent to OpenAI for analysis per their <a
+                href="https://openai.com/policies/privacy-policy" target="_blank">Privacy Policy</a>. Ensure appropriate
+            permissions before using it on sensitive code.</p>
     </div>
 
     <!-- API Configuration Section -->
     <div class="section">
         <h2>API Configuration</h2>
-        <p>Get a free OpenAI API key when you sign up for an OpenAI account <a href="https://platform.openai.com/api-keys" target="_blank">here</a>.</p>
+        <p>Get a free OpenAI API key when you sign up for an OpenAI account <a
+                href="https://platform.openai.com/api-keys" target="_blank">here</a>.</p>
         <label for="apiKey" class="label">OpenAI API Key:</label>
         <input type="text" id="apiKey" class="input-field" placeholder="Enter your OpenAI API Key">
         <div>
@@ -61,21 +67,25 @@
     <!-- Data Management Section -->
     <div class="section">
         <h2>Data Management</h2>
-        <p>If you ever need to reset your settings or remove stored data, you can do so below. Clearing the stored data will reset your API key, model selection, and any stored PR feedback.</p>
+        <p>If you ever need to reset your settings or remove stored data, you can do so below. Clearing the stored data
+            will reset your API key, model selection, and any stored PR feedback.</p>
         <button id="clearStorage" class="button button--danger">Clear All Stored Data</button>
     </div>
 
     <!-- Feedback Section -->
     <div class="section">
         <h2>Submit Feedback</h2>
-        <p>I value your feedback! If you have any thoughts, suggestions, or issues you'd like to share, please let me know.</p>
-        <p>You can reach out to me directly at <a href="mailto:PRreviews@gmail.com">PRreviews@gmail.com</a>.</p>
+        <p>I value your feedback! If you have any thoughts, suggestions, or issues you'd like to share, please let me
+            know.</p>
+        <p>You can reach out to me directly at <a href="mailto:pr-code-review@azzy.cloud">pr-code-review@azzy.cloud</a>.
+        </p>
     </div>
 
     <!-- Donate Section -->
     <div class="section">
         <h2>Support the Project</h2>
-        <p>If you find this extension helpful, consider supporting its development. Your donations help me continue improving and maintaining the extension!</p>
+        <p>If you find this extension helpful, consider supporting its development. Your donations help me continue
+            improving and maintaining the extension!</p>
         <button id="donateButton" class="button button--icon"><i class="fas fa-heart donate-button"></i> Donate</button>
     </div>
 
