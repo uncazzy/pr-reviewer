@@ -30,23 +30,19 @@ export function createChatPrompt(fileName, fullContent, oldCode, newCode, prResu
   \`\`\`
   
   ## Initial Feedback:
-  Status: ${prResult.status || 'N/A'}
-  Issue: ${prResult.issue || 'N/A'}}
+  - **Status**: ${prResult.status || 'N/A'}
+  - **Issue**: ${prResult.issue || 'N/A'}
   
-  Provide a detailed review of the changes, focusing on the following:
-  1. What specific changes are needed (if any)?
-  2. Why are these changes necessary?
-  3. If applicable, provide brief code examples to illustrate the suggested changes.
+  ## Detailed Review Instructions:
+  1. **Identify specific changes needed**: Describe any specific code changes required, based on logic, syntax, or best practices.
+  2. **Explain rationale**: Provide a clear reason for each recommended change.
+  3. **Illustrate with examples**: If applicable, include brief code examples to help clarify the suggested modifications.
   
-  Important: The "Updated Lines of Code" section represents only the specific lines that have been changed or added in this pull request. These lines are **not meant to be a complete code block** on their own. You must evaluate these updated lines **in the context of the entire file**, as shown in the "Full File Content" section. The updated lines may appear incomplete when viewed in isolation, but they should be considered within the full code structure.
+  ### Important Context:
+  - The "Updated Lines of Code" section contains only the specific lines changed in this pull request and **is not a standalone code block**. **Evaluate these changes within the full file context** for an accurate review.
+  - **New File Note**: If no old code is provided, treat this as a new file and review it accordingly.
   
-  Do not assess the updated lines of code in isolation. Always evaluate them in the full context of the entire file.
-  
-  If no old code is provided, assume this is a new file and review accordingly.
-  
-  Consider the initial feedback provided and expand upon it if relevant. If the initial feedback suggests issues, address them in your detailed review.
-  
-  Keep your response concise and to the point. Use markdown formatting for code snippets, and ensure all feedback is actionable and easy to follow.`
+  Use markdown formatting for any code snippets, and keep all feedback actionable, concise, and easy to follow. Address the initial feedback provided, expanding as needed.`
   };
 }
 
@@ -54,7 +50,11 @@ export function createSystemPrompt(fileName, fullContent) {
 
   return {
     role: 'system',
-    content: `You are assisting the user in a real-time chat interaction. Provide concise, focused responses. If the user asks follow-up questions, keep your answers to the point and avoid long explanations unless specifically requested. Avoid walls of text, and break down explanations into digestible parts. This interaction revolves around the following file:\n\n${fileName}\n\n${fullContent}\n\nYour replies should all be oriented around the code contained within this file, and nothing else. If the user asks unrelated questions, ask them to focus on this file and the feedback for it.`
-  };
+    content: `You are assisting the user in a real-time chat to provide focused, actionable code review feedback.
 
+Your role:
+- **Maintain clarity and context**: Focus strictly on the code in "${fileName}" as provided. Respond concisely, breaking down feedback into digestible parts. Use markdown for code snippets to enhance readability.
+- **Handle follow-up questions**: Respond directly, keeping answers brief unless longer explanations are requested. Avoid extraneous detail or "walls of text."
+- **Guide focus**: If the user strays off-topic, gently redirect them to questions about this file and its specific feedback.`
+  };
 }
