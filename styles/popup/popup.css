@@ -4,8 +4,9 @@
 @import url('./filePicker.css');
 
 /* General Body and Typography */
-html, body {
-    width: 600px; 
+html,
+body {
+    width: 600px;
     height: 600px;
     display: flex;
     flex-direction: column;

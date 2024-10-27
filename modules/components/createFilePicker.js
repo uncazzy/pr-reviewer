@@ -84,7 +84,9 @@ export async function createFilePicker(filePickerDiv, extractedData) {
         checkbox.type = 'checkbox';
         checkbox.name = 'files';
         checkbox.value = file.fileName;
-        checkbox.checked = true;
+        checkbox.checked = !file.isLargeFile;  // Only check non-large files
+        checkbox.disabled = file.isLargeFile;  // Disable checkbox for large files
+
 
         const iconSpan = document.createElement('span');
         iconSpan.className = 'file-icon';
@@ -97,6 +99,11 @@ export async function createFilePicker(filePickerDiv, extractedData) {
 
         const label = document.createElement('label');
         label.textContent = file.fileName;
+
+        if (file.isLargeFile) {
+            fileDiv.title = 'This file is too large and needs manual expansion to be included in analysis.';
+            fileDiv.classList.add('large-file'); // Add a specific class for styling
+        }
 
         // Add file type tag
         const fileTypeTag = document.createElement('span');

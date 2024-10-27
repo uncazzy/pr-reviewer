@@ -121,3 +121,13 @@
     margin-left: var(--padding-small);
     font-size: 12px;
 }
+
+/* Large file style */
+.file-picker-item.large-file {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.file-picker-item.large-file label {
+    color: gray;
+}

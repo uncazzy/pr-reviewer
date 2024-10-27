@@ -42,12 +42,16 @@ export function extractFileInfo(file, index) {
         .map(node => node.textContent.replace(/\s+$/, ''))
         .join('\n');
 
+    // Detect if the file has a "Load diff" button
+    const isLargeFile = !!file.querySelector('button.js-diff-load');
+
     return {
         fileName,
         oldCode,
         newCode,
         fullContent,
-        index
+        index,
+        isLargeFile
     };
 }
 
