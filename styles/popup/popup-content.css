@@ -1,4 +1,5 @@
-@import url('../variables.css'); /* Import variables */
+@import url('../variables.css');
+/* Import variables */
 
 /* Main Content Styles */
 #result {
@@ -33,7 +34,7 @@
     max-width: fit-content;
     border-radius: var(--border-radius);
     margin-bottom: 5px;
-    padding: var(--padding-small);
+    padding: var(--padding-extra-small);
 }
 
 .looks-good {
@@ -104,8 +105,13 @@
 
 /* Keyframes for Spinner */
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* Loading Container */
@@ -119,7 +125,8 @@
 }
 
 /* Refresh and Collapse Buttons */
-.refresh-button, .collapse-button {
+.refresh-button,
+.collapse-button {
     margin: var(--padding-small);
     padding: var(--padding-small) var(--padding-medium);
     background-color: #f0f0f0;
@@ -132,7 +139,8 @@
     margin-right: 0px;
 }
 
-.refresh-button:hover, .collapse-button:hover {
+.refresh-button:hover,
+.collapse-button:hover {
     background-color: #e0e0e0;
 }
 
@@ -144,7 +152,7 @@
     background-color: #f0f0f0;
     border: none;
     border-radius: 50%;
-    width: 30px; 
+    width: 30px;
     height: 30px;
     cursor: pointer;
     display: flex;
