@@ -42,8 +42,8 @@ ${newCode}
 
 ## Required Output Format:
 
-Status: [Looks Good / Requires Changes]
-Issue: If “Requires Changes,” briefly note the primary issue. If not, respond with "No issues detected."
+**Status**: [Looks Good / Requires Changes]
+**Issue**: If “Requires Changes,” provide a brief one-sentence description of the main issue. Keep it as short and concise as possible. Otherwise reply with "No issues detected""
 `;
 }
 

@@ -5,9 +5,12 @@ import { createSystemPrompt, createReviewPrompt } from '../prompts/reviewPrompt.
 // Function to send a code review request to OpenAI
 export async function analyzeCodeWithGPT(fileName, oldCode, newCode, fullFileContent) {
   console.log(`Analyzing file: ${fileName}`);
+
   const systemPrompt = createSystemPrompt(fileName, oldCode, newCode, fullFileContent);
   const userPrompt = createReviewPrompt(fileName, oldCode, newCode, fullFileContent);
-  console.log('Prompt being sent to OpenAI:', prompt);
+
+  console.log("System Prompt being sent to OpenAI:", systemPrompt);
+  console.log('User Prompt being sent to OpenAI:', userPrompt);
 
   const apiCall = async () => {
     const apiKey = await getApiKey();
@@ -23,11 +26,12 @@ export async function analyzeCodeWithGPT(fileName, oldCode, newCode, fullFileCon
           { role: 'user', content: systemPrompt },
         ],
         max_tokens: 1500,
-        temperature: 0.2,
+        temperature: 0,
       }),
     });
 
     const data = await response.json();
+
     if (data.error) throw new Error(`OpenAI API Error: ${data.error.message}`);
     return data.choices[0].message.content;
   };
