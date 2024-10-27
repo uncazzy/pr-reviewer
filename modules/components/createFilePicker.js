@@ -95,6 +95,13 @@ export async function createFilePicker(filePickerDiv, extractedData) {
             case 'js':
                 iconSpan.innerHTML = '<i class="fab fa-js-square"></i>';
                 break;
+            case 'jsx':
+            case 'tsx':
+                iconSpan.innerHTML = '<i class="fab fa-react"></i>';
+                break;
+            case 'ts':
+                iconSpan.innerHTML = '<i class="fab fa-js-square"></i>'; // or a TypeScript-specific icon
+                break;
             case 'css':
                 iconSpan.innerHTML = '<i class="fab fa-css3-alt"></i>';
                 break;
@@ -107,9 +114,45 @@ export async function createFilePicker(filePickerDiv, extractedData) {
             case 'java':
                 iconSpan.innerHTML = '<i class="fab fa-java"></i>';
                 break;
+            case 'json':
+                iconSpan.innerHTML = '<i class="fas fa-database"></i>';
+                break;
+            case 'xml':
+            case 'yml':
+            case 'yaml':
+                iconSpan.innerHTML = '<i class="fas fa-code"></i>';
+                break;
+            case 'md':
+                iconSpan.innerHTML = '<i class="fab fa-markdown"></i>';
+                break;
+            case 'sh':
+            case 'bash':
+                iconSpan.innerHTML = '<i class="fas fa-terminal"></i>';
+                break;
+            case 'php':
+                iconSpan.innerHTML = '<i class="fab fa-php"></i>';
+                break;
+            case 'rb':
+                iconSpan.innerHTML = '<i class="fas fa-gem"></i>';
+                break;
+            case 'cpp':
+            case 'c':
+                iconSpan.innerHTML = '<i class="fas fa-copyright"></i>'; // Use custom icons for C/C++
+                break;
+            case 'go':
+                iconSpan.innerHTML = '<i class="fab fa-golang"></i>'; // Add Golang icon if available
+                break;
+            case 'sql':
+                iconSpan.innerHTML = '<i class="fas fa-database"></i>';
+                break;
+            case 'dockerfile':
+            case 'docker':
+                iconSpan.innerHTML = '<i class="fab fa-docker"></i>';
+                break;
             default:
                 iconSpan.innerHTML = '<i class="fas fa-file-alt"></i>';
         }
+
 
         const label = document.createElement('label');
         label.textContent = file.fileName;
