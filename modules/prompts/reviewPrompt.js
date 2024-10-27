@@ -42,8 +42,12 @@ ${newCode}
 
 ## Required Output Format:
 
-**Status**: [Looks Good / Requires Changes]
-**Issue**: If “Requires Changes,” provide a brief one-sentence description of the main issue. Keep it as short and concise as possible. Otherwise reply with "No issues detected.""
+**Status**: [Looks Good / Warning / Requires Changes]
+- **Looks Good**: Code is acceptable as it stands with no issues detected.
+- **Warning**: Optional improvements or best practices that could enhance code quality but are not required for functionality.
+- **Requires Changes**: Essential corrections are necessary for code to function as intended or to avoid logic flaws that would cause incorrect outputs. **Do not flag issues that are solely related to best practices if the code is correct and functional as written.**
+
+**Issue**: If the status is “Warning” or “Requires Changes,” provide a brief one-sentence description of the main issue. Keep it as short and concise as possible. Otherwise reply with "No issues detected.""
 `;
 }
 
@@ -58,8 +62,8 @@ export function createSystemPrompt(fileName, oldCode, newCode, fullFileContent) 
 
 Your goal:
 - Focus on the "Updated Lines of Code" within the full file context provided. **Do not assess these updated lines in isolation** since they may appear incomplete when separated from the file’s complete structure.
-- Identify any issues with logic, structure, or coding standards and provide feedback accordingly.
-- For efficiency, summarize findings concisely in the requested format.
+- Identify any issues with logic, structure, or coding standards, and classify each as either "Requires Changes" for essential adjustments, "Warning" for optional improvements, or "Looks Good" if no issues are detected.
+- Summarize findings concisely in the requested format for efficiency.
 `;
 }
 

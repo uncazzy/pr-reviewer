@@ -41,6 +41,10 @@
     background-color: var(--success-color);
 }
 
+.warning {
+    background-color: var(--warning-color);
+}
+
 .requires-changes {
     background-color: var(--danger-color);
 }

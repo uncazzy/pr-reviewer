@@ -3,7 +3,7 @@ export function parseFeedback(feedback) {
   const issueMatch = feedback.match(/\*\*Issue\*\*: (.*)/i);
 
   return {
-    status: statusMatch ? statusMatch[1].trim() : 'Requires Changes',
+    status: statusMatch ? statusMatch[1].trim() : 'Error analyzing file',
     issue: issueMatch ? issueMatch[1].trim() : '',
   };
 }
