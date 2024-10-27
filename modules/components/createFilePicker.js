@@ -1,3 +1,5 @@
+import { getFileIcon } from "../../utils/getFileIcon.js"
+
 export async function createFilePicker(filePickerDiv, extractedData) {
     if (!filePickerDiv) {
         console.error('filePickerDiv is not defined');
@@ -90,101 +92,8 @@ export async function createFilePicker(filePickerDiv, extractedData) {
         // Determine the file extension
         const fileExtension = file.fileName.split('.').pop().toLowerCase();
 
-        // Assign an icon based on file extension
-        switch (fileExtension) {
-            case 'js':
-                iconSpan.innerHTML = '<i class="fab fa-js-square"></i>';
-                break;
-            case 'jsx':
-            case 'tsx':
-                iconSpan.innerHTML = '<i class="fab fa-react"></i>';
-                break;
-            case 'ts':
-                iconSpan.innerHTML = '<i class="fab fa-js-square"></i>';
-                break;
-            case 'css':
-                iconSpan.innerHTML = '<i class="fab fa-css3-alt"></i>';
-                break;
-            case 'html':
-                iconSpan.innerHTML = '<i class="fab fa-html5"></i>';
-                break;
-            case 'py':
-                iconSpan.innerHTML = '<i class="fab fa-python"></i>';
-                break;
-            case 'java':
-                iconSpan.innerHTML = '<i class="fab fa-java"></i>';
-                break;
-            case 'json':
-                iconSpan.innerHTML = '<i class="fas fa-database"></i>';
-                break;
-            case 'xml':
-            case 'yml':
-            case 'yaml':
-                iconSpan.innerHTML = '<i class="fas fa-code"></i>';
-                break;
-            case 'md':
-                iconSpan.innerHTML = '<i class="fab fa-markdown"></i>';
-                break;
-            case 'sh':
-            case 'bash':
-                iconSpan.innerHTML = '<i class="fas fa-terminal"></i>';
-                break;
-            case 'php':
-                iconSpan.innerHTML = '<i class="fab fa-php"></i>';
-                break;
-            case 'rb':
-                iconSpan.innerHTML = '<i class="fas fa-gem"></i>';
-                break;
-            case 'cpp':
-            case 'c':
-                iconSpan.innerHTML = '<i class="fas fa-copyright"></i>';
-                break;
-            case 'go':
-                iconSpan.innerHTML = '<i class="fab fa-golang"></i>';
-                break;
-            case 'sql':
-                iconSpan.innerHTML = '<i class="fas fa-database"></i>';
-                break;
-            case 'dockerfile':
-            case 'docker':
-                iconSpan.innerHTML = '<i class="fab fa-docker"></i>';
-                break;
-            case 'svg':
-                iconSpan.innerHTML = '<i class="fas fa-vector-square"></i>';
-                break;
-            case 'png':
-            case 'jpg':
-            case 'jpeg':
-            case 'gif':
-            case 'bmp':
-                iconSpan.innerHTML = '<i class="fas fa-file-image"></i>';
-                break;
-            case 'mp4':
-            case 'avi':
-            case 'mov':
-            case 'wmv':
-                iconSpan.innerHTML = '<i class="fas fa-file-video"></i>';
-                break;
-            case 'mp3':
-            case 'wav':
-            case 'flac':
-            case 'ogg':
-                iconSpan.innerHTML = '<i class="fas fa-file-audio"></i>';
-                break;
-            case 'pdf':
-                iconSpan.innerHTML = '<i class="fas fa-file-pdf"></i>';
-                break;
-            case 'zip':
-            case 'rar':
-            case '7z':
-                iconSpan.innerHTML = '<i class="fas fa-file-archive"></i>';
-                break;
-            case 'txt':
-                iconSpan.innerHTML = '<i class="fas fa-file-alt"></i>';
-                break;
-            default:
-                iconSpan.innerHTML = '<i class="fas fa-file-alt"></i>'; // Default for unknown types
-        }
+        // Get the icon using the helper function
+        iconSpan.innerHTML = getFileIcon(fileExtension);
 
         const label = document.createElement('label');
         label.textContent = file.fileName;
