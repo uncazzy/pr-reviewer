@@ -1,6 +1,6 @@
 import { getApiKey, getModel } from '../storage/index.js';
 
-export async function fetchDetailedFeedbackFromOpenAI(prompt) {
+export async function fetchDetailedFeedbackFromOpenAI(systemPrompt, userPrompt) {
     try {
         const apiKey = await getApiKey();
         const model = await getModel();
@@ -17,10 +17,9 @@ export async function fetchDetailedFeedbackFromOpenAI(prompt) {
                 messages: [
                     {
                         role: 'system',
-                        content:
-                            'You are an expert code reviewer with in-depth knowledge of software development best practices, security considerations, and performance optimization. Your role is to provide detailed, actionable feedback on the provided code changes.',
+                        content: systemPrompt
                     },
-                    { role: 'user', content: prompt },
+                    { role: 'user', content: userPrompt },
                 ],
                 max_tokens: 1000,
                 temperature: 0.2,

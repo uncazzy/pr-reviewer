@@ -1,5 +1,5 @@
 import { getFromStorage, setInStorage } from '../storage/index.js';
-import { createDetailedFeedbackPrompt } from '../prompts/detailedFeedbackPrompt.js';
+import { createSystemPrompt, createDetailedFeedbackPrompt } from '../prompts/detailedFeedbackPrompt.js';
 import { fetchDetailedFeedbackFromOpenAI } from './fetchDetailedFeedbackFromOpenAI.js';
 
 export async function getDetailedFeedback(fileName, baseUrl) {
@@ -26,9 +26,10 @@ export async function getDetailedFeedback(fileName, baseUrl) {
 
         if (!fileData) throw new Error('File data not found.');
 
-        const prompt = createDetailedFeedbackPrompt(fileName, fileData, initialFeedback);
+        const systemPrompt = createSystemPrompt(fileName, fileData, initialFeedback);
+        const userPrompt = createDetailedFeedbackPrompt(fileName, fileData, initialFeedback);
 
-        const detailedFeedback = await fetchDetailedFeedbackFromOpenAI(prompt);
+        const detailedFeedback = await fetchDetailedFeedbackFromOpenAI(systemPrompt, userPrompt);
 
         detailedFeedbacks[fileName] = detailedFeedback;
 

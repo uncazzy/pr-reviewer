@@ -1,11 +1,12 @@
 import { getApiKey, getModel } from '../storage/index.js';
 import { retryWithBackoff } from './retryWithBackoff.js';
-import { createReviewPrompt } from '../prompts/reviewPrompt.js';
+import { createSystemPrompt, createReviewPrompt } from '../prompts/reviewPrompt.js';
 
 // Function to send a code review request to OpenAI
 export async function analyzeCodeWithGPT(fileName, oldCode, newCode, fullFileContent) {
   console.log(`Analyzing file: ${fileName}`);
-  const prompt = createReviewPrompt(fileName, oldCode, newCode, fullFileContent);
+  const systemPrompt = createSystemPrompt(fileName, oldCode, newCode, fullFileContent);
+  const userPrompt = createReviewPrompt(fileName, oldCode, newCode, fullFileContent);
   console.log('Prompt being sent to OpenAI:', prompt);
 
   const apiCall = async () => {
@@ -18,8 +19,8 @@ export async function analyzeCodeWithGPT(fileName, oldCode, newCode, fullFileCon
       body: JSON.stringify({
         model: model,
         messages: [
-          { role: 'system', content: 'You are an expert code reviewer with advanced knowledge of software development practices.' },
-          { role: 'user', content: prompt },
+          { role: 'system', content: userPrompt },
+          { role: 'user', content: systemPrompt },
         ],
         max_tokens: 1500,
         temperature: 0.2,

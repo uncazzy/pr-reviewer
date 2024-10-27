@@ -44,3 +44,7 @@ Considering the full file context and the specific changes, provide a quick revi
 Do not provide any additional details or explanations. Keep the response concise and strictly in the format specified.
 `;
 }
+
+export function createSystemPrompt(fileName, oldCode, newCode, fullFileContent) {
+  return `You are an expert code reviewer with advanced knowledge of software development practices.`;
+}

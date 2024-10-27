@@ -48,3 +48,7 @@ Consider the initial feedback provided and expand upon it if relevant. If the in
 Keep your response concise and to the point. Use markdown formatting for code snippets, and ensure all feedback is actionable and easy to follow.
 `;
 }
+
+export function createSystemPrompt(fileName, fileData, initialFeedback) {
+  return `You are an expert code reviewer with in-depth knowledge of software development best practices, security considerations, and performance optimization. Your role is to provide detailed, actionable feedback on the provided code changes.`
+}
