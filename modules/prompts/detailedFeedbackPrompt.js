@@ -13,42 +13,47 @@ export function createDetailedFeedbackPrompt(fileName, fileData, initialFeedback
   return `
 You are reviewing a pull request for the file: ${fileName}.
 
-## Full File Content:
+## Review Content
+- **Full File Content** (entire codebase for context):
 \`\`\`
 ${fullContent.trim()}
 \`\`\`
 
-## Old Lines of Code (if applicable):
+- **Old Code Snippet (if available)**:
 \`\`\`
 ${oldCode ? oldCode.trim() : 'No previous code; this is a new file.'}
 \`\`\`
 
-## Updated Lines of Code:
+- **Updated Lines of Code** (new changes only):
 \`\`\`
 ${newCode.trim()}
 \`\`\`
 
-## Initial Feedback:
-Status: ${initialFeedback ? initialFeedback.status : 'N/A'}
-Issue: ${initialFeedback ? initialFeedback.issue : 'N/A'}
+- **Initial Feedback Summary**:
+  - **Status**: ${initialFeedback ? initialFeedback.status : 'N/A'}
+  - **Issue**: ${initialFeedback ? initialFeedback.issue : 'N/A'}
 
-Provide a detailed review of the changes, focusing on the following:
-1. What specific changes are needed (if any)?
-2. Why are these changes necessary?
-3. If applicable, provide brief code examples to illustrate the suggested changes.
+## Detailed Review Requirements:
+Provide a thorough, detailed review of the code changes, addressing the following:
+1. **Specific Change Recommendations**: If any issues or improvements are identified, specify the exact changes needed.
+2. **Rationale for Recommendations**: Explain why these changes are necessary to improve functionality, performance, or adherence to coding standards.
+3. **Illustrative Code Examples**: Where applicable, include brief code examples to illustrate recommended changes.
 
-Important: The "Updated Lines of Code" section represents only the specific lines that have been changed or added in this pull request. These lines are **not meant to be a complete code block** on their own. You must evaluate these updated lines **in the context of the entire file**, as shown in the "Full File Content" section. The updated lines may appear incomplete when viewed in isolation, but they should be considered within the full code structure.
+## Important Context:
+- **Evaluation Focus**: The "Updated Lines of Code" section shows only specific lines changed or added in this pull request and **is not a standalone code block**. **Always assess these updated lines within the full file context** to understand how they integrate within the overall structure.
+- **If No Old Code**: If no old code is provided, consider this as a new file and review accordingly.
 
-Do not assess the updated lines of code in isolation. Always evaluate them in the full context of the entire file.
-
-If no old code is provided, assume this is a new file and review accordingly.
-
-Consider the initial feedback provided and expand upon it if relevant. If the initial feedback suggests issues, address them in your detailed review.
-
-Keep your response concise and to the point. Use markdown formatting for code snippets, and ensure all feedback is actionable and easy to follow.
+## Output Requirements:
+1. Keep your response focused, actionable, and easy to follow.
+2. Use markdown for any code snippets or specific code suggestions.
+3. Expand on the initial feedback as necessary, providing additional insights or adjustments relevant to the detailed review.
 `;
 }
 
 export function createSystemPrompt(fileName, fileData, initialFeedback) {
-  return `You are an expert code reviewer with in-depth knowledge of software development best practices, security considerations, and performance optimization. Your role is to provide detailed, actionable feedback on the provided code changes.`
+  return `You are an expert code reviewer with in-depth knowledge of software development best practices, security considerations, and performance optimization. Your role is to provide detailed, actionable feedback on the code changes within the file "${fileName}", taking into account the initial feedback summary provided.
+
+- **Focus**: Review the updated lines of code within the full file content to ensure consistency, correctness, and adherence to best practices. Avoid evaluating the updated code lines in isolation, as they may appear incomplete without full context.
+- **Goal**: Identify actionable improvements with clear explanations, ensuring feedback is relevant, concise, and structured for easy implementation.
+`;
 }

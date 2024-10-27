@@ -15,36 +15,78 @@ export function createReviewPrompt(fileName, oldCode, newCode, fullFileContent) 
   fullFileContent = fullFileContent.trim();
 
   // Create the prompt
-  return `
-You are reviewing a pull request for the file: ${fileName}.
+  return `You are reviewing a pull request for the file: ${fileName}.
 
-## Full File Content:
-\`\`\`
+The review content includes:
+1. **Full File Context** - The complete file content, providing the necessary context for understanding how the updated lines integrate within the full code structure.
+2. **Old Code Snippet** - Displays lines of code as they were before the latest changes (if available).
+3. **Updated Lines of Code** - Shows only the specific lines added or modified in this pull request. **These lines are not a complete code block on their own and must be reviewed in the context of the full file.**
+
+--- Full File Content ---
+
 ${fullFileContent}
-\`\`\`
 
-## Old Lines of Code (if applicable):
-\`\`\`
+--- Old Code (if available) ---
+
 ${oldCode ? oldCode : 'No previous code; this is a new file.'}
-\`\`\`
 
-## Updated Lines of Code:
-\`\`\`
+--- Updated Code (new changes only) ---
+
 ${newCode}
-\`\`\`
 
-Important: The "Updated Lines of Code" section represents only the specific lines that have been changed or added in this pull request. These lines are **not meant to be a complete code block** on their own. You must evaluate these updated lines **in the context of the entire file**, as shown in the "Full File Content" section. The updated lines may appear incomplete when viewed in isolation, but they should be considered within the full code structure.
+# Instructions:
 
-Do not assess the updated lines of code in isolation. Always evaluate them in the full context of the entire file.
+- **Role**: Act as a Senior Code Reviewer with expertise in identifying best practices and common errors.
+- **Context**: Evaluate the updated lines of code within the full file context to ensure accuracy, completeness, and consistency. Do not assess the new lines in isolation, as they are not intended to function independently.
+- **Review Scope**: Check logic, structure, and coding standards relevant to the changes made, identifying any critical issues or adjustments needed.
 
-Considering the full file context and the specific changes, provide a quick review in the following format:
-- **Status**: [Looks Good / Requires Changes]
-- **Issue**: [If status is "Requires Changes", provide a brief one-sentence description of the main issue. Otherwise reply with "No issues detected"]
+## Required Output Format:
 
-Do not provide any additional details or explanations. Keep the response concise and strictly in the format specified.
+Status: [Looks Good / Requires Changes]
+Issue: If “Requires Changes,” briefly note the primary issue. If not, respond with "No issues detected."
 `;
 }
 
 export function createSystemPrompt(fileName, oldCode, newCode, fullFileContent) {
-  return `You are an expert code reviewer with advanced knowledge of software development practices.`;
+  // Clean up code snippets
+  oldCode = oldCode.trim();
+  newCode = newCode.trim();
+  fullFileContent = fullFileContent.trim();
+
+  // Create the prompt
+  return `You are an expert Senior Code Reviewer with advanced knowledge of software development. You evaluate code changes in context, ensuring quality and adherence to best practices.
+
+Your goal:
+- Focus on the "Updated Lines of Code" within the full file context provided. **Do not assess these updated lines in isolation** since they may appear incomplete when separated from the file’s complete structure.
+- Identify any issues with logic, structure, or coding standards and provide feedback accordingly.
+- For efficiency, summarize findings concisely in the requested format.
+`;
 }
+
+// export function createSystemPrompt(fileName, oldCode, newCode, fullFileContent) {
+//   return `You are an expert Senior Code Reviewer with advanced knowledge of software development. You evaluate code changes in context, ensuring quality and adherence to best practices.
+
+// File under review: ${fileName}
+
+// --- Full File Content ---
+// ${fullFileContent}
+
+// # Important Instructions:
+// - Focus on the "Updated Lines of Code" provided below within the full file context. **Do not assess these updated lines in isolation** since they may appear incomplete when separated from the file’s complete structure.
+// - **Updated Lines of Code (new changes only)**:
+// \`\`\`
+// ${newCode}
+// \`\`\`
+// - **Old Code Snippet (if available)**:
+// \`\`\`
+// ${oldCode ? oldCode : 'No previous code; this is a new file.'}
+// \`\`\`
+
+// # Goal:
+// Identify issues with logic, structure, or coding standards and provide feedback accordingly. For efficiency, summarize findings concisely in the requested format.
+
+// ## Required Output Format:
+// - Status: [Looks Good / Requires Changes]
+// - Issue: If “Requires Changes,” briefly note the primary issue. If not, respond with "No issues detected."
+// `;
+// }
