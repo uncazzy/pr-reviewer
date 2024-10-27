@@ -112,7 +112,7 @@ async function proceedToFileExtraction(tabId, basePrUrl, loadingDiv, analyzeButt
     filePickerDiv.style.display = 'block';
 
     // Update icon and text content, then change the state
-    analyzeButton.innerHTML = '<i class="fas fa-play"></i> Start AnalysisXX';
+    analyzeButton.innerHTML = '<i class="fas fa-play"></i> Start Analysis';
     analyzeButton.dataset.state = 'readyToAnalyze';
 
   } else {

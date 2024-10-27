@@ -100,7 +100,7 @@ export async function createFilePicker(filePickerDiv, extractedData) {
                 iconSpan.innerHTML = '<i class="fab fa-react"></i>';
                 break;
             case 'ts':
-                iconSpan.innerHTML = '<i class="fab fa-js-square"></i>'; // or a TypeScript-specific icon
+                iconSpan.innerHTML = '<i class="fab fa-js-square"></i>';
                 break;
             case 'css':
                 iconSpan.innerHTML = '<i class="fab fa-css3-alt"></i>';
@@ -137,10 +137,10 @@ export async function createFilePicker(filePickerDiv, extractedData) {
                 break;
             case 'cpp':
             case 'c':
-                iconSpan.innerHTML = '<i class="fas fa-copyright"></i>'; // Use custom icons for C/C++
+                iconSpan.innerHTML = '<i class="fas fa-copyright"></i>';
                 break;
             case 'go':
-                iconSpan.innerHTML = '<i class="fab fa-golang"></i>'; // Add Golang icon if available
+                iconSpan.innerHTML = '<i class="fab fa-golang"></i>';
                 break;
             case 'sql':
                 iconSpan.innerHTML = '<i class="fas fa-database"></i>';
@@ -149,10 +149,42 @@ export async function createFilePicker(filePickerDiv, extractedData) {
             case 'docker':
                 iconSpan.innerHTML = '<i class="fab fa-docker"></i>';
                 break;
-            default:
+            case 'svg':
+                iconSpan.innerHTML = '<i class="fas fa-vector-square"></i>';
+                break;
+            case 'png':
+            case 'jpg':
+            case 'jpeg':
+            case 'gif':
+            case 'bmp':
+                iconSpan.innerHTML = '<i class="fas fa-file-image"></i>';
+                break;
+            case 'mp4':
+            case 'avi':
+            case 'mov':
+            case 'wmv':
+                iconSpan.innerHTML = '<i class="fas fa-file-video"></i>';
+                break;
+            case 'mp3':
+            case 'wav':
+            case 'flac':
+            case 'ogg':
+                iconSpan.innerHTML = '<i class="fas fa-file-audio"></i>';
+                break;
+            case 'pdf':
+                iconSpan.innerHTML = '<i class="fas fa-file-pdf"></i>';
+                break;
+            case 'zip':
+            case 'rar':
+            case '7z':
+                iconSpan.innerHTML = '<i class="fas fa-file-archive"></i>';
+                break;
+            case 'txt':
                 iconSpan.innerHTML = '<i class="fas fa-file-alt"></i>';
+                break;
+            default:
+                iconSpan.innerHTML = '<i class="fas fa-file-alt"></i>'; // Default for unknown types
         }
-
 
         const label = document.createElement('label');
         label.textContent = file.fileName;

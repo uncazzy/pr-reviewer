@@ -43,7 +43,6 @@ async function initializePopup() {
         analyzeButton.style.display = 'inline-block';
         reanalyzeButton.style.display = 'none';
         filePickerDiv.style.display = 'none';
-        resultDiv.innerHTML = '<p>Please click "Analyze PR" to extract files and start the analysis.</p>';
     }
 
     initializeSyntaxHighlighting();
@@ -61,7 +60,7 @@ async function checkGitHubPRPage() {
                 const { hasResults, hasExtractedData } = await checkForResults(currentUrl, resultDiv, filePickerDiv);
                 resolve({ hasResults, hasExtractedData });
             } else {
-                resultDiv.innerHTML = '<p>Please navigate to a GitHub pull request page to use this extension.</p>';
+                resultDiv.innerHTML = '<p style="text-align: center;">Please navigate to a GitHub pull request page to use this extension.</p>';
                 filePickerDiv.style.display = 'none';
                 resolve({ hasResults: false, hasExtractedData: false });
             }
