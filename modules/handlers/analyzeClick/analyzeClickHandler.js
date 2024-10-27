@@ -4,10 +4,10 @@ import {
   getCurrentTabUrl,
   executeContentScript,
 } from './index.js'
-import { getFromStorage, setInStorage } from '../../storage/index.js';
+import { getFromStorage } from '../../storage/index.js';
 import { processFiles } from '../../files/processFiles.js';
 import { createFilePicker } from '../../components/index.js';
-import { getBaseUrl, checkForResults } from '../../result/index.js';
+import { getBaseUrl } from '../../result/index.js';
 
 export async function handleAnalyzeClick(loadingDiv, analyzeButton, reanalyzeButton, resultDiv, filePickerDiv) {
   try {
@@ -111,9 +111,10 @@ async function proceedToFileExtraction(tabId, basePrUrl, loadingDiv, analyzeButt
     await createFilePicker(filePickerDiv, extractedData);
     filePickerDiv.style.display = 'block';
 
-    // Change button text to "Start Analysis" and update state
-    analyzeButton.textContent = 'Start Analysis';
+    // Update icon and text content, then change the state
+    analyzeButton.innerHTML = '<i class="fas fa-play"></i> Start AnalysisXX';
     analyzeButton.dataset.state = 'readyToAnalyze';
+
   } else {
     filePickerDiv.style.display = 'none';
   }

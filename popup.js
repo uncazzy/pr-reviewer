@@ -108,7 +108,7 @@ async function displayFilePicker() {
             if (extractedData && extractedData.length > 0) {
                 await createFilePicker(filePickerDiv, extractedData);
                 filePickerDiv.style.display = 'block';
-                analyzeButton.textContent = 'Start Analysis';
+                analyzeButton.innerHTML = '<i class="fas fa-play"></i> Start Analysis';
                 analyzeButton.dataset.state = 'readyToAnalyze';
             } else {
                 filePickerDiv.style.display = 'none';
@@ -149,7 +149,7 @@ async function resetUI() {
     filePickerDiv.innerHTML = '';
     analyzeButton.disabled = false;
     analyzeButton.style.display = 'inline-block';
-    analyzeButton.textContent = 'Start Analysis';
+    analyzeButton.innerHTML = '<i class="fas fa-play"></i> Start Analysis';
     reanalyzeButton.style.display = 'none';
 
     // Display file picker if extracted data exists
