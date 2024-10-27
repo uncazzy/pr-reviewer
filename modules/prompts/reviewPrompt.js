@@ -43,7 +43,7 @@ ${newCode}
 ## Required Output Format:
 
 **Status**: [Looks Good / Requires Changes]
-**Issue**: If “Requires Changes,” provide a brief one-sentence description of the main issue. Keep it as short and concise as possible. Otherwise reply with "No issues detected""
+**Issue**: If “Requires Changes,” provide a brief one-sentence description of the main issue. Keep it as short and concise as possible. Otherwise reply with "No issues detected.""
 `;
 }
 
