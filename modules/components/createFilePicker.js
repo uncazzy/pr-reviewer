@@ -85,8 +85,21 @@ export async function createFilePicker(filePickerDiv, extractedData) {
         checkbox.name = 'files';
         checkbox.value = file.fileName;
         checkbox.checked = !file.isLargeFile;  // Only check non-large files
-        checkbox.disabled = file.isLargeFile;  // Disable checkbox for large files
 
+        checkbox.addEventListener('change', async (e) => {
+            if (file.isLargeFile && e.target.checked) {
+                // Trigger expansion and scraping of the large file content
+                // const expandedFileData = await expandAndScrapeLargeFile(fileDiv, file);
+                console.log("File is checked, expanding and scraping...");
+                fileDiv.classList.remove('large-file-unchecked');
+                // if (expandedFileData) {
+                //     extractedData[file.index] = expandedFileData;  // Update data with expanded content
+                //     sendExtractedData(extractedData);  // Save updated data
+                // }
+            } else if (file.isLargeFile && !e.target.checked) {
+                fileDiv.classList.add('large-file-unchecked');
+            }
+        });
 
         const iconSpan = document.createElement('span');
         iconSpan.className = 'file-icon';
@@ -102,7 +115,7 @@ export async function createFilePicker(filePickerDiv, extractedData) {
 
         if (file.isLargeFile) {
             fileDiv.title = 'This file is too large and needs manual expansion to be included in analysis.';
-            fileDiv.classList.add('large-file'); // Add a specific class for styling
+            fileDiv.classList.add('large-file', 'large-file-unchecked'); // Add a specific class for styling
         }
 
         // Add file type tag

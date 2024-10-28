@@ -123,11 +123,18 @@
 }
 
 /* Large file style */
-.file-picker-item.large-file {
+.file-picker-item.large-file-unchecked {
     opacity: 0.5;
-    pointer-events: none;
 }
 
-.file-picker-item.large-file label {
+.file-picker-item.large-file-unchecked label {
     color: gray;
+}
+
+.file-picker-item.large-file label::after {
+    content: " (Large File)";
+    color: #ff6f00;
+    font-weight: bold;
+    margin-left: 4px;
+    font-size: 0.85em;
 }
