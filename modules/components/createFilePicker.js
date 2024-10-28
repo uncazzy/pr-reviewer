@@ -1,4 +1,5 @@
 import { getFileIcon } from "../../utils/getFileIcon.js"
+import { getBaseUrl } from "../result/index.js";
 
 export async function createFilePicker(filePickerDiv, extractedData) {
     if (!filePickerDiv) {
@@ -88,14 +89,45 @@ export async function createFilePicker(filePickerDiv, extractedData) {
 
         checkbox.addEventListener('change', async (e) => {
             if (file.isLargeFile && e.target.checked) {
-                // Trigger expansion and scraping of the large file content
-                // const expandedFileData = await expandAndScrapeLargeFile(fileDiv, file);
                 console.log("File is checked, expanding and scraping...");
                 fileDiv.classList.remove('large-file-unchecked');
-                // if (expandedFileData) {
-                //     extractedData[file.index] = expandedFileData;  // Update data with expanded content
-                //     sendExtractedData(extractedData);  // Save updated data
-                // }
+
+                // Before sending the message, inject the content script
+                chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+                    const activeTab = tabs[0];
+                    const currentUrl = activeTab.url;  // Get the current URL
+                    const basePrUrl = getBaseUrl(currentUrl);
+
+                    // Inject the content script
+                    chrome.scripting.executeScript({
+                        target: { tabId: activeTab.id },
+                        files: ['dist/contentScript.bundle.js']
+                    }, function () {
+                        if (chrome.runtime.lastError) {
+                            console.error('Error injecting content script:', chrome.runtime.lastError.message);
+                            return;
+                        }
+
+                        // Now send the message to the content script, including the currentUrl
+                        chrome.tabs.sendMessage(activeTab.id, {
+                            action: 'expandAndScrapeLargeFile',
+                            fileName: file.fileName,
+                            basePrUrl: basePrUrl  // Pass the URL here
+                        }, function (response) {
+                            if (chrome.runtime.lastError) {
+                                console.error('Error sending message:', chrome.runtime.lastError.message);
+                                return;
+                            }
+
+                            if (response && response.success) {
+                                console.log('File expanded and scraped successfully');
+                                // Optionally, update the UI or fetch updated data
+                            } else {
+                                console.error('Error expanding and scraping file:', response ? response.error : 'Unknown error');
+                            }
+                        });
+                    });
+                });
             } else if (file.isLargeFile && !e.target.checked) {
                 fileDiv.classList.add('large-file-unchecked');
             }

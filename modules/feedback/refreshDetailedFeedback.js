@@ -7,8 +7,7 @@ export async function refreshDetailedFeedback(fileName, detailedFeedbackDiv, but
     detailedFeedbackDiv.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Refreshing detailed feedback...</div>';
 
     try {
-        const data = await getFromStorage(['extractedDataByPr']);
-        const extractedDataByPr = data.extractedDataByPr || {};
+        const extractedDataByPr = await getFromStorage('extractedDataByPr') || {};
 
         const baseUrl = await getCurrentPrUrl();
 
@@ -35,7 +34,7 @@ export async function refreshDetailedFeedback(fileName, detailedFeedbackDiv, but
         // Save the updated detailed feedback back to storage
         prData.detailedFeedback = detailedFeedbacks;
         extractedDataByPr[baseUrl] = prData;
-        await setInStorage('extractedDataByPr', extractedDataByPr);
+        await setInStorage({extractedDataByPr});
 
         // Fetch new detailed feedback
         const detailedFeedback = await getDetailedFeedback(fileName, baseUrl);

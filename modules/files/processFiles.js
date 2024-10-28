@@ -1,4 +1,4 @@
-import { setInStorage } from '../storage/index.js';
+import { setInStorage, getFromStorage } from '../storage/index.js';
 import { analyzeCodeWithGPT } from '../openai/api.js';
 import { parseFeedback } from '../feedback/parseFeedback.js';
 
@@ -25,7 +25,7 @@ export async function processFiles(selectedFiles, prUrl) {
     });
 
     // Retrieve existing extractedDataByPr from storage
-    const { extractedDataByPr = {} } = await chrome.storage.local.get('extractedDataByPr');
+    const extractedDataByPr = await getFromStorage('extractedDataByPr') || {};
 
     // Ensure prData exists
     if (!extractedDataByPr[prUrl]) {
@@ -36,14 +36,15 @@ export async function processFiles(selectedFiles, prUrl) {
     extractedDataByPr[prUrl].results = results;
 
     // Save updated extractedDataByPr to storage
-    await setInStorage('extractedDataByPr', extractedDataByPr);
+  
+    await setInStorage({ extractedDataByPr });
 
     // Save processingComplete flag
-    await setInStorage('processingComplete', true);
+    await setInStorage({ processingComplete: true });
 
     console.log('Results and PR URL updated');
   } catch (error) {
     console.error('Unexpected error:', error);
-    setInStorage('error', error.message || error);
+    await setInStorage({ error: error.message || error });
   }
 }

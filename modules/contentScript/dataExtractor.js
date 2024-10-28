@@ -1,5 +1,6 @@
 // Function to extract file information
-export function extractFileInfo(file, index) {
+export function extractFileInfo(file, index, isLargeFileFlag) {
+    console.log("isLargeFileFlag inside of extractFileInfo:", isLargeFileFlag)
     const fileNameElement = file.querySelector('.file-info .Truncate a');
     if (!fileNameElement) {
         console.warn('File name element not found');
@@ -42,8 +43,8 @@ export function extractFileInfo(file, index) {
         .map(node => node.textContent.replace(/\s+$/, ''))
         .join('\n');
 
-    // Detect if the file has a "Load diff" button
-    const isLargeFile = !!file.querySelector('button.js-diff-load');
+    // Use the initial isLargeFile flag or detect if it has a "Load diff" button
+    const isLargeFile = isLargeFileFlag || !!file.querySelector('button.load-diff-button');
 
     return {
         fileName,

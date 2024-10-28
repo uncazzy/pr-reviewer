@@ -22,8 +22,7 @@ export async function handleAnalyzeClick(loadingDiv, analyzeButton, reanalyzeBut
       analyzeButton.disabled = true;
 
       // Get the latest extractedData for the current PR
-      const data = await getFromStorage('extractedDataByPr');
-      const extractedDataByPr = data.extractedDataByPr || {};
+      const extractedDataByPr = await getFromStorage('extractedDataByPr') || {};
       const prData = extractedDataByPr[basePrUrl];
       const extractedData = prData ? prData.extractedData : null;
 

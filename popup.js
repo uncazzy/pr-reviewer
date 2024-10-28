@@ -136,7 +136,7 @@ async function resetUI() {
     }
 
     // Save updated data back to storage
-    await setInStorage('extractedDataByPr', extractedDataByPr);
+    await setInStorage({extractedDataByPr});
 
     // Also remove processingComplete flag
     await new Promise((resolve) => {

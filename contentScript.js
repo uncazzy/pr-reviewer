@@ -2,8 +2,10 @@ import {
     expandAllFiles,
     extractAllFilesData,
     sendExtractedData,
-    waitForFilesToBePresent
+    waitForFilesToBePresent,
+    extractFileInfo
 } from './modules/contentScript/index.js';
+import { getFromStorage, setInStorage } from "./modules/storage/index.js";
 
 (async function () {
     console.log('Content script loaded');
@@ -34,3 +36,84 @@ import {
         console.warn('No extracted data to send.');
     }
 })();
+
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    if (request.action === 'expandAndScrapeLargeFile') {
+        const { fileName, basePrUrl } = request;
+
+        expandAndScrapeLargeFile(fileName, basePrUrl).then(() => {
+            sendResponse({ success: true });
+        }).catch(error => {
+            console.error('Error in expandAndScrapeLargeFile:', error);
+            sendResponse({ success: false, error: error.message });
+        });
+        return true; // Keep the message channel open for sendResponse
+    }
+});
+
+async function expandAndScrapeLargeFile(fileName, basePrUrl) {
+    // Fetch `extractedDataByPr` from storage
+    let extractedDataByPr = await getFromStorage('extractedDataByPr') || {};
+
+    // Ensure `extractedData` exists for this base PR URL
+    if (!extractedDataByPr[basePrUrl]) {
+        extractedDataByPr[basePrUrl] = { extractedData: [] };
+    }
+
+    // Find the file element in the page that matches fileName
+    const fileElements = document.querySelectorAll('.file');
+    let fileFound = false;
+
+    for (const fileElement of fileElements) {
+        const fileNameElement = fileElement.querySelector('.file-info .Truncate a');
+        if (fileNameElement && fileNameElement.textContent.trim() === fileName) {
+            fileFound = true;
+            // Check if it has a "Load diff" button
+            const loadDiffButton = fileElement.querySelector('button.load-diff-button');
+
+            if (loadDiffButton) {
+                // Click the button to load the diff
+                loadDiffButton.click();
+
+                // Wait for the diff to load
+                await waitForDiffToLoad(fileElement);
+            }
+
+            // Now, extract the file data
+            const fileInfo = extractFileInfo(fileElement, null, true);
+
+            // Find the specific file data in extractedData where fileName matches
+            let existingFileIndex = extractedDataByPr[basePrUrl].extractedData.findIndex(item => item.fileName === fileName);
+
+            if (existingFileIndex !== -1) {
+                // Update the existing file info
+                extractedDataByPr[basePrUrl].extractedData[existingFileIndex] = fileInfo;
+            } else {
+                // If the file doesn’t exist, add it to the array
+                extractedDataByPr[basePrUrl].extractedData.push(fileInfo);
+            }
+
+            // Save back to storage
+            await setInStorage({ extractedDataByPr });
+            break;
+        }
+    }
+
+    if (!fileFound) {
+        throw new Error(`File ${fileName} not found on the page.`);
+    }
+}
+
+// Helper function to wait for the diff to load
+function waitForDiffToLoad(fileElement) {
+    return new Promise((resolve, reject) => {
+        const observer = new MutationObserver(() => {
+            const isLoading = fileElement.querySelector('.js-diff-progressive-loader');
+            if (!isLoading) {
+                observer.disconnect();
+                resolve();
+            }
+        });
+        observer.observe(fileElement, { childList: true, subtree: true });
+    });
+}

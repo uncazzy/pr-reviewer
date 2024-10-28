@@ -13,8 +13,7 @@ export async function fetchAndDisplayDetailedFeedback(fileName, detailedFeedback
         detailedFeedbackDiv.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading detailed feedback...</div>';
 
         // Retrieve extractedDataByPr from storage
-        const storageData = await getFromStorage(['extractedDataByPr']);
-        const extractedDataByPr = storageData.extractedDataByPr || {};
+        const extractedDataByPr = await getFromStorage('extractedDataByPr') || {};
 
         // Get the base PR URL dynamically
         const baseUrl = await getCurrentPrUrl();
@@ -53,7 +52,7 @@ export async function fetchAndDisplayDetailedFeedback(fileName, detailedFeedback
             // Save updated detailedFeedback back to storage
             prData.detailedFeedback = detailedFeedback;
             extractedDataByPr[baseUrl] = prData;
-            await setInStorage('extractedDataByPr', extractedDataByPr);
+            await setInStorage({ extractedDataByPr });
 
             displayDetailedFeedback(fileName, detailedFeedbackResponse, oldCode, newCode, fullContent, detailedFeedbackDiv, button);
         }

@@ -4,8 +4,7 @@ import { fetchDetailedFeedbackFromOpenAI } from './fetchDetailedFeedbackFromOpen
 
 export async function getDetailedFeedback(fileName, baseUrl) {
     try {
-        const data = await getFromStorage(['extractedDataByPr']);
-        const extractedDataByPr = data.extractedDataByPr || {};
+        const extractedDataByPr = await getFromStorage('extractedDataByPr') || {};
 
         if (!baseUrl) {
             throw new Error('PR URL not provided.');
@@ -36,7 +35,7 @@ export async function getDetailedFeedback(fileName, baseUrl) {
         // Save updated detailedFeedback back to storage
         prData.detailedFeedback = detailedFeedbacks;
         extractedDataByPr[baseUrl] = prData;
-        await setInStorage('extractedDataByPr', extractedDataByPr);
+        await setInStorage({extractedDataByPr});
 
         return detailedFeedback;
     } catch (error) {

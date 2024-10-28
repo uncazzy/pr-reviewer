@@ -1,25 +1,28 @@
-import { getBaseUrl } from "../result";
+import { getBaseUrl } from "../result/index.js";
+import { setInStorage } from "../storage/index.js";
 
 export function sendExtractedData(extractedData) {
   const currentPrUrl = window.location.href;
   const baseUrl = getBaseUrl(currentPrUrl);
 
   chrome.storage.local.get('extractedDataByPr', (data) => {
+    console.log('Data retrieved from storage:', data);
+
     const extractedDataByPr = data.extractedDataByPr || {};
 
-    // Ensure the baseUrl key exists and is an object
-    if (!extractedDataByPr[baseUrl]) {
-      extractedDataByPr[baseUrl] = {};
-    }
+    // Update the extractedDataByPr object directly
+    extractedDataByPr[baseUrl] = {
+      extractedData: extractedData
+    };
 
-    // Assign the extractedData array to the extractedData property
-    extractedDataByPr[baseUrl].extractedData = extractedData;
-
-    chrome.storage.local.set({ extractedDataByPr }, () => {
+    // Save back to storage
+    setInStorage({ extractedDataByPr }).then(() => {
       console.log('Extracted data saved to local storage for PR:', baseUrl);
 
       // Send a message indicating that extraction is complete
       chrome.runtime.sendMessage({ type: 'extractionComplete', prUrl: baseUrl });
+    }).catch(error => {
+      console.error('Error saving extracted data:', error);
     });
   });
 }
