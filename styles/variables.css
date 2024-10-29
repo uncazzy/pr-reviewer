@@ -19,7 +19,7 @@
 
     /* Border and Radius */
     --border-radius: 5px;
-    --border-radius-pill: 12px; /* Used for badges */
+    --border-radius-pill: 12px;
     --border-color: #333;
     --border-color-light: #444;
 
@@ -28,7 +28,7 @@
     --box-shadow-heavy: 0 4px 8px rgba(0, 0, 0, 0.3);
 
     /* Spacing */
-    --padding-extra-small: 6px;
+    --padding-extra-small: 5px;
     --padding-small: 8px;
     --padding-medium: 10px;
     --padding-large: 14px;
