@@ -71,10 +71,11 @@ export async function handleAnalyzeClick(loadingDiv, analyzeButton, reanalyzeBut
 
     // Trigger re-scraping by sending a message to the content script
     chrome.tabs.sendMessage(currentTab.id, { action: 'scrapeFiles' }, (response) => {
+      console.log('Scraping response:', response);
       if (response && response.success) {
         console.log('Rescraping completed successfully.');
       } else {
-        console.error('Error during rescraping:', response ? response.error : 'Unknown error');
+        console.error('Error during scraping:', response ? response.error : 'Unknown error');
       }
     });
 

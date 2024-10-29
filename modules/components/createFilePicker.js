@@ -124,6 +124,7 @@ export async function createFilePicker(filePickerDiv, extractedData) {
                     chrome.tabs.sendMessage(activeTab.id, {
                         action: 'expandAndScrapeLargeFile',
                         fileName: file.fileName,
+                        index: file.index,
                         basePrUrl: basePrUrl  // Pass the URL here
                     }, function (response) {
                         if (chrome.runtime.lastError) {

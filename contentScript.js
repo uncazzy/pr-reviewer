@@ -41,41 +41,49 @@ if (!window.hasContentScriptRun) {
     })();
 }
 
-chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+
+    console.log("Request:", request);
+
     if (request.action === 'scrapeFiles') {
-        console.log('Rescraping files...');
+        console.log('Scraping files...');
 
-        try {
-            await waitForFilesToBePresent();
-            await expandAllFiles();
-            const extractedData = extractAllFilesData();
+        (async function () {
+            try {
+                await waitForFilesToBePresent();
+                await expandAllFiles();
+                const extractedData = extractAllFilesData();
 
-            if (extractedData.length > 0) {
-                console.log('Extracted data:', extractedData);
-                sendExtractedData(extractedData);
-                sendResponse({ success: true });
-            } else {
-                console.warn('No extracted data to send.');
-                sendResponse({ success: false, error: 'No data found' });
+                if (extractedData.length > 0) {
+                    console.log('Extracted data:', extractedData);
+                    sendExtractedData(extractedData);
+                    sendResponse({ success: true });
+                } else {
+                    console.warn('No extracted data to send.');
+                    sendResponse({ success: false, error: 'No data found' });
+                }
+            } catch (error) {
+                console.error('Error in scrapeFiles:', error);
+                sendResponse({ success: false, error: error.message });
             }
-        } catch (error) {
-            console.error('Error in scrapeFiles:', error);
-            sendResponse({ success: false, error: error.message });
-        }
+        })();
     } else if (request.action === 'expandAndScrapeLargeFile') {
-        const { fileName, basePrUrl } = request;
+        const { fileName, index, basePrUrl } = request;
 
-        expandAndScrapeLargeFile(fileName, basePrUrl).then(() => {
-            sendResponse({ success: true });
-        }).catch(error => {
-            console.error('Error in expandAndScrapeLargeFile:', error);
-            sendResponse({ success: false, error: error.message });
-        });
-        return true; // Keep the message channel open for sendResponse
+        expandAndScrapeLargeFile(fileName, index, basePrUrl)
+            .then(() => {
+                sendResponse({ success: true });
+            })
+            .catch(error => {
+                console.error('Error in expandAndScrapeLargeFile:', error);
+                sendResponse({ success: false, error: error.message });
+            });
     }
+
+    return true; // Keep the message channel open for sendResponse
 });
 
-async function expandAndScrapeLargeFile(fileName, basePrUrl) {
+async function expandAndScrapeLargeFile(fileName, index, basePrUrl) {
     // Fetch `extractedDataByPr` from storage
     let extractedDataByPr = await getFromStorage('extractedDataByPr') || {};
 
@@ -104,14 +112,7 @@ async function expandAndScrapeLargeFile(fileName, basePrUrl) {
             }
 
             // Now, extract the file data
-            const fileInfo = extractFileInfo(fileElement, null, true);
-
-            console.log("FileInfo:", fileInfo);
-
-            // Retain isLargeFile flag
-            fileInfo.isLargeFile = true;
-
-            console.log("Updated FileInfo:", fileInfo);
+            const fileInfo = extractFileInfo(fileElement, index, true);
 
             // Find the specific file data in extractedData where fileName matches
             let existingFileIndex = extractedDataByPr[basePrUrl].extractedData.findIndex(item => item.fileName === fileName);
