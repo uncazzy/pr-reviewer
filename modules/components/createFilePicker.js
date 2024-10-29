@@ -98,34 +98,23 @@ export async function createFilePicker(filePickerDiv, extractedData) {
                     const currentUrl = activeTab.url;  // Get the current URL
                     const basePrUrl = getBaseUrl(currentUrl);
 
-                    // Inject the content script
-                    chrome.scripting.executeScript({
-                        target: { tabId: activeTab.id },
-                        files: ['dist/contentScript.bundle.js']
-                    }, function () {
+                    // Now send the message to the content script, including the currentUrl
+                    chrome.tabs.sendMessage(activeTab.id, {
+                        action: 'expandAndScrapeLargeFile',
+                        fileName: file.fileName,
+                        basePrUrl: basePrUrl  // Pass the URL here
+                    }, function (response) {
                         if (chrome.runtime.lastError) {
-                            console.error('Error injecting content script:', chrome.runtime.lastError.message);
+                            console.error('Error sending message:', chrome.runtime.lastError.message);
                             return;
                         }
 
-                        // Now send the message to the content script, including the currentUrl
-                        chrome.tabs.sendMessage(activeTab.id, {
-                            action: 'expandAndScrapeLargeFile',
-                            fileName: file.fileName,
-                            basePrUrl: basePrUrl  // Pass the URL here
-                        }, function (response) {
-                            if (chrome.runtime.lastError) {
-                                console.error('Error sending message:', chrome.runtime.lastError.message);
-                                return;
-                            }
-
-                            if (response && response.success) {
-                                console.log('File expanded and scraped successfully');
-                                // Optionally, update the UI or fetch updated data
-                            } else {
-                                console.error('Error expanding and scraping file:', response ? response.error : 'Unknown error');
-                            }
-                        });
+                        if (response && response.success) {
+                            console.log('File expanded and scraped successfully');
+                            // Optionally, update the UI or fetch updated data
+                        } else {
+                            console.error('Error expanding and scraping file:', response ? response.error : 'Unknown error');
+                        }
                     });
                 });
             } else if (file.isLargeFile && !e.target.checked) {

@@ -70,7 +70,7 @@ export function extractAllFilesData() {
 
     for (let index = 0; index < sortedFileContainers.length; index++) {
         const fileContainer = sortedFileContainers[index];
-        const fileInfo = extractFileInfo(fileContainer, index);
+        const fileInfo = extractFileInfo(fileContainer, index, null);
         if (fileInfo) {
             extractedData.push(fileInfo);
             console.log('Extracted file info:', fileInfo);

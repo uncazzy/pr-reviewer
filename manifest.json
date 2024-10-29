@@ -17,6 +17,17 @@
         "service_worker": "background.js",
         "type": "module"
     },
+    "content_scripts": [
+        {
+            "matches": [
+                "https://github.com/*/*/pull/*/files*"
+            ],
+            "js": [
+                "dist/contentScript.bundle.js"
+            ],
+            "run_at": "document_idle"
+        }
+    ],
     "action": {
         "default_popup": "popup.html",
         "default_icon": "assets/icons/icon.png"

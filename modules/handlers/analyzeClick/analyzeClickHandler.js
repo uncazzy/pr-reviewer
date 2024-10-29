@@ -94,9 +94,6 @@ async function proceedToFileExtraction(tabId, basePrUrl, loadingDiv, analyzeButt
   await checkApiKey();
   await resetUI(resultDiv, loadingDiv, analyzeButton);
 
-  // Execute content script to extract files
-  await executeContentScript(tabId);
-
   // Wait for extractedData to be available
   await waitForExtractedData(basePrUrl);
 

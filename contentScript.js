@@ -7,35 +7,39 @@ import {
 } from './modules/contentScript/index.js';
 import { getFromStorage, setInStorage } from "./modules/storage/index.js";
 
-(async function () {
-    console.log('Content script loaded');
+if (!window.hasContentScriptRun) {
+    window.hasContentScriptRun = true;
 
-    // Wait for the DOM to be fully loaded
-    if (document.readyState === 'loading' || document.readyState === 'interactive') {
-        console.log('Waiting for DOM to fully load...');
-        await new Promise((resolve) => {
-            document.addEventListener('DOMContentLoaded', resolve);
-        });
-    }
+    (async function () {
+        console.log('Content script loaded');
 
-    console.log('DOM fully loaded, waiting for files to be present...');
-    await waitForFilesToBePresent();
+        // Wait for the DOM to be fully loaded
+        if (document.readyState === 'loading' || document.readyState === 'interactive') {
+            console.log('Waiting for DOM to fully load...');
+            await new Promise((resolve) => {
+                document.addEventListener('DOMContentLoaded', resolve);
+            });
+        }
 
-    console.log('Files are present, expanding files...');
+        console.log('DOM fully loaded, waiting for files to be present...');
+        await waitForFilesToBePresent();
 
-    // Expand all files before extracting
-    await expandAllFiles();
+        console.log('Files are present, expanding files...');
 
-    console.log('All files expanded, proceeding to extract data...');
-    const extractedData = extractAllFilesData();
+        // Expand all files before extracting
+        await expandAllFiles();
 
-    if (extractedData.length > 0) {
-        console.log('Extracted data:', extractedData);
-        sendExtractedData(extractedData);
-    } else {
-        console.warn('No extracted data to send.');
-    }
-})();
+        console.log('All files expanded, proceeding to extract data...');
+        const extractedData = extractAllFilesData();
+
+        if (extractedData.length > 0) {
+            console.log('Extracted data:', extractedData);
+            sendExtractedData(extractedData);
+        } else {
+            console.warn('No extracted data to send.');
+        }
+    })();
+}
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     if (request.action === 'expandAndScrapeLargeFile') {
@@ -81,6 +85,13 @@ async function expandAndScrapeLargeFile(fileName, basePrUrl) {
 
             // Now, extract the file data
             const fileInfo = extractFileInfo(fileElement, null, true);
+
+            console.log("FileInfo:", fileInfo);
+
+            // Retain isLargeFile flag
+            fileInfo.isLargeFile = true;
+
+            console.log("Updated FileInfo:", fileInfo);
 
             // Find the specific file data in extractedData where fileName matches
             let existingFileIndex = extractedDataByPr[basePrUrl].extractedData.findIndex(item => item.fileName === fileName);
