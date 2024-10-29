@@ -55,6 +55,12 @@ export async function createFilePicker(filePickerDiv, extractedData) {
         const checkboxes = form.querySelectorAll('input[type="checkbox"]');
         checkboxes.forEach(checkbox => {
             checkbox.checked = true;
+            const fileDiv = checkbox.closest('.file-picker-item');
+
+            // Re-add the "large-file-unchecked" class only to large files
+            if (fileDiv && fileDiv.classList.contains('large-file')) {
+                fileDiv.classList.remove('large-file-unchecked');
+            }
         });
     });
 
@@ -65,6 +71,13 @@ export async function createFilePicker(filePickerDiv, extractedData) {
         const checkboxes = form.querySelectorAll('input[type="checkbox"]');
         checkboxes.forEach(checkbox => {
             checkbox.checked = false;
+
+            const fileDiv = checkbox.closest('.file-picker-item');
+
+            // Re-add the "large-file-unchecked" class only to large files
+            if (fileDiv && fileDiv.classList.contains('large-file')) {
+                fileDiv.classList.add('large-file-unchecked');
+            }
         });
     });
 
@@ -87,8 +100,17 @@ export async function createFilePicker(filePickerDiv, extractedData) {
         checkbox.value = file.fileName;
         checkbox.checked = !file.isLargeFile;  // Only check non-large files
 
+        console.log("File:", file)
+
         checkbox.addEventListener('change', async (e) => {
             if (file.isLargeFile && e.target.checked) {
+
+                if (file.fullContent.length > 1) {
+                    console.log("File is already scraped, skipping...");
+                    fileDiv.classList.remove('large-file-unchecked');
+                    return;
+                }
+
                 console.log("File is checked, expanding and scraping...");
                 fileDiv.classList.remove('large-file-unchecked');
 
