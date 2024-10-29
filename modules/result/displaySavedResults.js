@@ -1,8 +1,6 @@
 import { createFileFeedback } from '../components/index.js';
 
 export function displaySavedResults(results, resultDiv) {
-
-  console.log("Results:", results)
   if (!resultDiv) {
     console.error('resultDiv is not defined');
     return;
