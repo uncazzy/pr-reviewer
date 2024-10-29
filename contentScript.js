@@ -41,8 +41,28 @@ if (!window.hasContentScriptRun) {
     })();
 }
 
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-    if (request.action === 'expandAndScrapeLargeFile') {
+chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
+    if (request.action === 'scrapeFiles') {
+        console.log('Rescraping files...');
+
+        try {
+            await waitForFilesToBePresent();
+            await expandAllFiles();
+            const extractedData = extractAllFilesData();
+
+            if (extractedData.length > 0) {
+                console.log('Extracted data:', extractedData);
+                sendExtractedData(extractedData);
+                sendResponse({ success: true });
+            } else {
+                console.warn('No extracted data to send.');
+                sendResponse({ success: false, error: 'No data found' });
+            }
+        } catch (error) {
+            console.error('Error in scrapeFiles:', error);
+            sendResponse({ success: false, error: error.message });
+        }
+    } else if (request.action === 'expandAndScrapeLargeFile') {
         const { fileName, basePrUrl } = request;
 
         expandAndScrapeLargeFile(fileName, basePrUrl).then(() => {

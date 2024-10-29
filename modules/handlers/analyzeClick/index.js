@@ -3,7 +3,6 @@ import { checkApiKey } from './checkApiKey.js';
 import { resetUI } from './resetUI.js';
 import { getCurrentTabUrl } from './getCurrentTabUrl.js';
 import { ensureFilesTabUrl } from './ensureFilesTabUrl.js';
-import { executeContentScript } from './executeContentScript.js';
 
 export {
     handleAnalyzeClick,
@@ -11,5 +10,4 @@ export {
     resetUI,
     getCurrentTabUrl,
     ensureFilesTabUrl,
-    executeContentScript,
 };

@@ -2,7 +2,6 @@ import {
   checkApiKey,
   resetUI,
   getCurrentTabUrl,
-  executeContentScript,
 } from './index.js'
 import { getFromStorage } from '../../storage/index.js';
 import { processFiles } from '../../files/processFiles.js';
@@ -23,8 +22,11 @@ export async function handleAnalyzeClick(loadingDiv, analyzeButton, reanalyzeBut
 
       // Get the latest extractedData for the current PR
       const extractedDataByPr = await getFromStorage('extractedDataByPr') || {};
+      console.log('extractedDataByPr:', extractedDataByPr);
       const prData = extractedDataByPr[basePrUrl];
+      console.log('prData:', prData);
       const extractedData = prData ? prData.extractedData : null;
+      console.log('extractedData:', extractedData);
 
       if (!extractedData || extractedData.length === 0) {
         alert('No extracted data available. Please try analyzing the PR again.');
@@ -67,8 +69,16 @@ export async function handleAnalyzeClick(loadingDiv, analyzeButton, reanalyzeBut
       currentUrl = updatedTabInfo.currentUrl;
     }
 
+    // Trigger re-scraping by sending a message to the content script
+    chrome.tabs.sendMessage(currentTab.id, { action: 'scrapeFiles' }, (response) => {
+      if (response && response.success) {
+        console.log('Rescraping completed successfully.');
+      } else {
+        console.error('Error during rescraping:', response ? response.error : 'Unknown error');
+      }
+    });
+
     await proceedToFileExtraction(
-      currentTab.id,
       basePrUrl,
       loadingDiv,
       analyzeButton,
@@ -85,7 +95,7 @@ export async function handleAnalyzeClick(loadingDiv, analyzeButton, reanalyzeBut
 }
 
 // Helper function to proceed with file extraction and displaying the file picker
-async function proceedToFileExtraction(tabId, basePrUrl, loadingDiv, analyzeButton, reanalyzeButton, resultDiv, filePickerDiv) {
+async function proceedToFileExtraction(basePrUrl, loadingDiv, analyzeButton, reanalyzeButton, resultDiv, filePickerDiv) {
   // Show loading, disable analyze button, hide reanalyze button
   loadingDiv.style.display = 'block';
   analyzeButton.disabled = true;
@@ -94,13 +104,8 @@ async function proceedToFileExtraction(tabId, basePrUrl, loadingDiv, analyzeButt
   await checkApiKey();
   await resetUI(resultDiv, loadingDiv, analyzeButton);
 
-  // Wait for extractedData to be available
-  await waitForExtractedData(basePrUrl);
-
-  // Get the latest extractedData for the current PR
-  const { extractedDataByPr } = await getFromStorage('extractedDataByPr');
-  const prData = extractedDataByPr ? extractedDataByPr[basePrUrl] : null;
-  const extractedData = prData ? prData.extractedData : null;
+  // // Wait for extractedData to be available
+  const extractedData = await waitForExtractedData(basePrUrl);
 
   // Show the file picker
   if (extractedData && extractedData.length > 0) {
@@ -131,31 +136,30 @@ function waitForTabToLoad(tabId) {
   });
 }
 
-function waitForExtractedData(baseUrl) {
-  return new Promise((resolve, reject) => {
+async function waitForExtractedData(baseUrl) {
+  return new Promise(async (resolve, reject) => {
     const maxAttempts = 20; // Wait up to 10 seconds
     let attempts = 0;
 
-    const checkData = () => {
-      chrome.storage.local.get('extractedDataByPr', (data) => {
-        const extractedDataByPr = data.extractedDataByPr || {};
-        const extractedData = extractedDataByPr[baseUrl] && extractedDataByPr[baseUrl].extractedData;
-        if (extractedData && extractedData.length > 0) {
-          resolve();
+    const checkData = async () => {
+      const data = await getFromStorage('extractedDataByPr');
+      const extractedDataByPr = data || {};
+      const extractedData = extractedDataByPr[baseUrl] && extractedDataByPr[baseUrl].extractedData;
+
+      if (extractedData && extractedData.length > 0) {
+        resolve(extractedData);
+      } else {
+        attempts++;
+        if (attempts < maxAttempts) {
+          setTimeout(checkData, 500);
         } else {
-          attempts++;
-          if (attempts < maxAttempts) {
-            setTimeout(checkData, 500);
-          } else {
-            reject('Timed out waiting for extractedData.');
-          }
+          reject('Timed out waiting for extractedData.');
         }
-      });
+      }
     };
     checkData();
   });
 }
-
 
 // Helper function to get selected files from the file picker
 function getSelectedFiles(filePickerDiv, extractedData) {
