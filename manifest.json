@@ -1,6 +1,7 @@
 {
     "manifest_version": 3,
     "name": "PR Code Reviewer",
+    "description": "Efficient GitHub pull request code reviewer",
     "version": "1.0",
     "permissions": [
         "scripting",

@@ -1,8 +1,4 @@
-import { initializeFeedbackListener } from "./modules/feedback/messageListener.js";
 import { getDetailedFeedback } from "./modules/feedback/getDetailedFeedback.js";
-
-// Initialize the listener for feedback-related messages
-initializeFeedbackListener();
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'getDetailedFeedback') {

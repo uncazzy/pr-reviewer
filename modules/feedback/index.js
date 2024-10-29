@@ -1,4 +1,3 @@
-import { initializeFeedbackListener } from './messageListener.js';
 import { getDetailedFeedback } from './getDetailedFeedback.js';
 import { fetchDetailedFeedbackFromOpenAI } from './fetchDetailedFeedbackFromOpenAI.js';
 import { fetchAndDisplayDetailedFeedback } from './fetchAndDisplayDetailedFeedback.js';
@@ -14,7 +13,6 @@ export {
     displayDetailedFeedback,
     collapseDetailedFeedback,
     refreshDetailedFeedback,
-    initializeFeedbackListener,
     parseFeedback,
     getCurrentPrUrl
 };
