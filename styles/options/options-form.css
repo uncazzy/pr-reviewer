@@ -25,13 +25,3 @@ label {
     max-width: fit-content;
     display: flex;
 }
-
-/* Status Message - Moved to options.css */
-#status {
-    font-style: italic;
-    display: flex;
-    flex-direction: column;
-    margin: auto;
-    margin-top: 15px;
-    max-width: 75%;
-}
