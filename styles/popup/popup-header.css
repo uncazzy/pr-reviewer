@@ -20,3 +20,11 @@
 .header .accent {
     color: var(--primary-color);
 }
+
+
+#reanalyze {
+    background: none;
+    position: absolute;
+    left: 10px;
+    top: 25px;
+}
