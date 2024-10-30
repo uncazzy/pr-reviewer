@@ -37,8 +37,7 @@ export async function createFilePicker(filePickerDiv, extractedData) {
         filterContainer.appendChild(filterButton);
     });
 
-    filePickerDiv.appendChild(searchInput);
-    filePickerDiv.appendChild(filterContainer);
+
 
     // Create a form to contain the checkboxes
     const form = document.createElement('form');
@@ -83,7 +82,12 @@ export async function createFilePicker(filePickerDiv, extractedData) {
 
     selectButtonsContainer.appendChild(selectAllButton);
     selectButtonsContainer.appendChild(deselectAllButton);
-    filePickerDiv.appendChild(selectButtonsContainer);
+
+    if (extractedData.length > 3) {
+        filePickerDiv.appendChild(searchInput);
+        filePickerDiv.appendChild(filterContainer);
+        filePickerDiv.appendChild(selectButtonsContainer);
+    }
 
     // Render file list
     const fileListContainer = document.createElement('div');
