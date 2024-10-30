@@ -61,8 +61,19 @@ document.addEventListener('DOMContentLoaded', () => {
             updateStatus('All stored PR data has been cleared.');
             console.log('Deleting all stored PR data...');
 
-        }
-    });
+            // Remove multiple keys from storage
+        const keysToRemove = ['extractedDataByPr', 'apiMessagesHistory', 'chatHistory', 'processingComplete'];
+        chrome.storage.local.remove(keysToRemove, () => {
+            if (chrome.runtime.lastError) {
+                console.error('Error deleting PR data:', chrome.runtime.lastError);
+                updateStatus('An error occurred while deleting PR data.');
+            } else {
+                updateStatus('All specified PR data has been cleared.');
+                console.log('Deleted "extractedDataByPr", "apiMessagesHistory", and "results" from storage.');
+            }
+        });
+    }
+});
 
     // Event listener for the "Clear All Stored Data" button
     clearStorageButton.addEventListener('click', () => {
