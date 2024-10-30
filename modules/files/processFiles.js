@@ -10,7 +10,8 @@ export async function processFiles(selectedFiles, prUrl) {
       analyzeCodeWithGPT(file.fileName, file.oldCode, file.newCode, file.fullContent)
         .then((feedback) => {
           const parsedFeedback = parseFeedback(feedback);
-          return { fileName: file.fileName, status: parsedFeedback.status, issue: parsedFeedback.issue, index: file.index };
+          const fileURL = prUrl + '/files' + file.fileHref;
+          return { fileName: file.fileName, fileURL, status: parsedFeedback.status, issue: parsedFeedback.issue, index: file.index };
         })
         .catch((error) => ({ fileName: file.fileName, status: 'Error', issue: error.message }))
     );

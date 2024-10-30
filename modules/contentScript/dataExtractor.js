@@ -1,8 +1,9 @@
 // Function to extract file information
 export function extractFileInfo(file, index, isLargeFileFlag) {
-    console.log("isLargeFileFlag inside of extractFileInfo:", isLargeFileFlag)
     const fileNameElement = file.querySelector('.file-info .Truncate a');
-    if (!fileNameElement) {
+    const fileHref = fileNameElement.getAttribute('href'); 
+
+    if (!fileNameElement || !fileHref) {
         console.warn('File name element not found');
         return null;
     }
@@ -70,6 +71,7 @@ export function extractFileInfo(file, index, isLargeFileFlag) {
     const isLargeFile = isLargeFileFlag || !!file.querySelector('button.load-diff-button');
 
     return {
+        fileHref,
         fileName,
         oldCode,
         newCode,

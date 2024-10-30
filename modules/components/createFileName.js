@@ -1,6 +1,31 @@
-export function createFileName(fileName) {
+export function createFileName(fileName, fileURL) {
+
+    // Create a container div for the file name
     const fileNameDiv = document.createElement('div');
     fileNameDiv.className = 'file-name';
-    fileNameDiv.textContent = `File: ${fileName}`;
+
+    // Add "File:" text as a regular span
+    const fileLabel = document.createElement('span');
+    fileLabel.textContent = 'File: ';
+    fileNameDiv.appendChild(fileLabel);
+
+    // Create the link element for the actual file name
+    const fileLink = document.createElement('a');
+    fileLink.href = '#'; // Temporary placeholder, navigation will be handled by the click event
+    fileLink.textContent = fileName;
+    fileLink.className = 'file-name-link';
+
+    // Set up click event to open link in the current tab
+    fileLink.addEventListener('click', (event) => {
+        event.preventDefault(); // Prevent default anchor behavior
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            const currentTabId = tabs[0].id;
+            chrome.tabs.update(currentTabId, { url: fileURL });
+        });
+    });
+
+    // Append the file link to the container div
+    fileNameDiv.appendChild(fileLink);
+
     return fileNameDiv;
 }

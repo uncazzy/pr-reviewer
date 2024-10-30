@@ -9,7 +9,7 @@ export function createFileFeedback(message, resultDiv) {
     const fileDiv = document.createElement('div');
     fileDiv.className = 'file-feedback';
 
-    const fileName = createFileName(message.fileName);
+    const fileName = createFileName(message.fileName, message.fileURL);
     const statusDiv = createStatusDiv(message.status);
     const issueDiv = createIssueDiv(message.issue);
     const expandButton = createExpandButton(message.fileName);
