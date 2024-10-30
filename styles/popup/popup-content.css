@@ -23,10 +23,8 @@
 }
 
 .file-name {
-    font-weight: bold;
-    font-size: 16px;
+    font-size: 14px;
     margin-bottom: 10px;
-    color: var(--secondary-color);
 }
 
 /* Feedback Labels */
@@ -67,11 +65,11 @@
 /* Expand Button */
 .expand-button {
     background: none;
-    color: var(--tertiary-color);
+    color: var(--small-text-color);
     border: none;
     padding: 0;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 12px;
     margin-top: var(--padding-small);
 }
 
