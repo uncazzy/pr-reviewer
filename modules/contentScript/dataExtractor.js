@@ -21,11 +21,19 @@ export function extractFileInfo(file, index, isLargeFileFlag) {
 
         if (!codeCell) return; // Skip rows without code cells
 
-        // Capture the text content of the cell, including leading spaces
+        // Capture the line number cell
+        let lineNumberCell = row.querySelector('td[data-line-number]');
+        let lineNumber = lineNumberCell ? lineNumberCell.getAttribute('data-line-number') : null;
+
+        // Capture the text content of the code cell, including leading spaces
         let lineContent = codeCell.querySelector('.blob-code-inner')?.innerText || codeCell.innerText;
 
-        // Add line content to the result
-        newFileLines.push(lineContent);
+        // Add line number and line content to the result
+        if (lineNumber) {
+            newFileLines.push(`${lineNumber}: ${lineContent}`);
+        } else {
+            newFileLines.push(lineContent); // For cases where line number isn't available
+        }
     });
 
     // Join the lines while preserving the original code structure
@@ -34,13 +42,28 @@ export function extractFileInfo(file, index, isLargeFileFlag) {
     // Remove excessive blank lines (more than two consecutive newlines)
     fullContent = fullContent.replace(/\n{3,}/g, '\n\n');
 
-    // Extract old and new code snippets
-    const oldCode = Array.from(file.querySelectorAll('.blob-code-deletion .blob-code-inner'))
-        .map(node => node.textContent.replace(/\s+$/, ''))
+    // Extract old code snippets with line numbers
+    const oldCode = Array.from(file.querySelectorAll('.blob-code-deletion'))
+        .map(row => {
+            // Access the line number in the preceding sibling <td>
+            const lineNumberCell = row.previousElementSibling;
+            const lineNumber = lineNumberCell?.getAttribute('data-line-number');
+            const lineContent = row.querySelector('.blob-code-inner')?.innerText.trim();
+            return lineNumber ? `${lineNumber}: ${lineContent}` : lineContent;
+        })
+        .filter(Boolean) // Remove any null/undefined entries
         .join('\n');
 
-    const newCode = Array.from(file.querySelectorAll('.blob-code-addition .blob-code-inner'))
-        .map(node => node.textContent.replace(/\s+$/, ''))
+    // Extract new code snippets with line numbers
+    const newCode = Array.from(file.querySelectorAll('.blob-code-addition'))
+        .map(row => {
+            // Access the line number in the preceding sibling <td>
+            const lineNumberCell = row.previousElementSibling;
+            const lineNumber = lineNumberCell?.getAttribute('data-line-number');
+            const lineContent = row.querySelector('.blob-code-inner')?.innerText.trim();
+            return lineNumber ? `${lineNumber}: ${lineContent}` : lineContent;
+        })
+        .filter(Boolean)
         .join('\n');
 
     // Use the initial isLargeFile flag or detect if it has a "Load diff" button

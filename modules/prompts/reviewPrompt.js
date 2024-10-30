@@ -22,17 +22,29 @@ The review content includes:
 2. **Old Code Snippet** - Displays lines of code as they were before the latest changes (if available).
 3. **Updated Lines of Code** - Shows only the specific lines added or modified in this pull request. **These lines are not a complete code block on their own and must be reviewed in the context of the full file.**
 
---- Full File Content ---
+Each section includes the line number the code is associated with.
 
+<FULL_FILE_CONTENT_START>
+
+\`\`\`
 ${fullFileContent}
+\`\`\`
 
---- Old Code (if available) ---
+<FULL_FILE_CONTENT_END>
+
+<OLD_CODE_START (if available)>
 
 ${oldCode ? oldCode : 'No previous code; this is a new file.'}
 
---- Updated Code (new changes only) ---
+<OLD_CODE_END>
 
+<UPDATED_CODE_START> [# Important: These are only the lines that were changed. Do not evaluate these lines of code in isolation as they are likely incomplete and/or poorly formatted, and will be out of context. This code block is only provided as reference of what was changed in this file.]
+
+\`\`\`
 ${newCode}
+\`\`\`
+
+<UPDATED_CODE_END>
 
 # Instructions:
 
