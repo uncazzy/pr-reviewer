@@ -40,7 +40,7 @@ export function displayDetailedFeedback(fileName, feedback, oldCode, newCode, fu
     const refreshButton = document.createElement('button');
     refreshButton.className = 'refresh-button';
     refreshButton.innerHTML = '<i class="fas fa-sync-alt"></i>';
-    refreshButton.title = 'Refresh Feedback';
+    refreshButton.title = 'Regenerate Feedback';
     refreshButton.addEventListener('click', () => refreshDetailedFeedback(fileName, detailedFeedbackDiv, button));
     collapseAndRefreshButtonContainer.appendChild(refreshButton);
 

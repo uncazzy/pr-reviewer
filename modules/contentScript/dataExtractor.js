@@ -49,7 +49,7 @@ export function extractFileInfo(file, index, isLargeFileFlag) {
             // Access the line number in the preceding sibling <td>
             const lineNumberCell = row.previousElementSibling;
             const lineNumber = lineNumberCell?.getAttribute('data-line-number');
-            const lineContent = row.querySelector('.blob-code-inner')?.innerText.trim();
+            const lineContent = row.querySelector('.blob-code-inner')?.innerText;
             return lineNumber ? `${lineNumber}: ${lineContent}` : lineContent;
         })
         .filter(Boolean) // Remove any null/undefined entries
@@ -61,7 +61,7 @@ export function extractFileInfo(file, index, isLargeFileFlag) {
             // Access the line number in the preceding sibling <td>
             const lineNumberCell = row.previousElementSibling;
             const lineNumber = lineNumberCell?.getAttribute('data-line-number');
-            const lineContent = row.querySelector('.blob-code-inner')?.innerText.trim();
+            const lineContent = row.querySelector('.blob-code-inner')?.innerText
             return lineNumber ? `${lineNumber}: ${lineContent}` : lineContent;
         })
         .filter(Boolean)
