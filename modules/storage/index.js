@@ -5,7 +5,7 @@ import { removeFromStorage } from './removeFromStorage.js';
 import { getApiKey } from './getApiKey.js';
 import { getModel } from './getModel.js';
 import { getCurrentPrUrl } from './getCurrentPrUrl.js';
-import { deleteAllPrData } from "./deleteAllPrData.js"
+
 export {
   handleStorageChanges,
   getFromStorage,
@@ -14,5 +14,4 @@ export {
   getApiKey,
   getModel,
   getCurrentPrUrl,
-  deleteAllPrData
 };
