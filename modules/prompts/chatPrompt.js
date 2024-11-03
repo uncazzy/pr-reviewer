@@ -3,31 +3,30 @@
  * 
  * @param {string} fileName - Name of the file being reviewed.
  * @param {string} fullContent - Full code from the file.
- * @param {string} oldCode - Old code.
- * @param {string} newCode - New or updated code.
  * @param {string} prResult - Initial code review.
  * @returns {string} - The formatted prompt for OpenAI.
  */
 
-export function createChatPrompt(fileName, fullContent, oldCode, newCode, prResult) {
+export function createChatPrompt(fileName, fullContent, prResult) {
   return {
     role: 'user',
     content: `You are reviewing a pull request for the file: ${fileName}.
   
-  ## Full File Content:
-  \`\`\`
-  ${fullContent.trim()}
-  \`\`\`
-  
-  ## Old Lines of Code (if applicable):
-  \`\`\`
-  ${oldCode ? oldCode.trim() : 'No previous code; this is a new file.'}
-  \`\`\`
-  
-  ## Updated Lines of Code:
-  \`\`\`
-  ${newCode.trim()}
-  \`\`\`
+The review includes the **Full File Content**, showing the current state of the file with all changes applied. Annotations are as follows:
+- \`+\` indicates added lines.
+- \`-\` indicates deleted lines.
+- Unmarked lines remain unchanged.
+- Deleted lines appear in their original positions, marked with \`// Deleted line\`.
+
+Each line includes its line number for reference.
+
+<FULL_FILE_CONTENT_START>
+
+\`\`\`
+${fullContent}
+\`\`\`
+
+<FULL_FILE_CONTENT_END>
   
   ## Initial Feedback:
   - **Status**: ${prResult.status || 'N/A'}

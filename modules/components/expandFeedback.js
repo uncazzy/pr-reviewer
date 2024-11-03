@@ -11,11 +11,11 @@ export function expandFeedback(fileName, button, detailedFeedbackDiv) {
                 return;
             }
 
-            const { oldCode, newCode, fullContent } = fileData;
+            const { fullContent } = fileData;
 
             if (data.detailedFeedback && data.detailedFeedback[fileName]) {
                 // Pass feedback and additional code information to displayDetailedFeedback
-                displayDetailedFeedback(fileName, data.detailedFeedback[fileName], oldCode, newCode, fullContent, detailedFeedbackDiv, button);
+                displayDetailedFeedback(fileName, data.detailedFeedback[fileName], fullContent, detailedFeedbackDiv, button);
             } else {
                 fetchAndDisplayDetailedFeedback(fileName, detailedFeedbackDiv, button);
             }

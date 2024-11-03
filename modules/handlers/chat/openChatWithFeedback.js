@@ -3,7 +3,7 @@ import { clearChatHistory } from './clearChatHistory.js';
 import { handleUserMessage } from './handleUserMessage.js';
 import { chatMessages } from './chatUtils.js'; // Import shared messages array
 
-export function openChatWithFeedback(fileName, feedback, fullContent, newCode, oldCode) {
+export function openChatWithFeedback(fileName, feedback, fullContent) {
     chrome.storage.local.get(['chatHistory'], (data) => {
 
         chatMessages.length = 0; // Clear the array
@@ -26,7 +26,7 @@ export function openChatWithFeedback(fileName, feedback, fullContent, newCode, o
         renderExistingMessages(fileName, messagesContainer, chatMessages);
 
         // Setup input container with the messagesContainer
-        setupChatInput(chatContainer, messagesContainer, fileName, feedback, fullContent, newCode, oldCode);
+        setupChatInput(chatContainer, messagesContainer, fileName, feedback, fullContent);
     });
 }
 
@@ -90,7 +90,7 @@ function createChatHeader(fileName, messagesContainer) {
 
 
 // Setup chat input and button with messagesContainer reference
-function setupChatInput(chatContainer, messagesContainer, fileName, feedback, fullContent, newCode, oldCode) {
+function setupChatInput(chatContainer, messagesContainer, fileName, feedback, fullContent) {
     const chatInputContainer = document.createElement('div');
     chatInputContainer.className = 'chat-input-container';
 
@@ -101,7 +101,7 @@ function setupChatInput(chatContainer, messagesContainer, fileName, feedback, fu
 
     const sendButton = createButton('send-button', '<i class="fas fa-paper-plane"></i>', () => {
         if (chatInput.value.trim() !== "") {
-            handleUserMessage(chatInput.value.trim(), fileName, feedback, fullContent, newCode, oldCode, messagesContainer);
+            handleUserMessage(chatInput.value.trim(), fileName, feedback, fullContent, messagesContainer);
             chatInput.value = '';
         }
     });
@@ -112,7 +112,7 @@ function setupChatInput(chatContainer, messagesContainer, fileName, feedback, fu
         if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault();
             if (chatInput.value.trim() !== "") {
-                handleUserMessage(chatInput.value.trim(), fileName, feedback, fullContent, newCode, oldCode, messagesContainer);
+                handleUserMessage(chatInput.value.trim(), fileName, feedback, fullContent, messagesContainer);
                 chatInput.value = '';
             }
         }

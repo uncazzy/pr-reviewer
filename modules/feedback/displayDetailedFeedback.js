@@ -2,7 +2,7 @@ import { openChatWithFeedback } from '../handlers/chat/index.js';
 import { collapseDetailedFeedback } from './collapseDetailedFeedback.js';
 import { refreshDetailedFeedback } from './refreshDetailedFeedback.js';
 
-export function displayDetailedFeedback(fileName, feedback, oldCode, newCode, fullContent, detailedFeedbackDiv, button) {
+export function displayDetailedFeedback(fileName, feedback, fullContent, detailedFeedbackDiv, button) {
     const parsedContent = marked.parse(feedback);
     detailedFeedbackDiv.innerHTML = parsedContent;
     detailedFeedbackDiv.querySelectorAll('pre code').forEach((block) => {
@@ -21,7 +21,7 @@ export function displayDetailedFeedback(fileName, feedback, oldCode, newCode, fu
     askFollowUpButton.innerHTML = '<i class="fas fa-comments"></i> Ask Follow-up';
     askFollowUpButton.title = 'Chat and ask questions about this file';
     askFollowUpButton.addEventListener('click', () => {
-        openChatWithFeedback(fileName, feedback, fullContent, newCode, oldCode);  // Pass all code data to chat
+        openChatWithFeedback(fileName, feedback, fullContent);  // Pass all code data to chat
     });
     buttonContainer.appendChild(askFollowUpButton);
 

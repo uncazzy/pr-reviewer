@@ -2,32 +2,32 @@
  * Generates a detailed feedback prompt for OpenAI based on the provided file details and initial feedback.
  * 
  * @param {string} fileName - Name of the file being reviewed.
- * @param {object} fileData - An object containing `oldCode`, `newCode`, and `fullContent` of the file.
+ * @param {object} fileData - An object containing the `fullContent` of the file.
  * @param {object} initialFeedback - Initial feedback provided for the file.
  * @returns {string} - The formatted prompt for OpenAI.
  */
 
 export function createDetailedFeedbackPrompt(fileName, fileData, initialFeedback) {
-  const { oldCode, newCode, fullContent } = fileData;
+  const { fullContent } = fileData;
 
   return `
 You are reviewing a pull request for the file: ${fileName}.
 
-## Review Content
-- **Full File Content** (entire codebase for context):
+The review includes the **Full File Content**, showing the current state of the file with all changes applied. Annotations are as follows:
+- \`+\` indicates added lines.
+- \`-\` indicates deleted lines.
+- Unmarked lines remain unchanged.
+- Deleted lines appear in their original positions, marked with \`// Deleted line\`.
+
+Each line includes its line number for reference.
+
+<FULL_FILE_CONTENT_START>
+
 \`\`\`
-${fullContent.trim()}
+${fullContent}
 \`\`\`
 
-- **Old Code Snippet (if available)**:
-\`\`\`
-${oldCode ? oldCode.trim() : 'No previous code; this is a new file.'}
-\`\`\`
-
-- **Updated Lines of Code** (new changes only):
-\`\`\`
-${newCode.trim()}
-\`\`\`
+<FULL_FILE_CONTENT_END>
 
 - **Initial Feedback Summary**:
   - **Status**: ${initialFeedback ? initialFeedback.status : 'N/A'}

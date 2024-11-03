@@ -41,8 +41,6 @@ export async function refreshDetailedFeedback(fileName, detailedFeedbackDiv, but
         displayDetailedFeedback(
             fileName,
             detailedFeedback,
-            matchingFile.oldCode,
-            matchingFile.newCode,
             matchingFile.fullContent,
             detailedFeedbackDiv,
             button

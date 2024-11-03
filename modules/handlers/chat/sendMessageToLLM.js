@@ -3,7 +3,7 @@ import { chatMessages } from './chatUtils.js';
 import { createChatPrompt, createSystemPrompt } from '../../prompts/chatPrompt.js';
 import { getBaseUrl } from '../../result/index.js';
 
-export async function sendMessageToLLM(fileName, detailedFeedback, fullContent, newCode, oldCode, userQuestion, messagesContainer) {
+export async function sendMessageToLLM(fileName, detailedFeedback, fullContent, userQuestion, messagesContainer) {
     let fileData = null;
 
     try {
@@ -35,7 +35,7 @@ export async function sendMessageToLLM(fileName, detailedFeedback, fullContent, 
 
     // Prepare the system and initial prompts using the new prompt functions
     const systemPrompt = createSystemPrompt(fileName, fullContent);
-    const initialPrompt = createChatPrompt(fileName, fullContent, oldCode, newCode, fileData);
+    const initialPrompt = createChatPrompt(fileName, fullContent, fileData);
 
     // Prepare the messages to send to OpenAI API
     let apiMessages = []; // Messages sent to the LLM, including system and initial prompts

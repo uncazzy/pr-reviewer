@@ -41,10 +41,10 @@ export async function fetchAndDisplayDetailedFeedback(fileName, detailedFeedback
             return;
         }
 
-        const { oldCode, newCode, fullContent } = fileData;
+        const { fullContent } = fileData;
         if (detailedFeedback[fileName]) {
             console.log(`Using cached detailed feedback for ${fileName}`);
-            displayDetailedFeedback(fileName, detailedFeedback[fileName], oldCode, newCode, fullContent, detailedFeedbackDiv, button);
+            displayDetailedFeedback(fileName, detailedFeedback[fileName], fullContent, detailedFeedbackDiv, button);
         } else {
             const detailedFeedbackResponse = await getDetailedFeedback(fileName, baseUrl);
             detailedFeedback[fileName] = detailedFeedbackResponse;
@@ -54,7 +54,7 @@ export async function fetchAndDisplayDetailedFeedback(fileName, detailedFeedback
             extractedDataByPr[baseUrl] = prData;
             await setInStorage({ extractedDataByPr });
 
-            displayDetailedFeedback(fileName, detailedFeedbackResponse, oldCode, newCode, fullContent, detailedFeedbackDiv, button);
+            displayDetailedFeedback(fileName, detailedFeedbackResponse, fullContent, detailedFeedbackDiv, button);
         }
     } catch (error) {
         console.error('Error fetching or displaying detailed feedback:', error);

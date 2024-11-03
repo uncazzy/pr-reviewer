@@ -2,7 +2,7 @@ import { renderMessage } from "./renderMessage.js";
 import { sendMessageToLLM } from './sendMessageToLLM.js';
 import { chatMessages } from './chatUtils.js';
 
-export function handleUserMessage(messageContent, fileName, feedback, fullContent, newCode, oldCode, messagesContainer) {
+export function handleUserMessage(messageContent, fileName, feedback, fullContent, messagesContainer) {
     // Create a new user message object and push it to chatMessages array
     const userMessage = { role: 'user', content: messageContent };
     chatMessages.push(userMessage);
@@ -19,5 +19,5 @@ export function handleUserMessage(messageContent, fileName, feedback, fullConten
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
     // Send the user's message to LLM for further processing
-    sendMessageToLLM(fileName, feedback, fullContent, newCode, oldCode, messageContent, messagesContainer);
+    sendMessageToLLM(fileName, feedback, fullContent, messageContent, messagesContainer);
 }
