@@ -7,7 +7,7 @@ export async function processFiles(selectedFiles, prUrl) {
   const results = [];
   try {
     const promises = selectedFiles.map((file) =>
-      analyzeCodeWithGPT(file.fileName, file.oldCode, file.newCode, file.fullContent)
+      analyzeCodeWithGPT(file.fileName, file.fullContent)
         .then((feedback) => {
           const parsedFeedback = parseFeedback(feedback);
           const fileURL = prUrl + '/files' + file.fileHref;

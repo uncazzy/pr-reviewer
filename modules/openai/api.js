@@ -3,11 +3,11 @@ import { retryWithBackoff } from './retryWithBackoff.js';
 import { createSystemPrompt, createReviewPrompt } from '../prompts/reviewPrompt.js';
 
 // Function to send a code review request to OpenAI
-export async function analyzeCodeWithGPT(fileName, oldCode, newCode, fullFileContent) {
+export async function analyzeCodeWithGPT(fileName, fullContent) {
   console.log(`Analyzing file: ${fileName}`);
 
-  const systemPrompt = createSystemPrompt(fileName, oldCode, newCode, fullFileContent);
-  const userPrompt = createReviewPrompt(fileName, oldCode, newCode, fullFileContent);
+  const systemPrompt = createSystemPrompt(fileName, fullContent);
+  const userPrompt = createReviewPrompt(fileName, fullContent);
 
   console.log("System Prompt being sent to OpenAI:", systemPrompt);
   console.log('User Prompt being sent to OpenAI:', userPrompt);
