@@ -1,13 +1,18 @@
 {
-  "devDependencies": {
-    "webpack": "^5.95.0",
-    "webpack-cli": "^5.1.4"
-  },
+  "name": "pr-reviewer",
+  "version": "0.1.0",
+  "type": "module",
   "scripts": {
-    "build": "webpack"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.254",
+    "vite": "^5.4.11",
+    "vite-plugin-web-extension": "^4.3.1"
   },
   "dependencies": {
-    "@babel/preset-env": "^7.25.4",
-    "babel-loader": "^9.2.1"
+    "@babel/preset-env": "^7.25.4"
   }
 }
