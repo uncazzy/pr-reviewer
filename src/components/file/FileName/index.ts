@@ -1,5 +1,10 @@
-export function createFileName(fileName, fileURL) {
-
+/**
+ * Creates a file name element with a clickable link
+ * @param fileName - The name of the file to display
+ * @param fileURL - The URL that the file link should navigate to
+ * @returns An HTMLDivElement containing the file name and link
+ */
+export function createFileName(fileName: string, fileURL: string): HTMLDivElement {
     // Create a container div for the file name
     const fileNameDiv = document.createElement('div');
     fileNameDiv.className = 'file-name';
@@ -19,8 +24,10 @@ export function createFileName(fileName, fileURL) {
     fileLink.addEventListener('click', (event) => {
         event.preventDefault(); // Prevent default anchor behavior
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            const currentTabId = tabs[0].id;
-            chrome.tabs.update(currentTabId, { url: fileURL });
+            if (tabs && tabs.length > 0 && tabs[0].id) {
+                const currentTabId = tabs[0].id;
+                chrome.tabs.update(currentTabId, { url: fileURL });
+            }
         });
     });
 

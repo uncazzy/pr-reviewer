@@ -1,5 +1,5 @@
-export function getFileIcon(fileExtension) {
-    switch (fileExtension) {
+export function getFileIcon(fileExtension: string): string {
+    switch (fileExtension.toLowerCase()) {
         case 'js':
             return '<i class="fab fa-js-square"></i>';
         case 'jsx':
