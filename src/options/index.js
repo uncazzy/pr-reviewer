@@ -21,6 +21,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (data.openaiModel) {
             modelSelect.value = data.openaiModel;
+        } else {
+            // Set default model if not already set
+            const defaultModel = "gpt-4o-mini";
+            modelSelect.value = defaultModel;
+            chrome.storage.local.set({ 'openaiModel': defaultModel });
         }
     });
 

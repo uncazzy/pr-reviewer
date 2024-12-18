@@ -1,20 +1,48 @@
 import { getApiKey, getModel } from '@utils/storage';
-import { chatMessages } from './chatUtils.js';
+import { chatMessages } from './chatUtils';
 import { createChatPrompt, createSystemPrompt } from '@utils/api/openai/prompts/chatPrompt';
 import { getBaseUrl } from '@utils/results';
+import { marked } from 'marked';
+import hljs from 'highlight.js';
 
-export async function sendMessageToLLM(fileName, detailedFeedback, fullContent, userQuestion, messagesContainer) {
-    let fileData = null;
+interface FileData {
+    fileName: string;
+    [key: string]: any;
+}
+
+interface ExtractedData {
+    extractedData: FileData[];
+}
+
+interface ExtractedDataByPr {
+    [baseUrl: string]: ExtractedData;
+}
+
+interface ChatMessage {
+    role: 'system' | 'user' | 'assistant';
+    content: string;
+}
+
+export async function sendMessageToLLM(
+    fileName: string,
+    detailedFeedback: string,
+    fullContent: string,
+    userQuestion: string,
+    messagesContainer: HTMLElement
+): Promise<void> {
+    let fileData: FileData | null = null;
 
     try {
         // Retrieve the `extractedDataByPr` and find the relevant file data using the base URL
-        const baseUrl = await new Promise((resolve) => {
+        const baseUrl = await new Promise<string>((resolve) => {
             chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
                 resolve(getBaseUrl(tabs[0].url));
             });
         });
 
-        const data = await new Promise((resolve) => chrome.storage.local.get('extractedDataByPr', resolve));
+        const data = await new Promise<{ extractedDataByPr?: ExtractedDataByPr }>((resolve) => 
+            chrome.storage.local.get('extractedDataByPr', resolve)
+        );
         const extractedDataByPr = data.extractedDataByPr || {};
 
         // Get the specific PR data using the base URL
@@ -34,17 +62,17 @@ export async function sendMessageToLLM(fileName, detailedFeedback, fullContent, 
     }
 
     // Prepare the system and initial prompts using the new prompt functions
-    const systemPrompt = createSystemPrompt(fileName, fullContent);
-    const initialPrompt = createChatPrompt(fileName, fullContent, fileData);
+    const systemPrompt: ChatMessage = createSystemPrompt(fileName, fullContent);
+    const initialPrompt: ChatMessage = createChatPrompt(fileName, fullContent, fileData);
 
     // Prepare the messages to send to OpenAI API
-    let apiMessages = []; // Messages sent to the LLM, including system and initial prompts
+    let apiMessages: ChatMessage[] = []; // Messages sent to the LLM, including system and initial prompts
 
     // Retrieve apiMessages from storage or initialize them
-    let apiMessagesHistory = {};
-    let storedApiMessages = [];
+    let apiMessagesHistory: { [key: string]: ChatMessage[] } = {};
+    let storedApiMessages: ChatMessage[] = [];
 
-    await new Promise((resolve) => {
+    await new Promise<void>((resolve) => {
         chrome.storage.local.get(['apiMessagesHistory'], (data) => {
             apiMessagesHistory = data.apiMessagesHistory || {};
             storedApiMessages = apiMessagesHistory[fileName] || [];
@@ -54,7 +82,11 @@ export async function sendMessageToLLM(fileName, detailedFeedback, fullContent, 
 
     if (storedApiMessages.length === 0) {
         // First time, initialize apiMessages
-        apiMessages = [systemPrompt, initialPrompt, { role: 'assistant', content: detailedFeedback }];
+        apiMessages = [
+            systemPrompt,
+            initialPrompt,
+            { role: 'assistant', content: detailedFeedback }
+        ];
     } else {
         // Use stored apiMessages
         apiMessages = storedApiMessages;
@@ -71,7 +103,7 @@ export async function sendMessageToLLM(fileName, detailedFeedback, fullContent, 
         const apiKey = await getApiKey();
         const model = await getModel();
         if (!apiKey) {
-            throw 'OpenAI API key not found.';
+            throw new Error('OpenAI API key not found.');
         }
 
         // Stream the response from the LLM
@@ -89,6 +121,10 @@ export async function sendMessageToLLM(fileName, detailedFeedback, fullContent, 
                 temperature: 0.2
             })
         });
+
+        if (!response.body) {
+            throw new Error('Response body is null');
+        }
 
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
@@ -120,44 +156,46 @@ export async function sendMessageToLLM(fileName, detailedFeedback, fullContent, 
             const { value, done: readerDone } = await reader.read();
             done = readerDone;
 
-            // Decode the incoming chunk
-            const chunk = decoder.decode(value, { stream: true });
+            if (value) {
+                // Decode the incoming chunk
+                const chunk = decoder.decode(value, { stream: true });
 
-            // Process each line of the stream, which starts with "data: "
-            const lines = chunk.split("\n");
-            for (let line of lines) {
-                line = line.trim();
-                if (line.startsWith("data:")) {
-                    const jsonData = line.substring(5).trim();  // Remove "data: "
+                // Process each line of the stream, which starts with "data: "
+                const lines = chunk.split("\n");
+                for (let line of lines) {
+                    line = line.trim();
+                    if (line.startsWith("data:")) {
+                        const jsonData = line.substring(5).trim();  // Remove "data: "
 
-                    if (jsonData === "[DONE]") {
-                        done = true;
-                        break;
-                    }
-
-                    try {
-                        // Buffer incomplete chunks and combine them into a complete JSON object
-                        partialData += jsonData;
-
-                        // Try parsing the buffered data
-                        const parsedData = JSON.parse(partialData);
-                        const delta = parsedData.choices[0].delta;
-
-                        if (delta && delta.content) {
-                            assistantMessage += delta.content;
-                            messageContentDiv.innerHTML = marked.parse(assistantMessage);
-                            messageContentDiv.querySelectorAll('pre code').forEach((block) => {
-                                hljs.highlightElement(block);
-                            });
-                            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                        if (jsonData === "[DONE]") {
+                            done = true;
+                            break;
                         }
 
-                        // Clear partial data once successfully parsed
-                        partialData = '';
+                        try {
+                            // Buffer incomplete chunks and combine them into a complete JSON object
+                            partialData += jsonData;
 
-                    } catch (err) {
-                        // If there's a parsing error, it's likely due to incomplete JSON
-                        console.warn('Incomplete or malformed JSON, awaiting more chunks...', err);
+                            // Try parsing the buffered data
+                            const parsedData = JSON.parse(partialData);
+                            const delta = parsedData.choices[0].delta;
+
+                            if (delta && delta.content) {
+                                assistantMessage += delta.content;
+                                messageContentDiv.innerHTML = marked.parse(assistantMessage);
+                                messageContentDiv.querySelectorAll('pre code').forEach((block) => {
+                                    hljs.highlightElement(block);
+                                });
+                                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                            }
+
+                            // Clear partial data once successfully parsed
+                            partialData = '';
+
+                        } catch (err) {
+                            // If there's a parsing error, it's likely due to incomplete JSON
+                            console.warn('Incomplete or malformed JSON, awaiting more chunks...', err);
+                        }
                     }
                 }
             }
@@ -172,8 +210,8 @@ export async function sendMessageToLLM(fileName, detailedFeedback, fullContent, 
 
         // Save messages and apiMessages to storage
         chrome.storage.local.get(['chatHistory', 'apiMessagesHistory'], (data) => {
-            let chatHistory = data.chatHistory || {};
-            let apiMessagesHistory = data.apiMessagesHistory || {};
+            let chatHistory: { [key: string]: ChatMessage[] } = data.chatHistory || {};
+            let apiMessagesHistory: { [key: string]: ChatMessage[] } = data.apiMessagesHistory || {};
 
             chatHistory[fileName] = chatMessages;
             apiMessagesHistory[fileName] = apiMessages;
@@ -182,6 +220,6 @@ export async function sendMessageToLLM(fileName, detailedFeedback, fullContent, 
         });
 
     } catch (error) {
-        console.error('Error sending message to LLM:', error);
+        console.error('Error sending message to LLM:', error instanceof Error ? error.message : error);
     }
 }

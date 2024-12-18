@@ -1,6 +1,8 @@
 import { openChatWithFeedback } from '@handlers/chat';
 import { collapseDetailedFeedback } from './collapseDetailedFeedback.js';
 import { refreshDetailedFeedback } from './refreshDetailedFeedback.js';
+import { marked } from 'marked';
+import hljs from 'highlight.js';
 
 export function displayDetailedFeedback(fileName, feedback, fullContent, detailedFeedbackDiv, button) {
     const parsedContent = marked.parse(feedback);

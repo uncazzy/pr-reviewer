@@ -3,7 +3,7 @@ import {
   resetUI,
   getCurrentTabUrl,
 } from './index.js'
-import { getFromStorage } from '@utils/storage';
+import { getFromStorage } from '@utils/storage/index.ts';
 import { processFiles } from '@utils/api';
 import { createFilePicker } from '@components/file/FilePicker';
 import { getBaseUrl } from '@utils/results';

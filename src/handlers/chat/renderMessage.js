@@ -1,3 +1,6 @@
+import { marked } from 'marked';
+import hljs from 'highlight.js';
+
 export function renderMessage(message, messagesContainer) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `chat-message ${message.role}-message`;

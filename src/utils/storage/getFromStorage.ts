@@ -1,4 +1,4 @@
-export function getFromStorage(key) {
+export function getFromStorage<T>(key: string): Promise<T> {
   return new Promise((resolve, reject) => {
     chrome.storage.local.get([key], (data) => {
       if (chrome.runtime.lastError) {

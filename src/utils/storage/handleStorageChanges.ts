@@ -1,6 +1,30 @@
 import { getBaseUrl, displaySavedResults } from '@utils/results';
 
-export function handleStorageChanges(changes, area) {
+interface StorageChange<T = any> {
+  oldValue?: T;
+  newValue?: T;
+}
+
+interface PrData {
+  results?: any[];
+  detailedFeedback?: any;
+}
+
+interface ExtractedDataByPr {
+  [key: string]: PrData;
+}
+
+interface StorageChanges {
+  [key: string]: StorageChange<any>;
+}
+
+interface ProcessingStorageChanges extends StorageChanges {
+  processingComplete?: StorageChange<boolean>;
+  extractedDataByPr?: StorageChange<ExtractedDataByPr>;
+  error?: StorageChange<string>;
+}
+
+export function handleStorageChanges(changes: ProcessingStorageChanges, area: string): void {
   const loadingDiv = document.getElementById('loading');
   const analyzeButton = document.getElementById('analyze');
   const reanalyzeButton = document.getElementById('reanalyze');
