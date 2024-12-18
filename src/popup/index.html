@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>PR Code Review</title>
+    <link rel="stylesheet" href="../assets/fonts/css/all.min.css"> <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="../libs/highlight/styles/default.min.css"> <!-- Highlight.js Theme -->
+    <link rel="stylesheet" href="../styles/global.css"> <!-- Include global styles -->
+    <link rel="stylesheet" href="../styles/popup/popup.css"> <!-- Include specific popup styles -->
+    <link rel="stylesheet" href="../styles/chat/chat.css">
+</head>
+
+<body>
+    <!-- Header Section -->
+    <div class="header">
+
+        <h1 class="heading"><i class="fas fa-code-branch accent"></i> PR Code Review</h1>
+
+        <button id="analyze" class="button">
+            <i class="fa-solid fa-list"></i> Show Available Files
+        </button>
+
+        <div id="loading">
+            <i class="fas fa-spinner"></i>
+            <p>Analyzing...</p>
+        </div>
+
+        <button id="reanalyze" class="button" style="display: none;" title="Go back to file selection">
+            <i class="fa-solid fa-arrow-left"></i>
+        </button>
+
+    </div>
+
+    <!-- File Picker Section -->
+    <div id="file-picker"></div>
+
+    <!-- Results Section -->
+    <div id="result"></div>
+
+    <!-- Settings button -->
+    <button id="settings-button" class="settings-button" title="Settings">
+        <i class="fas fa-cog"></i>
+    </button>
+
+    <!-- Load necessary scripts -->
+    <script type="module" src="index.js"></script>
+</body>
+
+</html>

@@ -12,7 +12,7 @@ export default defineConfig({
       browser: 'chrome',
       webExtConfig: {
         buildDirectory: 'dist',
-        htmlFiles: ['popup.html', 'options.html'],
+        htmlFiles: ['src/popup/index.html', 'src/options/index.html'],
       }
     }),
   ],
@@ -20,17 +20,17 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       input: {
-        contentScript: path.resolve(__dirname, 'contentScript.js'),
-        background: path.resolve(__dirname, 'background.js'),
-        popup: path.resolve(__dirname, 'popup.js'),
-        options: path.resolve(__dirname, 'options.js')
+        contentScript: path.resolve(__dirname, 'src/content/extractors/index.js'),
+        background: path.resolve(__dirname, 'src/background/index.js'),
+        popup: path.resolve(__dirname, 'src/popup/index.js'),
+        options: path.resolve(__dirname, 'src/options/index.js')
       },
       output: [
         {
           format: 'es',
           entryFileNames: '[name].bundle.js',
           chunkFileNames: '[name].[hash].js',
-          assetFileNames: '[name].[ext]',
+          assetFileNames: 'assets/[name].[ext]',
           dir: 'dist'
         }
       ]
@@ -41,8 +41,13 @@ export default defineConfig({
     cssCodeSplit: true
   },
   resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './modules'),
-    },
-  },
+    alias: [
+      { find: '@', replacement: path.resolve(__dirname, 'src') },
+      { find: '@components', replacement: path.resolve(__dirname, 'src/components') },
+      { find: '@utils', replacement: path.resolve(__dirname, 'src/utils') },
+      { find: '@handlers', replacement: path.resolve(__dirname, 'src/handlers') },
+      { find: '@styles', replacement: path.resolve(__dirname, 'src/styles') },
+      { find: '@assets', replacement: path.resolve(__dirname, 'src/assets') }
+    ]
+  }
 });
