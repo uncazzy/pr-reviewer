@@ -1,3 +1,5 @@
+import '@fortawesome/fontawesome-free/css/all.min.css';
+
 document.addEventListener('DOMContentLoaded', () => {
     const apiKeyInput = document.getElementById('apiKey');
     const modelSelect = document.getElementById('modelSelect');

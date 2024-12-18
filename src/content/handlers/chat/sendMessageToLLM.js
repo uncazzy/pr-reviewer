@@ -1,7 +1,7 @@
-import { getApiKey, getModel } from '../../../../modules/storage/index.js';
+import { getApiKey, getModel } from '@utils/storage';
 import { chatMessages } from './chatUtils.js';
-import { createChatPrompt, createSystemPrompt } from '../../utils/api/openai/prompts/chatPrompt.js';
-import { getBaseUrl } from '../../../../modules/result/index.js';
+import { createChatPrompt, createSystemPrompt } from '@utils/api/openai/prompts/chatPrompt';
+import { getBaseUrl } from '@utils/results';
 
 export async function sendMessageToLLM(fileName, detailedFeedback, fullContent, userQuestion, messagesContainer) {
     let fileData = null;
