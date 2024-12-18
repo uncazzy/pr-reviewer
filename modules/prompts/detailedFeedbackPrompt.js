@@ -15,9 +15,7 @@ You are reviewing a pull request for the file: ${fileName}.
 
 The review includes the **Full File Content**, showing the current state of the file with all changes applied. Annotations are as follows:
 - \`+\` indicates added lines.
-- \`-\` indicates deleted lines.
 - Unmarked lines remain unchanged.
-- Deleted lines appear in their original positions, marked with \`// Deleted line\`.
 
 Each line includes its line number for reference.
 
@@ -39,10 +37,6 @@ Provide a thorough, detailed review of the code changes, addressing the followin
 2. **Rationale for Recommendations**: Explain why these changes are necessary to improve functionality, performance, or adherence to coding standards.
 3. **Illustrative Code Examples**: Where applicable, include brief code examples to illustrate recommended changes.
 
-## Important Context:
-- **Evaluation Focus**: The "Updated Lines of Code" section shows only specific lines changed or added in this pull request and **is not a standalone code block**. **Always assess these updated lines within the full file context** to understand how they integrate within the overall structure.
-- **If No Old Code**: If no old code is provided, consider this as a new file and review accordingly.
-
 ## Output Requirements:
 1. Keep your response focused, actionable, and easy to follow.
 2. Use markdown for any code snippets or specific code suggestions.
@@ -53,7 +47,7 @@ Provide a thorough, detailed review of the code changes, addressing the followin
 export function createSystemPrompt(fileName, fileData, initialFeedback) {
   return `You are an expert code reviewer with in-depth knowledge of software development best practices, security considerations, and performance optimization. Your role is to provide detailed, actionable feedback on the code changes within the file "${fileName}", taking into account the initial feedback summary provided.
 
-- **Focus**: Review the updated lines of code within the full file content to ensure consistency, correctness, and adherence to best practices. Avoid evaluating the updated code lines in isolation, as they may appear incomplete without full context.
+- **Focus**: Review the full file content to ensure consistency, correctness, and adherence to best practices.
 - **Goal**: Identify actionable improvements with clear explanations, ensuring feedback is relevant, concise, and structured for easy implementation.
 `;
 }

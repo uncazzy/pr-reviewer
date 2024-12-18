@@ -6,7 +6,6 @@ export function expandFeedback(fileName, button, detailedFeedbackDiv) {
             const fileData = data.extractedData && data.extractedData.find(file => file.fileName === fileName);
 
             if (!fileData) {
-                console.warn('File data not found for:', fileName);
                 fetchAndDisplayDetailedFeedback(fileName, detailedFeedbackDiv, button);
                 return;
             }

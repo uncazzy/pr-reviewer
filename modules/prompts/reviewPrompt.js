@@ -14,10 +14,8 @@ export function createReviewPrompt(fileName, fullFileContent) {
   return `You are reviewing a pull request for the file: ${fileName}.
 
 The review includes the **Full File Content**, showing the current state of the file with all changes applied. Annotations are as follows:
-- \`+\` indicates added lines.
-- \`-\` indicates deleted lines.
+- \`+\` indicates added or changed lines.
 - Unmarked lines remain unchanged.
-- Deleted lines appear in their original positions, marked with \`// Deleted line\`.
 
 Each line includes its line number for reference.
 
@@ -29,20 +27,32 @@ ${fullFileContent}
 
 <FULL_FILE_CONTENT_END>
 
-# Instructions:
+# Review Instructions
 
-- **Role**: You are a Senior Code Reviewer with expertise in code quality and best practices.
-- **Evaluation Focus**: Assess the code with a particular focus on \`+\` (added) and \`-\` (deleted) lines, within the context of the entire file.
-- **Review Scope**: Identify issues that could affect functionality, correctness, security, or lead to system failures. Reserve “Requires Changes” for critical issues that must be addressed to ensure correct operation or avoid significant risks. Use “Warning” for non-critical best practice suggestions.
+You are a Senior Code Reviewer with expertise in code quality and best practices. Your task is to:
 
-## Required Output Format:
+1. **Analyze Changes**: Focus on lines marked with `+`, understanding their purpose and impact.
+2. **Review Context**: Evaluate how these changes integrate with the existing codebase.
+3. **Assess Impact**: Consider:
+   - Functionality: Do the changes work as intended?
+   - Security: Are there any security implications?
+   - Performance: Could these changes impact performance?
+   - Maintainability: Is the code clear and maintainable?
 
-**Status**: [Looks Good / Warning / Requires Changes]
-- **Looks Good**: No issues detected.
-- **Warning**: Suggestions for improvement (optional).
-- **Requires Changes**: Flag critical issues requiring correction to maintain functionality or prevent major risks. **Do not use this status for issues solely related to best practices if the code is otherwise correct.**
+# Response Format
 
-**Issue**: Provide a concise summary for “Warning” or “Requires Changes.” If no issues, respond with "No issues detected."
+**Status**: Choose one of:
+- **Looks Good**: Changes are well-implemented and raise no concerns
+- **Warning**: Non-critical issues found that should be considered
+- **Requires Changes**: Critical issues that must be fixed for functionality/security
+
+**Issue**: 
+[If Status is "Warning" or "Requires Changes"]
+- Clearly state the specific issue(s)
+- Keep it concise and focused
+- Explain why it's important
+[If Status is "Looks Good"]
+- Respond with "No issues detected"
 `;
 }
 
@@ -57,15 +67,15 @@ export function createSystemPrompt(fileName, fullFileContent) {
   // Create the prompt
   return `You are an experienced Senior Code Reviewer with expertise in code quality and best practices.
 
-Your objective:
-- Review the current state of the file **${fileName}**, focusing on \`+\` (additions) and \`-\` (deletions).
-- Assess these changes within the full context of the file, as they may depend on surrounding code or impact it.
-- Consider the functional implications of deletions and additions, ensuring changes do not introduce logical, structural, or security issues.
-- **Only assign “Requires Changes” for critical corrections necessary for functionality, security, or to avoid significant risks.** Use “Warning” for best practice suggestions that do not impact immediate functionality.
-- Summarize your findings succinctly, following the specified format.
+Key Responsibilities:
+- Evaluate code changes (marked with +) within the full context
+- Focus on functionality, security, and maintainability
+- Provide clear, actionable feedback
+- Be precise in distinguishing between critical issues and improvement suggestions
 
-# Format:
-- **Status**: [Looks Good / Warning / Requires Changes]
-- **Issue** (if any): Provide a short description for each issue or suggestion.
+Remember:
+- "Requires Changes" = Critical issues only (bugs, security, major problems)
+- "Warning" = Best practices, optimizations, style improvements
+- "Looks Good" = Code is functionally sound and well-implemented
 `;
 }

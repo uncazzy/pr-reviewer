@@ -8,30 +8,6 @@ export function extractFileInfo(file, index, isLargeFileFlag) {
     }
 
     const fileName = fileNameElement.textContent.trim();
-
-    // Maps line numbers to deleted lines
-    const deletionsMap = new Map();
-
-    // Collect deletions with line numbers
-    const deletionCodeCells = file.querySelectorAll('td.blob-code-deletion');
-    deletionCodeCells.forEach(codeCell => {
-        const row = codeCell.parentElement; // The <tr> element
-
-        // Get the line number cell for the deletion
-        const lineNumberCell = row.querySelector('td.blob-num-deletion');
-        const lineNumber = lineNumberCell ? lineNumberCell.getAttribute('data-line-number') : null;
-
-        // Access the code marker
-        const codeMarkerElement = codeCell.querySelector('.blob-code-inner.blob-code-marker');
-        const codeMarker = codeMarkerElement ? codeMarkerElement.getAttribute('data-code-marker') : '-';
-        const lineContentText = codeMarkerElement ? codeMarkerElement.innerText : codeCell.innerText;
-        const lineContent = codeMarker + lineContentText;
-
-        if (lineNumber) {
-            deletionsMap.set(lineNumber, lineContent);
-        }
-    });
-
     const newFileLines = [];
 
     // Select all code rows, including those with context and additions
@@ -42,11 +18,10 @@ export function extractFileInfo(file, index, isLargeFileFlag) {
         let codeCell = row.querySelector(
             'td.blob-code:not(.blob-code-hunk):not([data-split-side="left"])'
         );
-
         if (!codeCell) return; // Skip rows without code cells
 
         // Capture the line number cell
-        let lineNumberCell = row.querySelector('td[data-line-number]');
+        let lineNumberCell = row.querySelector('td.js-blob-rnum[data-line-number]');
         let lineNumber = lineNumberCell ? lineNumberCell.getAttribute('data-line-number') : null;
 
         // Access the code marker
@@ -56,13 +31,6 @@ export function extractFileInfo(file, index, isLargeFileFlag) {
         // Get the line content
         let lineContentText = codeCell.querySelector('.blob-code-inner')?.innerText || codeCell.innerText;
         let lineContent = lineContentText;
-
-        // Check if there is a deletion at this line number
-        if (lineNumber && deletionsMap.has(lineNumber)) {
-            const deletionContent = deletionsMap.get(lineNumber);
-            // Include the deletion before the current line
-            newFileLines.push(`${lineNumber}: ${deletionContent}  // Deleted line`);
-        }
 
         // Include the current line
         if (lineNumber) {

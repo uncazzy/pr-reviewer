@@ -14,9 +14,7 @@ export function createChatPrompt(fileName, fullContent, prResult) {
   
 The review includes the **Full File Content**, showing the current state of the file with all changes applied. Annotations are as follows:
 - \`+\` indicates added lines.
-- \`-\` indicates deleted lines.
 - Unmarked lines remain unchanged.
-- Deleted lines appear in their original positions, marked with \`// Deleted line\`.
 
 Each line includes its line number for reference.
 
@@ -28,20 +26,17 @@ ${fullContent}
 
 <FULL_FILE_CONTENT_END>
   
-  ## Initial Feedback:
-  - **Status**: ${prResult.status || 'N/A'}
-  - **Issue**: ${prResult.issue || 'N/A'}
+## Initial Feedback:
+- **Status**: ${prResult.status || 'N/A'}
+- **Issue**: ${prResult.issue || 'N/A'}
+
+## Detailed Review Instructions:
+1. **Identify specific changes needed**: Describe any specific code changes required, based on logic, syntax, or best practices.
+2. **Explain rationale**: Provide a clear reason for each recommended change.
+3. **Illustrate with examples**: If applicable, include brief code examples to help clarify the suggested modifications.
   
-  ## Detailed Review Instructions:
-  1. **Identify specific changes needed**: Describe any specific code changes required, based on logic, syntax, or best practices.
-  2. **Explain rationale**: Provide a clear reason for each recommended change.
-  3. **Illustrate with examples**: If applicable, include brief code examples to help clarify the suggested modifications.
-  
-  ### Important Context:
-  - The "Updated Lines of Code" section contains only the specific lines changed in this pull request and **is not a standalone code block**. **Evaluate these changes within the full file context** for an accurate review.
-  - **New File Note**: If no old code is provided, treat this as a new file and review it accordingly.
-  
-  Use markdown formatting for any code snippets, and keep all feedback actionable, concise, and easy to follow. Address the initial feedback provided, expanding as needed.`
+## Output Requirements:
+Use markdown formatting for any code snippets, and keep all feedback actionable, concise, and easy to follow. Address the initial feedback provided, expanding as needed.`
   };
 }
 
