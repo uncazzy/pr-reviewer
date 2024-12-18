@@ -1,3 +1,7 @@
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import hljs from 'highlight.js';
+import 'highlight.js/styles/default.css'
+
 import { handleAnalyzeClick } from '@handlers/analyzeClick';
 import { handleStorageChanges, setInStorage } from '@utils/storage';
 import { getBaseUrl, checkForResults  } from '@utils/results';
