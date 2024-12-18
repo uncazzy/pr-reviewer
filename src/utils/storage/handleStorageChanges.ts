@@ -14,22 +14,19 @@ interface ExtractedDataByPr {
   [key: string]: PrData;
 }
 
-interface StorageChanges {
-  [key: string]: StorageChange<any>;
-}
-
-interface ProcessingStorageChanges extends StorageChanges {
+interface ProcessingStorageChanges {
   processingComplete?: StorageChange<boolean>;
   extractedDataByPr?: StorageChange<ExtractedDataByPr>;
   error?: StorageChange<string>;
+  [key: string]: StorageChange<any> | undefined;
 }
 
 export function handleStorageChanges(changes: ProcessingStorageChanges, area: string): void {
-  const loadingDiv = document.getElementById('loading');
-  const analyzeButton = document.getElementById('analyze');
-  const reanalyzeButton = document.getElementById('reanalyze');
-  const filePicker = document.getElementById('file-picker');
-  const resultDiv = document.getElementById('result');
+  const loadingDiv = document.getElementById('loading') as HTMLDivElement;
+  const analyzeButton = document.getElementById('analyze') as HTMLButtonElement;
+  const reanalyzeButton = document.getElementById('reanalyze') as HTMLButtonElement;
+  const filePicker = document.getElementById('file-picker') as HTMLInputElement;
+  const resultDiv = document.getElementById('result') as HTMLDivElement;
 
   // Check if all required DOM elements are present
   if (!loadingDiv || !analyzeButton || !reanalyzeButton || !filePicker || !resultDiv) {
@@ -43,6 +40,7 @@ export function handleStorageChanges(changes: ProcessingStorageChanges, area: st
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (tabs && tabs.length > 0) {
           const currentUrl = tabs[0].url;
+          if (!currentUrl) return;
           const basePrUrl = getBaseUrl(currentUrl);
 
           chrome.storage.local.get('extractedDataByPr', (data) => {
@@ -81,6 +79,7 @@ export function handleStorageChanges(changes: ProcessingStorageChanges, area: st
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (tabs && tabs.length > 0) {
           const currentUrl = tabs[0].url;
+          if (!currentUrl) return;
           const basePrUrl = getBaseUrl(currentUrl);
 
           const oldPrData = oldValue[basePrUrl] || {};
