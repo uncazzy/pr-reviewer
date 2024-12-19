@@ -1,13 +1,41 @@
-import { displayDetailedFeedback } from "./displayDetailedFeedback.js";
+import { displayDetailedFeedback } from "./displayDetailedFeedback";
 import { getFromStorage, setInStorage } from '@utils/storage';
 import { getDetailedFeedback } from '@utils/feedback';
 import { getCurrentTabPrUrl } from '@utils/tabs';
 
-export async function refreshDetailedFeedback(fileName, detailedFeedbackDiv, button) {
+interface ExtractedFile {
+    fileName: string;
+    fullContent: string[];
+}
+
+interface DetailedFeedbacks {
+    [fileName: string]: string;
+}
+
+interface PrData {
+    extractedData?: ExtractedFile[];
+    detailedFeedback?: DetailedFeedbacks;
+}
+
+interface ExtractedDataByPr {
+    [baseUrl: string]: PrData;
+}
+
+/**
+ * Refreshes the detailed feedback for a specific file
+ * @param fileName - The name of the file to refresh feedback for
+ * @param detailedFeedbackDiv - The div element to display the feedback in
+ * @param button - The button that triggered the refresh
+ */
+export async function refreshDetailedFeedback(
+    fileName: string,
+    detailedFeedbackDiv: HTMLElement,
+    button: HTMLButtonElement
+): Promise<void> {
     detailedFeedbackDiv.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Refreshing detailed feedback...</div>';
 
     try {
-        const extractedDataByPr = await getFromStorage('extractedDataByPr') || {};
+        const extractedDataByPr = (await getFromStorage('extractedDataByPr')) as ExtractedDataByPr || {};
 
         const baseUrl = await getCurrentTabPrUrl();
 
@@ -21,7 +49,9 @@ export async function refreshDetailedFeedback(fileName, detailedFeedbackDiv, but
         const extractedData = prData.extractedData || [];
         let detailedFeedbacks = prData.detailedFeedback || {};
 
-        const matchingFile = extractedData.find(file => file.fileName === fileName || file.fileName === fileName.replace(/\\/g, ''));
+        const matchingFile = extractedData.find(file => 
+            file.fileName === fileName || file.fileName === fileName.replace(/\\/g, '')
+        );
 
         if (!matchingFile) {
             detailedFeedbackDiv.innerHTML = '<p class="error-message">File data not found. Please re-analyze the PR.</p>';
@@ -34,7 +64,7 @@ export async function refreshDetailedFeedback(fileName, detailedFeedbackDiv, but
         // Save the updated detailed feedback back to storage
         prData.detailedFeedback = detailedFeedbacks;
         extractedDataByPr[baseUrl] = prData;
-        await setInStorage({extractedDataByPr});
+        await setInStorage({ extractedDataByPr });
 
         // Fetch new detailed feedback
         const detailedFeedback = await getDetailedFeedback(fileName, baseUrl);

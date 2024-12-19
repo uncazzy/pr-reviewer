@@ -1,13 +1,23 @@
+import { ChatMessage } from '@content/handlers/chat/chatUtils';
+
+interface PrResult {
+  status?: string;
+  issue?: string;
+}
+
 /**
  * Generates a detailed feedback prompt for OpenAI based on the provided file details and initial feedback.
  * 
- * @param {string} fileName - Name of the file being reviewed.
- * @param {string} fullContent - Full code from the file.
- * @param {string} prResult - Initial code review.
- * @returns {string} - The formatted prompt for OpenAI.
+ * @param fileName - Name of the file being reviewed.
+ * @param fullContent - Full code from the file.
+ * @param prResult - Initial code review result.
+ * @returns The formatted prompt for OpenAI.
  */
-
-export function createChatPrompt(fileName, fullContent, prResult) {
+export function createChatPrompt(
+  fileName: string,
+  fullContent: string,
+  prResult: PrResult
+): ChatMessage {
   return {
     role: 'user',
     content: `You are reviewing a pull request for the file: ${fileName}.
@@ -27,8 +37,8 @@ ${fullContent}
 <FULL_FILE_CONTENT_END>
   
 ## Initial Feedback:
-- **Status**: ${prResult.status || 'N/A'}
-- **Issue**: ${prResult.issue || 'N/A'}
+- **Status**: ${prResult?.status || 'N/A'}
+- **Issue**: ${prResult?.issue || 'N/A'}
 
 ## Detailed Review Instructions:
 1. **Identify specific changes needed**: Describe any specific code changes required, based on logic, syntax, or best practices.
@@ -40,8 +50,17 @@ Use markdown formatting for any code snippets, and keep all feedback actionable,
   };
 }
 
-export function createSystemPrompt(fileName, fullContent) {
-
+/**
+ * Creates a system prompt for OpenAI based on the provided file details.
+ * 
+ * @param fileName - Name of the file being reviewed.
+ * @param fullContent - Full code from the file.
+ * @returns The system prompt for OpenAI.
+ */
+export function createSystemPrompt(
+  fileName: string,
+  fullContent: string
+): ChatMessage {
   return {
     role: 'system',
     content: `You are assisting the user in a real-time chat to provide focused, actionable code review feedback.

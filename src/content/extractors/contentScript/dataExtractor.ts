@@ -1,40 +1,63 @@
-export function extractFileInfo(file, index, isLargeFileFlag) {
-    const fileNameElement = file.querySelector('.file-info .Truncate a');
-    const fileHref = fileNameElement.getAttribute('href');
+interface FileInfo {
+    fileHref: string;
+    fileName: string;
+    fullContent: string;
+    index: number;
+    isLargeFile: boolean;
+}
 
-    if (!fileNameElement || !fileHref) {
+/**
+ * Extracts information from a file container element
+ * @param file - The file container element
+ * @param index - The index of the file in the list
+ * @param isLargeFileFlag - Flag indicating if the file is large
+ * @returns FileInfo object or null if extraction fails
+ */
+export function extractFileInfo(
+    file: Element,
+    index: number,
+    isLargeFileFlag: boolean | null
+): FileInfo | null {
+    const fileNameElement = file.querySelector<HTMLAnchorElement>('.file-info .Truncate a');
+    if (!fileNameElement) {
         console.warn('File name element not found');
         return null;
     }
 
-    const fileName = fileNameElement.textContent.trim();
-    const newFileLines = [];
+    const fileHref = fileNameElement.getAttribute('href');
+    if (!fileHref) {
+        console.warn('File href not found');
+        return null;
+    }
+
+    const fileName = fileNameElement.textContent?.trim() || '';
+    const newFileLines: string[] = [];
 
     // Select all code rows, including those with context and additions
     const codeRows = file.querySelectorAll('tr');
 
     codeRows.forEach(row => {
         // Select the code cell, including context, deletions, and excluding hunk headers and left-side cells in split diffs
-        let codeCell = row.querySelector(
+        const codeCell = row.querySelector<HTMLTableDataCellElement>(
             'td.blob-code:not(.blob-code-hunk):not([data-split-side="left"])'
         );
         if (!codeCell) return; // Skip rows without code cells
 
         // Capture the line number cell
-        let lineNumberCell = row.querySelector('td.js-blob-rnum[data-line-number]');
-        let lineNumber = lineNumberCell ? lineNumberCell.getAttribute('data-line-number') : null;
+        const lineNumberCell = row.querySelector<HTMLTableDataCellElement>('td.js-blob-rnum[data-line-number]');
+        const lineNumber = lineNumberCell?.getAttribute('data-line-number') || null;
 
         // Access the code marker
-        let codeMarkerElement = codeCell.querySelector('.blob-code-inner.blob-code-marker');
-        let codeMarker = codeMarkerElement ? codeMarkerElement.getAttribute('data-code-marker') : '';
+        const codeMarkerElement = codeCell.querySelector<HTMLElement>('.blob-code-inner.blob-code-marker');
+        const codeMarker = codeMarkerElement?.getAttribute('data-code-marker') || '';
 
         // Get the line content
-        let lineContentText = codeCell.querySelector('.blob-code-inner')?.innerText || codeCell.innerText;
-        let lineContent = lineContentText;
+        const lineContentElement = codeCell.querySelector<HTMLElement>('.blob-code-inner');
+        const lineContent = lineContentElement ? lineContentElement.innerText : codeCell.innerText;
 
         // Include the current line
         if (lineNumber) {
-            let prefix = codeMarker || ' '; // Use '+' for additions, ' ' for unchanged lines
+            const prefix = codeMarker || ' '; // Use '+' for additions, ' ' for unchanged lines
             newFileLines.push(`${lineNumber}: ${prefix}${lineContent}`);
         } else {
             newFileLines.push(lineContent); // For cases where line number isn't available
@@ -59,12 +82,15 @@ export function extractFileInfo(file, index, isLargeFileFlag) {
     };
 }
 
-// Function to extract data from all files
-export function extractAllFilesData() {
+/**
+ * Extracts data from all file containers in the document
+ * @returns Array of FileInfo objects
+ */
+export function extractAllFilesData(): FileInfo[] {
     const fileContainers = document.querySelectorAll('.file');
     console.log(`Found ${fileContainers.length} file containers`);
 
-    let extractedData = [];
+    const extractedData: FileInfo[] = [];
 
     // Sort fileContainers based on their order in the DOM
     const sortedFileContainers = Array.from(fileContainers).sort((a, b) => {

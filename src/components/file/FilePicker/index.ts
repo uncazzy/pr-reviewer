@@ -1,7 +1,15 @@
 import { getFileIcon } from "@utils/ui"
 import { getBaseUrl } from "@utils/results";
 
-export async function createFilePicker(filePickerDiv, extractedData) {
+interface ExtractedDataFile {
+    fileName: string;
+    filePath: string;
+    isLargeFile?: boolean;
+    fullContent?: string[];
+    index?: number;
+}
+
+export async function createFilePicker(filePickerDiv: HTMLElement, extractedData: ExtractedDataFile[]): Promise<void> {
     if (!filePickerDiv) {
         console.error('filePickerDiv is not defined');
         return;
@@ -22,7 +30,7 @@ export async function createFilePicker(filePickerDiv, extractedData) {
     searchInput.placeholder = 'Search files...';
 
     // Create file type filters
-    const fileTypes = [...new Set(extractedData.map(file => file.fileName.split('.').pop().toLowerCase()))];
+    const fileTypes = [...new Set(extractedData.map(file => file.fileName.split('.').pop()?.toLowerCase() || ''))];
     const filterContainer = document.createElement('div');
     filterContainer.id = 'file-type-filters';
 
@@ -37,8 +45,6 @@ export async function createFilePicker(filePickerDiv, extractedData) {
         filterContainer.appendChild(filterButton);
     });
 
-
-
     // Create a form to contain the checkboxes
     const form = document.createElement('form');
     form.id = 'file-picker-form';
@@ -51,7 +57,7 @@ export async function createFilePicker(filePickerDiv, extractedData) {
     selectAllButton.textContent = 'Select All';
     selectAllButton.addEventListener('click', (e) => {
         e.preventDefault();
-        const checkboxes = form.querySelectorAll('input[type="checkbox"]');
+        const checkboxes = form.querySelectorAll<HTMLInputElement>('input[type="checkbox"]');
         checkboxes.forEach(checkbox => {
             checkbox.checked = true;
             const fileDiv = checkbox.closest('.file-picker-item');
@@ -67,7 +73,7 @@ export async function createFilePicker(filePickerDiv, extractedData) {
     deselectAllButton.textContent = 'Deselect All';
     deselectAllButton.addEventListener('click', (e) => {
         e.preventDefault();
-        const checkboxes = form.querySelectorAll('input[type="checkbox"]');
+        const checkboxes = form.querySelectorAll<HTMLInputElement>('input[type="checkbox"]');
         checkboxes.forEach(checkbox => {
             checkbox.checked = false;
 
@@ -96,7 +102,8 @@ export async function createFilePicker(filePickerDiv, extractedData) {
     extractedData.forEach(file => {
         const fileDiv = document.createElement('div');
         fileDiv.className = 'file-picker-item';
-        fileDiv.dataset.type = file.fileName.split('.').pop().toLowerCase();
+        const fileExtension = file.fileName.split('.').pop()?.toLowerCase() || '';
+        fileDiv.dataset.type = fileExtension;
 
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
@@ -107,9 +114,9 @@ export async function createFilePicker(filePickerDiv, extractedData) {
         console.log("File:", file)
 
         checkbox.addEventListener('change', async (e) => {
-            if (file.isLargeFile && e.target.checked) {
-
-                if (file.fullContent.length > 1) {
+            const target = e.target as HTMLInputElement;
+            if (file.isLargeFile && target.checked) {
+                if (file.fullContent && file.fullContent.length > 1) {
                     console.log("File is already scraped, skipping...");
                     fileDiv.classList.remove('large-file-unchecked');
                     return;
@@ -121,7 +128,11 @@ export async function createFilePicker(filePickerDiv, extractedData) {
                 // Before sending the message, inject the content script
                 chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
                     const activeTab = tabs[0];
+                    if (!activeTab?.id) return;
+                    
                     const currentUrl = activeTab.url;  // Get the current URL
+                    if (!currentUrl) return;
+                    
                     const basePrUrl = getBaseUrl(currentUrl);
 
                     // Now send the message to the content script, including the currentUrl
@@ -130,7 +141,7 @@ export async function createFilePicker(filePickerDiv, extractedData) {
                         fileName: file.fileName,
                         index: file.index,
                         basePrUrl: basePrUrl  // Pass the URL here
-                    }, function (response) {
+                    }, function (response: { success?: boolean; error?: string }) {
                         if (chrome.runtime.lastError) {
                             console.error('Error sending message:', chrome.runtime.lastError.message);
                             return;
@@ -144,16 +155,13 @@ export async function createFilePicker(filePickerDiv, extractedData) {
                         }
                     });
                 });
-            } else if (file.isLargeFile && !e.target.checked) {
+            } else if (file.isLargeFile && !target.checked) {
                 fileDiv.classList.add('large-file-unchecked');
             }
         });
 
         const iconSpan = document.createElement('span');
         iconSpan.className = 'file-icon';
-
-        // Determine the file extension
-        const fileExtension = file.fileName.split('.').pop().toLowerCase();
 
         // Get the icon using the helper function
         iconSpan.innerHTML = getFileIcon(fileExtension);
@@ -184,10 +192,10 @@ export async function createFilePicker(filePickerDiv, extractedData) {
     // Search functionality
     searchInput.addEventListener('input', () => {
         const searchTerm = searchInput.value.toLowerCase();
-        const items = fileListContainer.querySelectorAll('.file-picker-item');
+        const items = fileListContainer.querySelectorAll<HTMLElement>('.file-picker-item');
         items.forEach(item => {
             const label = item.querySelector('label');
-            if (label && label.textContent.toLowerCase().includes(searchTerm)) {
+            if (label && label.textContent?.toLowerCase().includes(searchTerm)) {
                 item.style.display = 'flex';
             } else {
                 item.style.display = 'none';
@@ -196,9 +204,9 @@ export async function createFilePicker(filePickerDiv, extractedData) {
     });
 
     // Filter functionality
-    function toggleFileTypeFilter(type, button) {
+    function toggleFileTypeFilter(type: string, button: HTMLButtonElement) {
         const isActive = button.classList.toggle('active');
-        const items = fileListContainer.querySelectorAll(`.file-picker-item[data-type="${type}"]`);
+        const items = fileListContainer.querySelectorAll<HTMLElement>(`.file-picker-item[data-type="${type}"]`);
         items.forEach(item => {
             item.style.display = isActive ? 'none' : 'flex';
         });

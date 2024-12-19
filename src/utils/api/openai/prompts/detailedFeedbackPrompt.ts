@@ -1,16 +1,28 @@
+interface FileData {
+    fullContent: string;
+}
+
+interface InitialFeedback {
+    status?: string;
+    issue?: string;
+}
+
 /**
  * Generates a detailed feedback prompt for OpenAI based on the provided file details and initial feedback.
  * 
- * @param {string} fileName - Name of the file being reviewed.
- * @param {object} fileData - An object containing the `fullContent` of the file.
- * @param {object} initialFeedback - Initial feedback provided for the file.
- * @returns {string} - The formatted prompt for OpenAI.
+ * @param fileName - Name of the file being reviewed.
+ * @param fileData - An object containing the `fullContent` of the file.
+ * @param initialFeedback - Initial feedback provided for the file.
+ * @returns The formatted prompt for OpenAI.
  */
+export function createDetailedFeedbackPrompt(
+    fileName: string,
+    fileData: FileData,
+    initialFeedback: InitialFeedback | null
+): string {
+    const { fullContent } = fileData;
 
-export function createDetailedFeedbackPrompt(fileName, fileData, initialFeedback) {
-  const { fullContent } = fileData;
-
-  return `
+    return `
 You are reviewing a pull request for the file: ${fileName}.
 
 The review includes the **Full File Content**, showing the current state of the file with all changes applied. Annotations are as follows:
@@ -44,10 +56,21 @@ Provide a thorough, detailed review of the code changes, addressing the followin
 `;
 }
 
-export function createSystemPrompt(fileName, fileData, initialFeedback) {
-  return `You are an expert code reviewer with in-depth knowledge of software development best practices, security considerations, and performance optimization. Your role is to provide detailed, actionable feedback on the code changes within the file "${fileName}", taking into account the initial feedback summary provided.
+/**
+ * Creates a system prompt for the detailed feedback review.
+ * 
+ * @param fileName - Name of the file being reviewed.
+ * @param fileData - An object containing the file data.
+ * @param initialFeedback - Initial feedback provided for the file.
+ * @returns The system prompt for OpenAI.
+ */
+export function createSystemPrompt(
+    fileName: string,
+    fileData: FileData,
+    initialFeedback: InitialFeedback | null
+): string {
+    return `You are an expert code reviewer with in-depth knowledge of software development best practices, security considerations, and performance optimization. Your role is to provide detailed, actionable feedback on the code changes within the file "${fileName}", taking into account the initial feedback summary provided.
 
 - **Focus**: Review the full file content to ensure consistency, correctness, and adherence to best practices.
-- **Goal**: Identify actionable improvements with clear explanations, ensuring feedback is relevant, concise, and structured for easy implementation.
-`;
+- **Goal**: Identify actionable improvements with clear explanations, ensuring feedback is relevant, constructive, and implementable.`;
 }

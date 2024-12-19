@@ -1,5 +1,5 @@
 import { getApiKey, getModel } from '@utils/storage';
-import { chatMessages } from './chatUtils';
+import { chatMessages, ChatMessage } from '@content/handlers/chat/chatUtils';
 import { createChatPrompt, createSystemPrompt } from '@utils/api/openai/prompts/chatPrompt';
 import { getBaseUrl } from '@utils/results';
 import { marked } from 'marked';
@@ -7,7 +7,11 @@ import hljs from 'highlight.js';
 
 interface FileData {
     fileName: string;
-    [key: string]: any;
+    status?: string;
+    issue?: string;
+    fileHref?: string;
+    fullContent?: string;
+    index?: number;
 }
 
 interface ExtractedData {
@@ -16,11 +20,6 @@ interface ExtractedData {
 
 interface ExtractedDataByPr {
     [baseUrl: string]: ExtractedData;
-}
-
-interface ChatMessage {
-    role: 'system' | 'user' | 'assistant';
-    content: string;
 }
 
 export async function sendMessageToLLM(
@@ -34,9 +33,17 @@ export async function sendMessageToLLM(
 
     try {
         // Retrieve the `extractedDataByPr` and find the relevant file data using the base URL
-        const baseUrl = await new Promise<string>((resolve) => {
+        const baseUrl = await new Promise<string>((resolve, reject) => {
             chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-                resolve(getBaseUrl(tabs[0].url));
+                if (!tabs[0]?.url) {
+                    reject(new Error('No active tab URL found'));
+                    return;
+                }
+                try {
+                    resolve(getBaseUrl(tabs[0].url));
+                } catch (error) {
+                    reject(error);
+                }
             });
         });
 
@@ -49,7 +56,8 @@ export async function sendMessageToLLM(
         const prData = extractedDataByPr[baseUrl];
         if (prData && prData.extractedData && prData.extractedData.length > 0) {
             // Find the specific file data based on fileName
-            fileData = prData.extractedData.find(file => file.fileName === fileName);
+            const foundFile = prData.extractedData.find(file => file.fileName === fileName);
+            fileData = foundFile || null;
 
             if (!fileData) {
                 console.warn(`No extracted data found for file: ${fileName}. Proceeding without file context.`);
@@ -63,7 +71,17 @@ export async function sendMessageToLLM(
 
     // Prepare the system and initial prompts using the new prompt functions
     const systemPrompt: ChatMessage = createSystemPrompt(fileName, fullContent);
-    const initialPrompt: ChatMessage = createChatPrompt(fileName, fullContent, fileData);
+    const initialPrompt: ChatMessage = createChatPrompt(
+        fileName,
+        fullContent,
+        fileData ? {
+            status: fileData.status,
+            issue: fileData.issue
+        } : {
+            status: undefined,
+            issue: undefined
+        }
+    );
 
     // Prepare the messages to send to OpenAI API
     let apiMessages: ChatMessage[] = []; // Messages sent to the LLM, including system and initial prompts
@@ -182,9 +200,14 @@ export async function sendMessageToLLM(
 
                             if (delta && delta.content) {
                                 assistantMessage += delta.content;
-                                messageContentDiv.innerHTML = marked.parse(assistantMessage);
+                                const parsedContent = await Promise.resolve(marked.parse(assistantMessage));
+                                messageContentDiv.innerHTML = parsedContent;
+                                
+                                // Apply syntax highlighting
                                 messageContentDiv.querySelectorAll('pre code').forEach((block) => {
-                                    hljs.highlightElement(block);
+                                    if (block instanceof HTMLElement) {
+                                        hljs.highlightElement(block);
+                                    }
                                 });
                                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
                             }

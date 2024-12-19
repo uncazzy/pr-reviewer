@@ -1,7 +1,7 @@
 export { analyzeCodeWithGPT } from './openai/api.js'
 export { fetchDetailedFeedbackFromOpenAI } from './openai/fetchDetailedFeedbackFromOpenAI.js'
-export { processFiles } from './processFiles'
-export { retryWithBackoff } from './retryWithBackoff'
+export { processFiles } from './processFiles.js'
+export { retryWithBackoff } from './retryWithBackoff.js'
 
 // Prompts
 export { createSystemPrompt } from './openai/prompts/reviewPrompt.js'

@@ -1,17 +1,19 @@
 /**
  * Generates the review prompt for OpenAI based on the provided file details.
  * 
- * @param {string} fileName - Name of the file being reviewed.
- * @param {string} fullFileContent - The full content of the file being reviewed, including '+' and '-' markers.
- * @returns {string} - The formatted prompt for OpenAI.
+ * @param fileName - Name of the file being reviewed.
+ * @param fullFileContent - The full content of the file being reviewed, including '+' and '-' markers.
+ * @returns The formatted prompt for OpenAI.
  */
+export function createReviewPrompt(
+    fileName: string,
+    fullFileContent: string
+): string {
+    // Clean up code snippet
+    fullFileContent = fullFileContent.trim();
 
-export function createReviewPrompt(fileName, fullFileContent) {
-  // Clean up code snippet
-  fullFileContent = fullFileContent.trim();
-
-  // Create the prompt
-  return `You are reviewing a pull request for the file: ${fileName}.
+    // Create the prompt
+    return `You are reviewing a pull request for the file: ${fileName}.
 
 The review includes the **Full File Content**, showing the current state of the file with all changes applied. Annotations are as follows:
 - \`+\` indicates added or changed lines.
@@ -31,7 +33,7 @@ ${fullFileContent}
 
 You are a Senior Code Reviewer with expertise in code quality and best practices. Your task is to:
 
-1. **Analyze Changes**: Focus on lines marked with `+`, understanding their purpose and impact.
+1. **Analyze Changes**: Focus on lines marked with \`+\`, understanding their purpose and impact.
 2. **Review Context**: Evaluate how these changes integrate with the existing codebase.
 3. **Assess Impact**: Consider:
    - Functionality: Do the changes work as intended?
@@ -59,13 +61,16 @@ You are a Senior Code Reviewer with expertise in code quality and best practices
 /**
  * Generates the system prompt for OpenAI based on the provided file details.
  * 
- * @param {string} fileName - Name of the file being reviewed.
- * @returns {string} - The formatted system prompt for OpenAI.
+ * @param fileName - Name of the file being reviewed.
+ * @param fullFileContent - The full content of the file being reviewed.
+ * @returns The formatted system prompt for OpenAI.
  */
-
-export function createSystemPrompt(fileName, fullFileContent) {
-  // Create the prompt
-  return `You are an experienced Senior Code Reviewer with expertise in code quality and best practices.
+export function createSystemPrompt(
+    fileName: string,
+    fullFileContent: string
+): string {
+    // Create the prompt
+    return `You are an experienced Senior Code Reviewer with expertise in code quality and best practices.
 
 Key Responsibilities:
 - Evaluate code changes (marked with +) within the full context

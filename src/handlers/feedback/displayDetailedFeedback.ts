@@ -1,15 +1,33 @@
-import { openChatWithFeedback } from '@handlers/chat';
-import { collapseDetailedFeedback } from './collapseDetailedFeedback.js';
-import { refreshDetailedFeedback } from './refreshDetailedFeedback.js';
+import { openChatWithFeedback } from '@/handlers/chat';
+import { collapseDetailedFeedback } from './collapseDetailedFeedback';
+import { refreshDetailedFeedback } from './refreshDetailedFeedback';
 import { marked } from 'marked';
 import hljs from 'highlight.js';
 
-export function displayDetailedFeedback(fileName, feedback, fullContent, detailedFeedbackDiv, button) {
-    const parsedContent = marked.parse(feedback);
+/**
+ * Displays detailed feedback for a file with syntax highlighting and interactive buttons
+ * @param fileName - Name of the file being reviewed
+ * @param feedback - The feedback content in markdown format
+ * @param fullContent - The full content of the file being reviewed
+ * @param detailedFeedbackDiv - The div element to display the feedback in
+ * @param button - The button that toggles the feedback visibility
+ */
+export async function displayDetailedFeedback(
+    fileName: string,
+    feedback: string,
+    fullContent: string[],
+    detailedFeedbackDiv: HTMLElement,
+    button: HTMLButtonElement
+): Promise<void> {
+    // Parse markdown content
+    const parsedContent = await Promise.resolve(marked.parse(feedback));
     detailedFeedbackDiv.innerHTML = parsedContent;
-    detailedFeedbackDiv.querySelectorAll('pre code').forEach((block) => {
+    
+    // Apply syntax highlighting
+    detailedFeedbackDiv.querySelectorAll<HTMLElement>('pre code').forEach((block) => {
         hljs.highlightElement(block);
     });
+    
     detailedFeedbackDiv.style.display = 'block';
     button.textContent = 'Collapse Feedback';
 
@@ -49,8 +67,8 @@ export function displayDetailedFeedback(fileName, feedback, fullContent, detaile
     // Append collapse & refresh container to main button container
     buttonContainer.appendChild(collapseAndRefreshButtonContainer);
 
-    // Append button container below the detailed feedback
-    detailedFeedbackDiv.appendChild(buttonContainer);
+    // Insert the button container at the top of the detailed feedback div
+    detailedFeedbackDiv.insertBefore(buttonContainer, detailedFeedbackDiv.firstChild);
 
     detailedFeedbackDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }

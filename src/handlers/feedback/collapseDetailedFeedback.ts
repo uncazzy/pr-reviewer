@@ -1,4 +1,12 @@
-export function collapseDetailedFeedback(detailedFeedbackDiv, button) {
+/**
+ * Collapses the detailed feedback section and handles scrolling behavior
+ * @param detailedFeedbackDiv - The div containing detailed feedback
+ * @param button - The button that toggles the feedback visibility
+ */
+export function collapseDetailedFeedback(
+    detailedFeedbackDiv: HTMLElement,
+    button: HTMLButtonElement
+): void {
     // Hide the detailed feedback
     detailedFeedbackDiv.style.display = 'none';
     button.textContent = 'Expand Feedback';
@@ -8,15 +16,17 @@ export function collapseDetailedFeedback(detailedFeedbackDiv, button) {
 
     if (fileFeedbackDiv) {
         const resultContainer = document.getElementById('result');
-        const allFileFeedbackDivs = Array.from(resultContainer.querySelectorAll('.file-feedback'));
-        const currentIndex = allFileFeedbackDivs.indexOf(fileFeedbackDiv);
+        if (!resultContainer) return;
+
+        const allFileFeedbackDivs = Array.from(resultContainer.querySelectorAll<HTMLElement>('.file-feedback'));
+        const currentIndex = allFileFeedbackDivs.indexOf(fileFeedbackDiv as HTMLElement);
         const topItemThreshold = 2; // Adjust based on how many top items need special handling
 
         if (currentIndex !== -1 && currentIndex < topItemThreshold) {
             // If the item is among the first few, apply scroll offset
 
             // Calculate the header height
-            const header = document.querySelector('.header');
+            const header = document.querySelector<HTMLElement>('.header');
             const headerHeight = header ? header.offsetHeight : 0;
 
             // Calculate the position of the fileFeedbackDiv relative to the document
