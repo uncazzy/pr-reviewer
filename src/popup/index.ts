@@ -4,15 +4,46 @@ import 'highlight.js/styles/default.css'
 
 import { handleAnalyzeClick } from '@handlers/analyzeClick';
 import { handleStorageChanges, setInStorage } from '@utils/storage';
-import { getBaseUrl, checkForResults  } from '@utils/results';
+import { getBaseUrl, checkForResults } from '@utils/results';
 import { createFilePicker } from '@components/file/FilePicker';
 
-const analyzeButton = document.getElementById('analyze');
-const reanalyzeButton = document.getElementById('reanalyze');
-const settingsButton = document.getElementById('settings-button');
-const resultDiv = document.getElementById('result');
-const loadingDiv = document.getElementById('loading');
-const filePickerDiv = document.getElementById('file-picker');
+interface ExtractedData {
+    fileName: string;
+    fullContent: string;
+    filePath: string;
+    [key: string]: unknown;
+}
+
+interface ExtractedDataFile {
+    fileName: string;
+    fullContent: string[];
+    filePath: string;
+}
+
+interface PRData {
+    extractedData?: ExtractedData[];
+    results?: unknown;
+}
+
+interface ExtractedDataByPr {
+    [baseUrl: string]: PRData;
+}
+
+interface CheckResults {
+    hasResults: boolean;
+    hasExtractedData: boolean;
+}
+
+const analyzeButton = document.getElementById('analyze') as HTMLButtonElement;
+const reanalyzeButton = document.getElementById('reanalyze') as HTMLButtonElement;
+const settingsButton = document.getElementById('settings-button') as HTMLButtonElement;
+const resultDiv = document.getElementById('result') as HTMLDivElement;
+const loadingDiv = document.getElementById('loading') as HTMLDivElement;
+const filePickerDiv = document.getElementById('file-picker') as HTMLDivElement;
+
+if (!analyzeButton || !reanalyzeButton || !settingsButton || !resultDiv || !loadingDiv || !filePickerDiv) {
+    throw new Error('Required DOM elements not found');
+}
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', initializePopup);
@@ -32,7 +63,7 @@ settingsButton.addEventListener('click', () => {
 });
 
 // Initialization
-async function initializePopup() {
+async function initializePopup(): Promise<void> {
     const { hasResults, hasExtractedData } = await checkGitHubPRPage();
 
     if (hasResults) {
@@ -52,11 +83,21 @@ async function initializePopup() {
     initializeSyntaxHighlighting();
 }
 
-async function checkGitHubPRPage() {
+async function checkGitHubPRPage(): Promise<CheckResults> {
     return new Promise((resolve) => {
         chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
             const currentTab = tabs[0];
+            if (!currentTab) {
+                resolve({ hasResults: false, hasExtractedData: false });
+                return;
+            }
+
             const currentUrl = currentTab.url;
+            if (!currentUrl) {
+                resolve({ hasResults: false, hasExtractedData: false });
+                return;
+            }
+
             const isPRPage = /^https:\/\/github\.com\/[^/]+\/[^/]+\/pull\/\d+/.test(currentUrl);
             analyzeButton.disabled = !isPRPage;
 
@@ -72,7 +113,7 @@ async function checkGitHubPRPage() {
     });
 }
 
-function initializeSyntaxHighlighting() {
+function initializeSyntaxHighlighting(): void {
     if (typeof hljs !== 'undefined') {
         hljs.highlightAll();
     } else {
@@ -80,36 +121,60 @@ function initializeSyntaxHighlighting() {
     }
 }
 
-async function checkForExtractedData() {
+async function checkForExtractedData(): Promise<boolean> {
     return new Promise((resolve) => {
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
             const currentTab = tabs[0];
+            if (!currentTab) {
+                resolve(false);
+                return;
+            }
+
             const currentUrl = currentTab.url;
+            if (!currentUrl) {
+                resolve(false);
+                return;
+            }
+
             const baseUrl = getBaseUrl(currentUrl);
 
-            chrome.storage.local.get(['extractedDataByPr'], (data) => {
+            chrome.storage.local.get(['extractedDataByPr'], (data: { extractedDataByPr?: ExtractedDataByPr }) => {
                 const extractedDataByPr = data.extractedDataByPr || {};
                 const prData = extractedDataByPr[baseUrl];
-                const hasExtractedData = prData && prData.extractedData && prData.extractedData.length > 0;
+                const hasExtractedData = Boolean(prData?.extractedData && prData.extractedData.length > 0);
                 resolve(hasExtractedData);
             });
         });
     });
 }
 
-async function displayFilePicker() {
+async function displayFilePicker(): Promise<void> {
     chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
         const currentTab = tabs[0];
-        const currentUrl = currentTab.url;
-        const baseUrl = getBaseUrl(currentUrl);
+        if (!currentTab) {
+            return;
+        }
 
-        chrome.storage.local.get(['extractedDataByPr'], async (data) => {
+        const currentUrl = currentTab.url;
+        if (!currentUrl) {
+            return;
+        }
+
+        const baseUrl = getBaseUrl(currentUrl);
+        chrome.storage.local.get(['extractedDataByPr'], async (data: { extractedDataByPr?: ExtractedDataByPr }) => {
             const extractedDataByPr = data.extractedDataByPr || {};
             const prData = extractedDataByPr[baseUrl];
-            const extractedData = prData ? prData.extractedData : null;
+            const extractedData = prData?.extractedData;
 
             if (extractedData && extractedData.length > 0) {
-                await createFilePicker(filePickerDiv, extractedData);
+                // Transform the data to match ExtractedDataFile format
+                const transformedData: ExtractedDataFile[] = extractedData.map(data => ({
+                    fileName: data.fileName,
+                    filePath: data.filePath,
+                    fullContent: data.fullContent.split('\n')
+                }));
+
+                await createFilePicker(filePickerDiv, transformedData);
                 filePickerDiv.style.display = 'block';
                 analyzeButton.innerHTML = '<i class="fas fa-play"></i> Start Analysis';
                 analyzeButton.title = 'Start analysis on selected files';
@@ -121,18 +186,27 @@ async function displayFilePicker() {
     });
 }
 
-async function resetUI() {
+async function resetUI(): Promise<void> {
     // Get the current PR URL
-    const currentUrl = await new Promise((resolve) => {
+    const currentUrl = await new Promise<string | undefined>((resolve) => {
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            resolve(tabs[0].url);
+            const currentTab = tabs[0];
+            if (!currentTab?.url) {
+                resolve(undefined);
+                return;
+            }
+            resolve(currentTab.url);
         });
     });
+
+    if (!currentUrl) {
+        return;
+    }
 
     const basePrUrl = getBaseUrl(currentUrl);
 
     // Retrieve existing extractedDataByPr from storage
-    const { extractedDataByPr = {} } = await chrome.storage.local.get(['extractedDataByPr']);
+    const { extractedDataByPr = {} } = await chrome.storage.local.get(['extractedDataByPr']) as { extractedDataByPr: ExtractedDataByPr };
 
     // Remove results for the current PR but keep extractedData
     if (extractedDataByPr[basePrUrl]) {
@@ -140,11 +214,11 @@ async function resetUI() {
     }
 
     // Save updated data back to storage
-    await setInStorage({extractedDataByPr});
+    await setInStorage({ extractedDataByPr });
 
     // Also remove processingComplete flag
-    await new Promise((resolve) => {
-        chrome.storage.local.remove(['processingComplete'], resolve);
+    await new Promise<void>((resolve) => {
+        chrome.storage.local.remove(['processingComplete'], () => resolve());
     });
 
     // Reset UI elements

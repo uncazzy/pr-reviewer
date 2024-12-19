@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "parcel src/popup/index.html src/options/index.html src/background/index.js src/content/extractors/index.js manifest.json public/assets/icons/icon.png",
+    "dev": "parcel src/popup/index.html src/options/index.html src/background/index.ts src/content/extractors/index.ts manifest.json public/assets/icons/icon.png",
     "build:popup": "parcel build src/popup/index.html --dist-dir dist --public-url . --no-source-maps",
     "build:options": "parcel build src/options/index.html --dist-dir dist/options --public-url . --no-source-maps",
-    "build:background": "parcel build src/background/index.js --dist-dir dist/background --no-source-maps",
-    "build:content": "parcel build src/content/extractors/index.js --dist-dir dist/content --no-source-maps",
+    "build:background": "parcel build src/background/index.ts --dist-dir dist/background --no-source-maps",
+    "build:content": "parcel build src/content/extractors/index.ts --dist-dir dist/content --no-source-maps",
     "build:manifest": "copy manifest.json dist\\manifest.json",
     "build:icons": "parcel build public/assets/icons/icon.png --dist-dir dist/icons --no-source-maps",
     "build": "npm run build:popup && npm run build:options && npm run build:background && npm run build:content && npm run build:manifest && npm run build:icons"

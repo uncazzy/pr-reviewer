@@ -1,5 +1,5 @@
-export { collapseDetailedFeedback } from './collapseDetailedFeedback.js';
-export { displayDetailedFeedback } from './displayDetailedFeedback.js';
-export { expandFeedback } from './expandFeedback.js';
-export { fetchAndDisplayDetailedFeedback } from './fetchAndDisplayDetailedFeedback.js';
-export { refreshDetailedFeedback } from './refreshDetailedFeedback.js';
+export { collapseDetailedFeedback } from './collapseDetailedFeedback';
+export { displayDetailedFeedback } from './displayDetailedFeedback';
+export { expandFeedback } from './expandFeedback';
+export { fetchAndDisplayDetailedFeedback } from './fetchAndDisplayDetailedFeedback';
+export { refreshDetailedFeedback } from './refreshDetailedFeedback';

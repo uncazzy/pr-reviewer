@@ -27,9 +27,10 @@ export function expandFeedback(
             }
 
             const { fullContent } = fileData;
+            const contentLines = fullContent.split('\n');
 
             if (data.detailedFeedback?.[fileName]) {
-                displayDetailedFeedback(fileName, data.detailedFeedback[fileName], fullContent, detailedFeedbackDiv, button);
+                displayDetailedFeedback(fileName, data.detailedFeedback[fileName], contentLines, detailedFeedbackDiv, button);
             } else {
                 fetchAndDisplayDetailedFeedback(fileName, detailedFeedbackDiv, button);
             }
