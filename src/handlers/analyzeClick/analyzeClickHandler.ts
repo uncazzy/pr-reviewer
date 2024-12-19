@@ -3,14 +3,46 @@ import {
   resetUI,
   getCurrentTabUrl,
 } from './index.js'
-import { getFromStorage } from '@utils/storage/index.ts';
+import { getFromStorage } from '@utils/storage/index';
 import { processFiles } from '@utils/api';
 import { createFilePicker } from '@components/file/FilePicker';
 import { getBaseUrl } from '@utils/results';
 
-export async function handleAnalyzeClick(loadingDiv, analyzeButton, reanalyzeButton, resultDiv, filePickerDiv) {
+interface ExtractedData {
+  fileName: string;
+  filePath: string;
+  isLargeFile?: boolean;
+  fullContent: string;  // Note: this is string for our use case
+  index?: number;
+  [key: string]: any;  // For any additional properties
+}
+
+interface ExtractedDataByPr {
+  [baseUrl: string]: {
+    extractedData: ExtractedData[];
+  };
+}
+
+/**
+ * Handles the click event of the analyze button.
+ */
+export async function handleAnalyzeClick(
+  loadingDiv: HTMLDivElement,
+  analyzeButton: HTMLButtonElement,
+  reanalyzeButton: HTMLButtonElement,
+  resultDiv: HTMLDivElement,
+  filePickerDiv: HTMLDivElement
+): Promise<void> {
   try {
-    let { currentTab, currentUrl } = await getCurrentTabUrl();
+    const tabInfo = await getCurrentTabUrl();
+    if (!tabInfo) {
+      throw new Error('Could not get current tab information');
+    }
+
+    let { currentTab, currentUrl } = tabInfo;
+    if (!currentUrl) {
+      throw new Error('No URL found in current tab');
+    }
 
     // Get the base version of the PR URL
     const basePrUrl = getBaseUrl(currentUrl);
@@ -21,7 +53,7 @@ export async function handleAnalyzeClick(loadingDiv, analyzeButton, reanalyzeBut
       analyzeButton.disabled = true;
 
       // Get the latest extractedData for the current PR
-      const extractedDataByPr = await getFromStorage('extractedDataByPr') || {};
+      const extractedDataByPr = (await getFromStorage('extractedDataByPr') as ExtractedDataByPr) || {};
       console.log('extractedDataByPr:', extractedDataByPr);
       const prData = extractedDataByPr[basePrUrl];
       console.log('prData:', prData);
@@ -60,24 +92,31 @@ export async function handleAnalyzeClick(loadingDiv, analyzeButton, reanalyzeBut
       let newUrl = currentUrl.replace('/commits', '/files').replace('/checks', '/files');
       newUrl = currentUrl.match(/\/pull\/\d+$/) ? `${currentUrl}/files` : newUrl;
 
-      chrome.tabs.update(currentTab.id, { url: newUrl });
+      chrome.tabs.update(currentTab.id!, { url: newUrl });
 
-      await waitForTabToLoad(currentTab.id);
+      await waitForTabToLoad(currentTab.id!);
 
       const updatedTabInfo = await getCurrentTabUrl();
+      if (!updatedTabInfo) {
+        throw new Error('Could not get updated tab information');
+      }
       currentTab = updatedTabInfo.currentTab;
       currentUrl = updatedTabInfo.currentUrl;
     }
 
     // Trigger re-scraping by sending a message to the content script
-    chrome.tabs.sendMessage(currentTab.id, { action: 'scrapeFiles' }, (response) => {
-      console.log('Scraping response:', response);
-      if (response && response.success) {
-        console.log('Sraping completed successfully.');
-      } else {
-        console.error('Error during scraping:', response ? response.error : 'Unknown error');
+    chrome.tabs.sendMessage(
+      currentTab.id!,
+      { action: 'scrapeFiles' },
+      (response: { success: boolean; error?: string }) => {
+        console.log('Scraping response:', response);
+        if (response && response.success) {
+          console.log('Sraping completed successfully.');
+        } else {
+          console.error('Error during scraping:', response ? response.error : 'Unknown error');
+        }
       }
-    });
+    );
 
     await proceedToFileExtraction(
       basePrUrl,
@@ -95,8 +134,17 @@ export async function handleAnalyzeClick(loadingDiv, analyzeButton, reanalyzeBut
   }
 }
 
-// Helper function to proceed with file extraction and displaying the file picker
-async function proceedToFileExtraction(basePrUrl, loadingDiv, analyzeButton, reanalyzeButton, resultDiv, filePickerDiv) {
+/**
+ * Helper function to proceed with file extraction and displaying the file picker.
+ */
+async function proceedToFileExtraction(
+  basePrUrl: string,
+  loadingDiv: HTMLDivElement,
+  analyzeButton: HTMLButtonElement,
+  reanalyzeButton: HTMLButtonElement,
+  resultDiv: HTMLDivElement,
+  filePickerDiv: HTMLDivElement
+): Promise<void> {
   // Show loading, disable analyze button, hide reanalyze button
   loadingDiv.style.display = 'block';
   analyzeButton.disabled = true;
@@ -105,19 +153,24 @@ async function proceedToFileExtraction(basePrUrl, loadingDiv, analyzeButton, rea
   await checkApiKey();
   await resetUI(resultDiv, loadingDiv, analyzeButton);
 
-  // // Wait for extractedData to be available
+  // Wait for extractedData to be available
   const extractedData = await waitForExtractedData(basePrUrl);
 
   // Show the file picker
   if (extractedData && extractedData.length > 0) {
-    await createFilePicker(filePickerDiv, extractedData);
+    // Transform the data to match ExtractedDataFile format
+    const filePickerData = extractedData.map(file => ({
+      ...file,
+      fullContent: file.fullContent.split('\n')  // Convert string to string[]
+    }));
+
+    await createFilePicker(filePickerDiv, filePickerData);
     filePickerDiv.style.display = 'block';
 
     // Update icon and text content, then change the state
     analyzeButton.innerHTML = '<i class="fas fa-play"></i> Start Analysis';
     analyzeButton.title = 'Start analysis on selected files';
     analyzeButton.dataset.state = 'readyToAnalyze';
-
   } else {
     filePickerDiv.style.display = 'none';
   }
@@ -126,9 +179,15 @@ async function proceedToFileExtraction(basePrUrl, loadingDiv, analyzeButton, rea
   loadingDiv.style.display = 'none';
 }
 
-function waitForTabToLoad(tabId) {
+/**
+ * Waits for a tab to finish loading.
+ */
+function waitForTabToLoad(tabId: number): Promise<void> {
   return new Promise((resolve) => {
-    chrome.tabs.onUpdated.addListener(function listener(updatedTabId, changeInfo) {
+    chrome.tabs.onUpdated.addListener(function listener(
+      updatedTabId: number,
+      changeInfo: chrome.tabs.TabChangeInfo
+    ) {
       if (updatedTabId === tabId && changeInfo.status === 'complete') {
         chrome.tabs.onUpdated.removeListener(listener);
         resolve();
@@ -137,15 +196,18 @@ function waitForTabToLoad(tabId) {
   });
 }
 
-async function waitForExtractedData(baseUrl) {
+/**
+ * Waits for extracted data to be available in storage.
+ */
+async function waitForExtractedData(baseUrl: string): Promise<ExtractedData[]> {
   return new Promise(async (resolve, reject) => {
     const maxAttempts = 20; // Wait up to 10 seconds
     let attempts = 0;
 
     const checkData = async () => {
-      const data = await getFromStorage('extractedDataByPr');
+      const data = await getFromStorage('extractedDataByPr') as ExtractedDataByPr;
       const extractedDataByPr = data || {};
-      const extractedData = extractedDataByPr[baseUrl] && extractedDataByPr[baseUrl].extractedData;
+      const extractedData = extractedDataByPr[baseUrl]?.extractedData;
 
       if (extractedData && extractedData.length > 0) {
         resolve(extractedData);
@@ -162,9 +224,14 @@ async function waitForExtractedData(baseUrl) {
   });
 }
 
-// Helper function to get selected files from the file picker
-function getSelectedFiles(filePickerDiv, extractedData) {
-  const checkboxes = filePickerDiv.querySelectorAll('input[name="files"]:checked');
+/**
+ * Helper function to get selected files from the file picker.
+ */
+function getSelectedFiles(
+  filePickerDiv: HTMLDivElement,
+  extractedData: ExtractedData[]
+): ExtractedData[] {
+  const checkboxes = filePickerDiv.querySelectorAll<HTMLInputElement>('input[name="files"]:checked');
   const selectedFileNames = Array.from(checkboxes).map(cb => cb.value);
 
   // Filter the extractedData array to include only the selected files

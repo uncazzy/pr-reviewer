@@ -1,7 +1,17 @@
 import { marked } from 'marked';
 import hljs from 'highlight.js';
+import { ChatMessage } from './chatUtils.js';
 
-export function renderMessage(message, messagesContainer) {
+/**
+ * Renders a chat message in the UI with proper styling and formatting.
+ * 
+ * @param message - The chat message to render
+ * @param messagesContainer - The container element where messages are displayed
+ */
+export async function renderMessage(
+    message: ChatMessage,
+    messagesContainer: HTMLDivElement
+): Promise<void> {
     const messageDiv = document.createElement('div');
     messageDiv.className = `chat-message ${message.role}-message`;
 
@@ -13,11 +23,16 @@ export function renderMessage(message, messagesContainer) {
     // Create message content
     const messageContentDiv = document.createElement('div');
     messageContentDiv.className = 'message-content';
-    messageContentDiv.innerHTML = marked.parse(message.content);
+    
+    // Parse markdown content
+    const parsedContent = await marked.parse(message.content);
+    messageContentDiv.innerHTML = parsedContent;
 
     // Apply syntax highlighting
     messageContentDiv.querySelectorAll('pre code').forEach((block) => {
-        hljs.highlightElement(block);
+        if (block instanceof HTMLElement) {
+            hljs.highlightElement(block);
+        }
     });
 
     // Assemble message

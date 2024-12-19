@@ -1,17 +1,11 @@
-import { renderMessage } from "./renderMessage";
-import { clearChatHistory } from './clearChatHistory';
-import { handleUserMessage } from './handleUserMessage';
-import { chatMessages } from './chatUtils'; // Import shared messages array
+import { renderMessage } from './renderMessage.ts';
+import { clearChatHistory } from './clearChatHistory.ts';
+import { handleUserMessage } from './handleUserMessage.ts';
+import { chatMessages, ChatMessage } from './chatUtils.ts';
 
 interface ChatContainer {
     chatContainer: HTMLDivElement;
     messagesContainer: HTMLDivElement;
-}
-
-interface ChatMessage {
-    role: 'user' | 'assistant';
-    content: string;
-    timestamp?: number;
 }
 
 interface ChatHistory {
@@ -28,8 +22,12 @@ interface StorageData {
  * @param feedback - The feedback content for the file
  * @param fullContent - The full content of the file
  */
-export function openChatWithFeedback(fileName: string, feedback: string, fullContent: string[]): void {
-    chrome.storage.local.get(['chatHistory'], (data: StorageData) => {
+export async function openChatWithFeedback(
+    fileName: string,
+    feedback: string,
+    fullContent: string[]
+): Promise<void> {
+    chrome.storage.local.get(['chatHistory'], async (data: StorageData) => {
         chatMessages.length = 0; // Clear the array
         const storedMessages = data.chatHistory && data.chatHistory[fileName] ? data.chatHistory[fileName] : [];
         chatMessages.push(...storedMessages);
@@ -55,7 +53,7 @@ export function openChatWithFeedback(fileName: string, feedback: string, fullCon
         resultDiv.appendChild(chatContainer);
 
         // Render existing messages in the messagesContainer
-        renderExistingMessages(fileName, messagesContainer, chatMessages);
+        await renderExistingMessages(fileName, messagesContainer, chatMessages);
 
         // Setup input container with the messagesContainer
         setupChatInput(chatContainer, messagesContainer, fileName, feedback, fullContent);
@@ -99,31 +97,29 @@ function createChatHeader(fileName: string, messagesContainer: HTMLDivElement): 
     titleContainer.appendChild(title);
 
     const buttonContainer = document.createElement('div');
-    buttonContainer.className = 'chat-header-buttons';
+    buttonContainer.className = 'chat-button-container';
 
-    // Clear Chat button
+    // Create clear button
     const clearButton = createButton(
-        'clear-chat-button',
+        'clear-button',
         '<i class="fas fa-trash"></i>',
-        () => {
-            clearChatHistory(fileName);
-            messagesContainer.innerHTML = '';
-        }
+        () => clearChatHistory(fileName, messagesContainer)
     );
     clearButton.title = 'Clear chat history';
 
-    // Back button
-    const backButton = createButton(
-        'back-button',
-        '<i class="fas fa-arrow-left"></i>',
+    // Create minimize button
+    const minimizeButton = createButton(
+        'minimize-button',
+        '<i class="fas fa-minus"></i>',
         () => {
-            location.reload();
+            messagesContainer.style.display = messagesContainer.style.display === 'none' ? 'block' : 'none';
         }
     );
-    backButton.title = 'Back to analysis';
+    minimizeButton.title = 'Minimize chat';
 
     buttonContainer.appendChild(clearButton);
-    buttonContainer.appendChild(backButton);
+    buttonContainer.appendChild(minimizeButton);
+
     titleContainer.appendChild(buttonContainer);
     header.appendChild(titleContainer);
 
@@ -146,33 +142,39 @@ function setupChatInput(
     fullContent: string[]
 ): void {
     const inputContainer = document.createElement('div');
-    inputContainer.className = 'chat-input-container';
+    inputContainer.className = 'input-container';
 
-    const textarea = document.createElement('textarea');
-    textarea.placeholder = 'Type your message...';
-    textarea.rows = 1;
+    const textArea = document.createElement('textarea');
+    textArea.placeholder = 'Type your message here...';
+    textArea.rows = 1;
 
-    const sendButton = createButton(
-        'send-button',
-        '<i class="fas fa-paper-plane"></i>',
-        () => {
-            const message = textarea.value.trim();
-            if (message) {
-                handleUserMessage(message, fileName, feedback, fullContent, messagesContainer);
-                textarea.value = '';
-            }
+    const sendButton = document.createElement('button');
+    sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
+    sendButton.title = 'Send message';
+
+    // Handle message submission
+    const submitMessage = () => {
+        const messageContent = textArea.value.trim();
+        if (messageContent) {
+            handleUserMessage(messageContent, fileName, feedback, fullContent.join('\n'), messagesContainer);
+            textArea.value = '';
+            textArea.rows = 1;
         }
-    );
+    };
 
-    // Handle Enter key
-    textarea.addEventListener('keypress', (e) => {
+    // Event listeners
+    sendButton.addEventListener('click', submitMessage);
+    textArea.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            sendButton.click();
+            submitMessage();
         }
     });
+    textArea.addEventListener('input', () => {
+        textArea.rows = Math.min(5, textArea.value.split('\n').length);
+    });
 
-    inputContainer.appendChild(textarea);
+    inputContainer.appendChild(textArea);
     inputContainer.appendChild(sendButton);
     chatContainer.appendChild(inputContainer);
 }
@@ -198,11 +200,13 @@ function createButton(className: string, innerHTML: string, onClick: () => void)
  * @param messagesContainer - The container for the chat messages
  * @param messages - The array of chat messages
  */
-function renderExistingMessages(fileName: string, messagesContainer: HTMLDivElement, messages: ChatMessage[]): void {
-    messages.forEach(message => {
-        renderMessage(message.role, message.content, messagesContainer);
-    });
-
-    // Scroll to the bottom of the messages container
+async function renderExistingMessages(
+    fileName: string,
+    messagesContainer: HTMLDivElement,
+    messages: ChatMessage[]
+): Promise<void> {
+    for (const message of messages) {
+        await renderMessage(message, messagesContainer);
+    }
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
