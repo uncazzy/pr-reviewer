@@ -66,8 +66,8 @@ Provide a thorough, detailed review of the code changes, addressing the followin
  */
 export function createSystemPrompt(
     fileName: string,
-    fileData: FileData,
-    initialFeedback: InitialFeedback | null
+    _fileData: FileData,
+    _initialFeedback: InitialFeedback | null
 ): string {
     return `You are an expert code reviewer with in-depth knowledge of software development best practices, security considerations, and performance optimization. Your role is to provide detailed, actionable feedback on the code changes within the file "${fileName}", taking into account the initial feedback summary provided.
 

@@ -24,7 +24,7 @@ export function createFileName(fileName: string, fileURL: string): HTMLDivElemen
     fileLink.addEventListener('click', (event) => {
         event.preventDefault(); // Prevent default anchor behavior
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            if (tabs && tabs.length > 0 && tabs[0].id) {
+            if (tabs && tabs.length > 0 && tabs?.[0]?.id) {
                 const currentTabId = tabs[0].id;
                 chrome.tabs.update(currentTabId, { url: fileURL });
             }

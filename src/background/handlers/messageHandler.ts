@@ -1,3 +1,4 @@
+import { getCurrentTabPrUrl } from '@/utils/tabs';
 import { getDetailedFeedback } from '@utils/feedback/';
 
 interface Message {
@@ -6,17 +7,24 @@ interface Message {
 }
 
 interface Response {
-  detailedFeedback?: string;
+  detailedFeedback?: string | undefined;
 }
 
 export function handleMessages(): void {
-  chrome.runtime.onMessage.addListener((
+  chrome.runtime.onMessage.addListener(async (
     message: Message,
     _sender: chrome.runtime.MessageSender,
     sendResponse: (response: Response) => void
   ) => {
     if (message.action === 'getDetailedFeedback') {
-      getDetailedFeedback(message.fileName)
+      const baseUrl = await getCurrentTabPrUrl();
+      if (!baseUrl) {
+        // Handle the error case
+        throw new Error('PR URL not found');
+      }
+
+      // Then call getDetailedFeedback with both parameters
+      getDetailedFeedback(message.fileName, baseUrl)
         .then((feedback) => {
           sendResponse({ detailedFeedback: feedback });
         })

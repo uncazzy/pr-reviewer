@@ -12,7 +12,7 @@ export function createExpandButton(fileName: string): HTMLButtonElement {
     expandButton.title = 'Expand detailed feedback';
     
     expandButton.addEventListener('click', function(this: HTMLButtonElement) {
-        const detailedFeedbackDiv = document.getElementById(`detailed-${CSS.escape(fileName)}`);
+        const detailedFeedbackDiv = document.getElementById(`detailed-${CSS.escape(fileName)}`) as HTMLDivElement;
         if (detailedFeedbackDiv) {
             expandFeedback(fileName, this, detailedFeedbackDiv);
         }

@@ -9,7 +9,7 @@ export function getBaseUrl(url: string): string {
     }
 
     const [beforePull, pullAndAfter] = parts;
-    const pullNumber = pullAndAfter.split('/')[0];
+    const pullNumber = pullAndAfter?.split('/')[0] || '';
     
     if (!pullNumber) {
         throw new Error('Could not extract pull request number');

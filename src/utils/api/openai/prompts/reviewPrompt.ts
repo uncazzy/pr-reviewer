@@ -66,8 +66,8 @@ You are a Senior Code Reviewer with expertise in code quality and best practices
  * @returns The formatted system prompt for OpenAI.
  */
 export function createSystemPrompt(
-    fileName: string,
-    fullFileContent: string
+    _fileName: string,
+    _fullFileContent: string
 ): string {
     // Create the prompt
     return `You are an experienced Senior Code Reviewer with expertise in code quality and best practices.

@@ -13,8 +13,8 @@ interface ExtractedData {
 }
 
 interface PrResult {
-    status?: string;
-    issue?: string;
+    status?: string | undefined;
+    issue?: string | undefined;
 }
 
 interface ExtractedDataByPr {
@@ -64,7 +64,7 @@ function toPrResult(data: ExtractedData | undefined): PrResult {
  */
 export async function sendMessageToLLM(
     fileName: string,
-    detailedFeedback: string,
+    _detailedFeedback: string,
     fullContent: string,
     userQuestion: string,
     messagesContainer: HTMLDivElement
@@ -75,7 +75,7 @@ export async function sendMessageToLLM(
         // Retrieve the `extractedDataByPr` and find the relevant file data using the base URL
         const baseUrl = await new Promise<string>((resolve) => {
             chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-                resolve(getBaseUrl(tabs[0].url || ''));
+                resolve(getBaseUrl(tabs[0]?.url || ''));
             });
         });
 

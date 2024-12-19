@@ -201,7 +201,7 @@ function createButton(className: string, innerHTML: string, onClick: () => void)
  * @param messages - The array of chat messages
  */
 async function renderExistingMessages(
-    fileName: string,
+    _fileName: string,
     messagesContainer: HTMLDivElement,
     messages: ChatMessage[]
 ): Promise<void> {

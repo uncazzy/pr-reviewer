@@ -4,14 +4,14 @@ interface TabInfo {
 }
 
 export function getCurrentTabUrl(): Promise<TabInfo | null> {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            if (tabs && tabs.length > 0) {
-                const currentTab = tabs[0];
-                resolve({ currentTab, currentUrl: currentTab.url });
-            } else {
-                resolve(null);
+            const currentTab = tabs[0];
+            if (!currentTab) {
+                reject(new Error('No active tab found'));
+                return;
             }
+            resolve({ currentTab, currentUrl: currentTab.url });
         });
     });
 }

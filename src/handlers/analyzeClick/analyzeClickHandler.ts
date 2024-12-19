@@ -12,7 +12,7 @@ interface ExtractedData {
   fileName: string;
   filePath: string;
   isLargeFile?: boolean;
-  fullContent: string;  // Note: this is string for our use case
+  fullContent: string;
   index?: number;
   [key: string]: any;  // For any additional properties
 }
@@ -78,7 +78,15 @@ export async function handleAnalyzeClick(
       }
 
       // Process the selected files
-      await processFiles(selectedFiles, basePrUrl);
+      const mappedSelectedFiles = selectedFiles.map((file, idx) => ({
+        fileName: file.fileName,
+        filePath: file.filePath,
+        fullContent: file.fullContent,
+        fileHref: file.filePath, // Using filePath as fileHref
+        index: file.index ?? idx
+      }));
+
+      await processFiles(mappedSelectedFiles, basePrUrl);
 
       // Reset the button state
       analyzeButton.dataset.state = '';

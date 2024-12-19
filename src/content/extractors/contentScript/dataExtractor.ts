@@ -1,4 +1,4 @@
-interface FileInfo {
+export interface FileInfo {
     fileHref: string;
     fileName: string;
     fullContent: string;
@@ -99,6 +99,10 @@ export function extractAllFilesData(): FileInfo[] {
 
     for (let index = 0; index < sortedFileContainers.length; index++) {
         const fileContainer = sortedFileContainers[index];
+        if (!fileContainer) {
+            console.warn(`File container at index ${index} not found`);
+            continue;
+        }
         const fileInfo = extractFileInfo(fileContainer, index, null);
         if (fileInfo) {
             extractedData.push(fileInfo);
