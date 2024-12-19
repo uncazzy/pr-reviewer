@@ -1,4 +1,5 @@
 /dist/
 /node_modules/
+/.parcel-cache/
 directory_structure.py
 get_files.py

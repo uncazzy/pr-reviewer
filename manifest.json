@@ -15,7 +15,7 @@
         "https://github.com/*/pull/*/files"
     ],
     "background": {
-        "service_worker": "background.js",
+        "service_worker": "background/index.js",
         "type": "module"
     },
     "content_scripts": [
@@ -24,27 +24,28 @@
                 "https://github.com/*/*/pull/*/files*"
             ],
             "js": [
-                "dist/contentScript.bundle.js"
+                "content/index.js"
             ],
             "run_at": "document_idle"
         }
     ],
     "action": {
-        "default_popup": "popup.html",
-        "default_icon": "assets/icons/icon.png"
+        "default_popup": "index.html",
+        "default_icon": "icons/icon.png"
     },
     "icons": {
-        "128": "assets/icons/icon.png"
+        "128": "icons/icon.png"
     },
-    "options_page": "options.html",
+    "options_page": "options/index.html",
     "content_security_policy": {
         "extension_pages": "script-src 'self'; object-src 'self'"
     },
     "web_accessible_resources": [
         {
             "resources": [
-                "libs/*",
-                "dist/*"
+                "*.js",
+                "*.js.map",
+                "icons/*"
             ],
             "matches": [
                 "https://github.com/*"
