@@ -39,7 +39,7 @@ export function handleStorageChanges(changes: ProcessingStorageChanges, area: st
       // Get the current PR URL
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (tabs && tabs.length > 0) {
-          const currentUrl = tabs[0].url;
+          const currentUrl = tabs[0]?.url;
           if (!currentUrl) return;
           const basePrUrl = getBaseUrl(currentUrl);
 
@@ -78,7 +78,7 @@ export function handleStorageChanges(changes: ProcessingStorageChanges, area: st
       // Get the current PR URL
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (tabs && tabs.length > 0) {
-          const currentUrl = tabs[0].url;
+          const currentUrl = tabs[0]?.url;
           if (!currentUrl) return;
           const basePrUrl = getBaseUrl(currentUrl);
 

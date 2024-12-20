@@ -1,3 +1,19 @@
+import { FileInfo } from './contentScript/dataExtractor';
+
+declare global {
+    interface Window {
+        hasContentScriptRun: boolean;
+    }
+}
+
+interface ExtractedData {
+    extractedData: FileInfo[];
+}
+
+interface ExtractedDataByPr {
+    [key: string]: ExtractedData;
+}
+
 import {
     expandAllFiles,
     extractAllFilesData,
@@ -41,7 +57,7 @@ if (!window.hasContentScriptRun) {
     })();
 }
 
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (request, _sender, sendResponse) {
 
     console.log("Request:", request);
 
@@ -64,7 +80,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                 }
             } catch (error) {
                 console.error('Error in scrapeFiles:', error);
-                sendResponse({ success: false, error: error.message });
+                sendResponse({ success: false, error: error instanceof Error ? error.message : String(error) });
             }
         })();
     } else if (request.action === 'expandAndScrapeLargeFile') {
@@ -83,9 +99,13 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     return true; // Keep the message channel open for sendResponse
 });
 
-async function expandAndScrapeLargeFile(fileName, index, basePrUrl) {
+async function expandAndScrapeLargeFile(
+    fileName: string,
+    index: number,
+    basePrUrl: string
+): Promise<void> {
     // Fetch `extractedDataByPr` from storage
-    let extractedDataByPr = await getFromStorage('extractedDataByPr') || {};
+    let extractedDataByPr: ExtractedDataByPr = await getFromStorage('extractedDataByPr') || {};
 
     // Ensure `extractedData` exists for this base PR URL
     if (!extractedDataByPr[basePrUrl]) {
@@ -98,35 +118,39 @@ async function expandAndScrapeLargeFile(fileName, index, basePrUrl) {
 
     for (const fileElement of fileElements) {
         const fileNameElement = fileElement.querySelector('.file-info .Truncate a');
-        if (fileNameElement && fileNameElement.textContent.trim() === fileName) {
+        if (fileNameElement && fileNameElement.textContent?.trim() === fileName) {
             fileFound = true;
             // Check if it has a "Load diff" button
             const loadDiffButton = fileElement.querySelector('button.load-diff-button');
+            if (loadDiffButton instanceof HTMLButtonElement) {
 
-            if (loadDiffButton) {
-                // Click the button to load the diff
-                loadDiffButton.click();
+                if (loadDiffButton) {
+                    // Click the button to load the diff
+                    loadDiffButton.click();
 
-                // Wait for the diff to load
-                await waitForDiffToLoad(fileElement);
+                    // Wait for the diff to load
+                    await waitForDiffToLoad(fileElement);
+                }
             }
 
             // Now, extract the file data
             const fileInfo = extractFileInfo(fileElement, index, true);
+            if (fileInfo) {
+                // Find the specific file data in extractedData where fileName matches
+                let existingFileIndex = extractedDataByPr[basePrUrl].extractedData.findIndex(item => item.fileName === fileName);
 
-            // Find the specific file data in extractedData where fileName matches
-            let existingFileIndex = extractedDataByPr[basePrUrl].extractedData.findIndex(item => item.fileName === fileName);
+                if (existingFileIndex !== -1) {
+                    // Update the existing file info
+                    extractedDataByPr[basePrUrl].extractedData[existingFileIndex] = fileInfo;
+                } else {
+                    // If the file doesn’t exist, add it to the array
+                    extractedDataByPr[basePrUrl].extractedData.push(fileInfo);
+                }
 
-            if (existingFileIndex !== -1) {
-                // Update the existing file info
-                extractedDataByPr[basePrUrl].extractedData[existingFileIndex] = fileInfo;
-            } else {
-                // If the file doesn’t exist, add it to the array
-                extractedDataByPr[basePrUrl].extractedData.push(fileInfo);
+                // Save back to storage
+                await setInStorage({ extractedDataByPr })
             }
 
-            // Save back to storage
-            await setInStorage({ extractedDataByPr });
             break;
         }
     }
@@ -137,8 +161,8 @@ async function expandAndScrapeLargeFile(fileName, index, basePrUrl) {
 }
 
 // Helper function to wait for the diff to load
-function waitForDiffToLoad(fileElement) {
-    return new Promise((resolve, reject) => {
+async function waitForDiffToLoad(fileElement: Element): Promise<void> {
+    return new Promise((resolve, _reject) => {
         const observer = new MutationObserver(() => {
             const isLoading = fileElement.querySelector('.js-diff-progressive-loader');
             if (!isLoading) {

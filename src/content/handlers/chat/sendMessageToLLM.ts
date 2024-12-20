@@ -47,7 +47,7 @@ export async function sendMessageToLLM(
             });
         });
 
-        const data = await new Promise<{ extractedDataByPr?: ExtractedDataByPr }>((resolve) => 
+        const data = await new Promise<{ extractedDataByPr?: ExtractedDataByPr }>((resolve) =>
             chrome.storage.local.get('extractedDataByPr', resolve)
         );
         const extractedDataByPr = data.extractedDataByPr || {};
@@ -75,11 +75,11 @@ export async function sendMessageToLLM(
         fileName,
         fullContent,
         fileData ? {
-            status: fileData.status,
-            issue: fileData.issue
+            status: fileData.status || 'Unknown',
+            issue: fileData.issue || 'No issues found'
         } : {
-            status: undefined,
-            issue: undefined
+            status: 'No File Data Available',
+            issue: 'Unable to retrieve file information'
         }
     );
 
@@ -202,7 +202,7 @@ export async function sendMessageToLLM(
                                 assistantMessage += delta.content;
                                 const parsedContent = await Promise.resolve(marked.parse(assistantMessage));
                                 messageContentDiv.innerHTML = parsedContent;
-                                
+
                                 // Apply syntax highlighting
                                 messageContentDiv.querySelectorAll('pre code').forEach((block) => {
                                     if (block instanceof HTMLElement) {

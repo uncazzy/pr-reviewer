@@ -67,8 +67,8 @@ export async function displayDetailedFeedback(
     // Append collapse & refresh container to main button container
     buttonContainer.appendChild(collapseAndRefreshButtonContainer);
 
-    // Insert the button container at the top of the detailed feedback div
-    detailedFeedbackDiv.insertBefore(buttonContainer, detailedFeedbackDiv.firstChild);
+    // Append button container below the detailed feedback
+    detailedFeedbackDiv.appendChild(buttonContainer);
 
     detailedFeedbackDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }

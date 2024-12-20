@@ -1,10 +1,5 @@
 import { ChatMessage } from '@content/handlers/chat/chatUtils';
 
-interface PrResult {
-  status?: string;
-  issue?: string;
-}
-
 /**
  * Generates a detailed feedback prompt for OpenAI based on the provided file details and initial feedback.
  * 
@@ -14,9 +9,12 @@ interface PrResult {
  * @returns The formatted prompt for OpenAI.
  */
 export function createChatPrompt(
-  fileName: string,
-  fullContent: string,
-  prResult: PrResult
+  fileName: string, 
+  fullContent: string, 
+  prResult: {
+      status?: string | undefined;
+      issue?: string | undefined;
+  }
 ): ChatMessage {
   return {
     role: 'user',
@@ -59,7 +57,7 @@ Use markdown formatting for any code snippets, and keep all feedback actionable,
  */
 export function createSystemPrompt(
   fileName: string,
-  fullContent: string
+  _fullContent: string
 ): ChatMessage {
   return {
     role: 'system',

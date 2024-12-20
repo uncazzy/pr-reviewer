@@ -22,12 +22,12 @@ interface StorageData {
  * @param feedback - The feedback content for the file
  * @param fullContent - The full content of the file
  */
-export async function openChatWithFeedback(
+export function openChatWithFeedback(
     fileName: string,
     feedback: string,
     fullContent: string[]
-): Promise<void> {
-    chrome.storage.local.get(['chatHistory'], async (data: StorageData) => {
+): void {
+    chrome.storage.local.get(['chatHistory'], (data: StorageData) => {
         chatMessages.length = 0; // Clear the array
         const storedMessages = data.chatHistory && data.chatHistory[fileName] ? data.chatHistory[fileName] : [];
         chatMessages.push(...storedMessages);
@@ -53,7 +53,7 @@ export async function openChatWithFeedback(
         resultDiv.appendChild(chatContainer);
 
         // Render existing messages in the messagesContainer
-        await renderExistingMessages(fileName, messagesContainer, chatMessages);
+        renderExistingMessages(fileName, messagesContainer, chatMessages);
 
         // Setup input container with the messagesContainer
         setupChatInput(chatContainer, messagesContainer, fileName, feedback, fullContent);
@@ -86,44 +86,40 @@ function createChatContainer(fileName: string): ChatContainer {
  * @returns The chat header element
  */
 function createChatHeader(fileName: string, messagesContainer: HTMLDivElement): HTMLDivElement {
-    const header = document.createElement('div');
-    header.className = 'chat-header';
+    const chatHeader = document.createElement('div');
+    chatHeader.className = 'chat-header';
 
-    const titleContainer = document.createElement('div');
-    titleContainer.className = 'chat-title-container';
+    const headerContentContainer = document.createElement('div');
+    headerContentContainer.className = 'header-content-container';
+    chatHeader.appendChild(headerContentContainer);
 
-    const title = document.createElement('h3');
-    title.textContent = `Chat about ${fileName}`;
-    titleContainer.appendChild(title);
+    const fileNameDisplay = document.createElement('div');
+    fileNameDisplay.className = 'chat-file-name';
+    fileNameDisplay.innerHTML = `Chatting about: <strong>${fileName}</strong>`;
+    headerContentContainer.appendChild(fileNameDisplay);
 
-    const buttonContainer = document.createElement('div');
-    buttonContainer.className = 'chat-button-container';
+    const chatHeaderButtons = document.createElement('div');
+    chatHeaderButtons.className = 'chat-header-buttons';
 
-    // Create clear button
-    const clearButton = createButton(
-        'clear-button',
-        '<i class="fas fa-trash"></i>',
+    const closeButton = createButton(
+        'close-chat',
+        '<i class="fas fa-times"></i>',
+        () => location.reload()
+    );
+    closeButton.title = 'Close chat';
+    chatHeaderButtons.appendChild(closeButton);
+
+    const newChatButton = createButton(
+        'new-chat-button',
+        '<i class="fa-solid fa-rotate-right"></i>',
         () => clearChatHistory(fileName, messagesContainer)
     );
-    clearButton.title = 'Clear chat history';
+    newChatButton.title = 'Start new chat';
+    chatHeaderButtons.appendChild(newChatButton);
 
-    // Create minimize button
-    const minimizeButton = createButton(
-        'minimize-button',
-        '<i class="fas fa-minus"></i>',
-        () => {
-            messagesContainer.style.display = messagesContainer.style.display === 'none' ? 'block' : 'none';
-        }
-    );
-    minimizeButton.title = 'Minimize chat';
+    headerContentContainer.appendChild(chatHeaderButtons);
 
-    buttonContainer.appendChild(clearButton);
-    buttonContainer.appendChild(minimizeButton);
-
-    titleContainer.appendChild(buttonContainer);
-    header.appendChild(titleContainer);
-
-    return header;
+    return chatHeader;
 }
 
 /**
@@ -141,42 +137,34 @@ function setupChatInput(
     feedback: string,
     fullContent: string[]
 ): void {
-    const inputContainer = document.createElement('div');
-    inputContainer.className = 'input-container';
+    const chatInputContainer = document.createElement('div');
+    chatInputContainer.className = 'chat-input-container';
 
-    const textArea = document.createElement('textarea');
-    textArea.placeholder = 'Type your message here...';
-    textArea.rows = 1;
+    const chatInput = document.createElement('textarea');
+    chatInput.className = 'chat-input';
+    chatInput.placeholder = 'Ask a follow-up question...';
+    chatInputContainer.appendChild(chatInput);
 
-    const sendButton = document.createElement('button');
-    sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
+    const sendButton = createButton('send-button', '<i class="fas fa-paper-plane"></i>', () => {
+        if (chatInput.value.trim() !== "") {
+            handleUserMessage(chatInput.value.trim(), fileName, feedback, fullContent.join('\n'), messagesContainer);
+            chatInput.value = '';
+        }
+    });
     sendButton.title = 'Send message';
+    chatInputContainer.appendChild(sendButton);
 
-    // Handle message submission
-    const submitMessage = () => {
-        const messageContent = textArea.value.trim();
-        if (messageContent) {
-            handleUserMessage(messageContent, fileName, feedback, fullContent.join('\n'), messagesContainer);
-            textArea.value = '';
-            textArea.rows = 1;
-        }
-    };
-
-    // Event listeners
-    sendButton.addEventListener('click', submitMessage);
-    textArea.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            submitMessage();
+    chatInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            if (chatInput.value.trim() !== "") {
+                handleUserMessage(chatInput.value.trim(), fileName, feedback, fullContent.join('\n'), messagesContainer);
+                chatInput.value = '';
+            }
         }
     });
-    textArea.addEventListener('input', () => {
-        textArea.rows = Math.min(5, textArea.value.split('\n').length);
-    });
 
-    inputContainer.appendChild(textArea);
-    inputContainer.appendChild(sendButton);
-    chatContainer.appendChild(inputContainer);
+    chatContainer.appendChild(chatInputContainer);
 }
 
 /**
@@ -200,13 +188,20 @@ function createButton(className: string, innerHTML: string, onClick: () => void)
  * @param messagesContainer - The container for the chat messages
  * @param messages - The array of chat messages
  */
-async function renderExistingMessages(
+function renderExistingMessages(
     fileName: string,
     messagesContainer: HTMLDivElement,
     messages: ChatMessage[]
-): Promise<void> {
-    for (const message of messages) {
-        await renderMessage(message, messagesContainer);
+): void {
+    if (messages.length === 0) {
+        const welcomeMessage: ChatMessage = {
+            role: 'assistant',
+            content: `<p><strong>Hello!</strong> I'm here to help you with the code changes in <strong>${fileName}</strong>. Feel free to ask any questions or request further explanations about the code review.</p>`
+        };
+        renderMessage(welcomeMessage, messagesContainer);
+    } else {
+        messages.forEach((message) => renderMessage(message, messagesContainer));
     }
+
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
