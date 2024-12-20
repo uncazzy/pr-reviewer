@@ -1,11 +1,5 @@
 import { FileInfo } from './contentScript/dataExtractor';
 
-declare global {
-    interface Window {
-        hasContentScriptRun: boolean;
-    }
-}
-
 interface ExtractedData {
     extractedData: FileInfo[];
 }
@@ -23,39 +17,106 @@ import {
 } from './contentScript/index.js';
 import { getFromStorage, setInStorage } from '@utils/storage';
 
-if (!window.hasContentScriptRun) {
-    window.hasContentScriptRun = true;
+// Generate a unique key for the current page
+const getScriptKey = () => {
+    try {
+        const url = new URL(window.location.href);
+        // Make sure we capture the PR number in the key
+        const prMatch = url.pathname.match(/\/pull\/\d+/);
+        return prMatch ? `scriptRun_${prMatch[0]}` : null;
+    } catch (error) {
+        console.error('Error generating script key:', error);
+        return null;
+    }
+};
 
-    (async function () {
-        console.log('Content script loaded');
+// Initialize the content script with proper locking
+async function initializeContentScript() {
+    const scriptKey = getScriptKey();
+    if (!scriptKey) {
+        console.log('Not a valid PR page, skipping initialization');
+        return;
+    }
 
-        // Wait for the DOM to be fully loaded
-        if (document.readyState === 'loading' || document.readyState === 'interactive') {
-            console.log('Waiting for DOM to fully load...');
-            await new Promise((resolve) => {
-                document.addEventListener('DOMContentLoaded', resolve);
-            });
+    try {
+        // Try to acquire the lock
+        const storage = await chrome.storage.local.get(scriptKey);
+        if (storage[scriptKey]) {
+            const lastRunTime = storage[scriptKey];
+            const timeSinceLastRun = Date.now() - lastRunTime;
+
+            // If last run was less than 5 seconds ago, skip
+            if (timeSinceLastRun < 5000) {
+                console.log('Content script recently ran, skipping');
+                return;
+            }
         }
 
-        console.log('DOM fully loaded, waiting for files to be present...');
-        await waitForFilesToBePresent();
+        // Set the lock with current timestamp
+        await chrome.storage.local.set({ [scriptKey]: Date.now() });
 
-        console.log('Files are present, expanding files...');
+        console.log('Content script loaded for:', scriptKey);
 
-        // Expand all files before extracting
-        await expandAllFiles();
-
-        console.log('All files expanded, proceeding to extract data...');
-        const extractedData = extractAllFilesData();
-
-        if (extractedData.length > 0) {
-            console.log('Extracted data:', extractedData);
-            sendExtractedData(extractedData);
-        } else {
-            console.warn('No extracted data to send.');
+        // Ensure we're on a PR page before proceeding
+        if (!document.querySelector('.pull-request-tab-content')) {
+            console.log('Not on PR page content yet, waiting...');
+            await new Promise(resolve => setTimeout(resolve, 1000));
         }
-    })();
+
+        // Rest of your initialization code remains the same...
+        // [previous initialization code]
+    } catch (error) {
+        console.error('Error during content script initialization:', error);
+        if (scriptKey) {
+            await chrome.storage.local.remove(scriptKey);
+        }
+    }
 }
+
+// Clean up old script locks periodically
+async function cleanupOldScriptLocks() {
+    const LOCK_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+    try {
+        const storage = await chrome.storage.local.get(null);
+        const now = Date.now();
+
+        const keysToRemove = Object.entries(storage)
+            .filter(([key, timestamp]) =>
+                key.startsWith('scriptRun_') &&
+                (now - (timestamp as number)) > LOCK_TIMEOUT
+            )
+            .map(([key]) => key);
+
+        if (keysToRemove.length > 0) {
+            await chrome.storage.local.remove(keysToRemove);
+        }
+    } catch (error) {
+        console.error('Error cleaning up script locks:', error);
+    }
+}
+
+// Initialize the content script and handle navigation
+(async () => {
+    await cleanupOldScriptLocks();
+    await initializeContentScript();
+
+    // Handle GitHub's SPA navigation
+    const observer = new MutationObserver(async (mutations) => {
+        for (const mutation of mutations) {
+            if (mutation.type === 'childList' &&
+                document.location.href.includes('/pull/') &&
+                document.location.href.includes('/files')) {
+                await initializeContentScript();
+                break;
+            }
+        }
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+})();
 
 chrome.runtime.onMessage.addListener(function (request, _sender, sendResponse) {
 

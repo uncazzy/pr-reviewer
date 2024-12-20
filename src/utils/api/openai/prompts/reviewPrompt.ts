@@ -48,13 +48,9 @@ You are a Senior Code Reviewer with expertise in code quality and best practices
 - **Warning**: Non-critical issues found that should be considered
 - **Requires Changes**: Critical issues that must be fixed for functionality/security
 
-**Issue**: 
-[If Status is "Warning" or "Requires Changes"]
-- Clearly state the specific issue(s)
-- Keep it concise and focused
-- Explain why it's important
-[If Status is "Looks Good"]
-- Respond with "No issues detected"
+**Issue**: Provide a concise one sentence summary for “Warning” or “Requires Changes.” 
+
+If there are no issues, status should be "Looks Good" and you can respond with "No issues detected."
 `;
 }
 
