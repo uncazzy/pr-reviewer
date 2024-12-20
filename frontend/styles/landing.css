@@ -45,29 +45,30 @@
 
 /* Feature Cards */
 .feature-card {
+    background-color: var(--secondary-background-color);
+    border-radius: 2rem;
     display: flex;
+    justify-content: space-between;
     gap: 40px;
     align-items: center;
     padding: 20px;
+    width: 100%;
     max-width: 1200px;
     margin: 0 auto;
 }
 
 .feature-content {
-    flex: 1;
+    min-width: 50%;
     padding: 20px;
 }
 
 .feature-card__image {
-    flex: 1;
-    border-radius: var(--border-radius);
-    overflow: hidden;
-    box-shadow: var(--box-shadow-heavy);
-    transition: transform var(--transition-duration) var(--transition-timing);
+    padding: 25px;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
+
     .feature-card,
     .card-right {
         flex-direction: column;
@@ -125,6 +126,6 @@
     }
 }
 
-image { 
+image {
     border-radius: 1rem;
 }
