@@ -51,26 +51,6 @@ Access the extension settings to:
 - Clear stored PR data
 - Manage other preferences
 
-## Project Structure
-
-```
-pr-reviewer/
-├── modules/
-│   ├── contentScript/          # PR page interaction
-│   │   └── dataExtractor.js   # Code extraction logic
-│   ├── handlers/              # Event handlers
-│   ├── components/            # UI components
-│   ├── storage/              # Data persistence
-│   └── result/               # Review results handling
-├── dist/                     # Compiled files
-├── styles/                   # CSS styles
-├── background.js            # Extension background script
-├── contentScript.js         # Main content script
-├── popup.js                # Extension popup logic
-├── options.js              # Settings page logic
-└── manifest.json           # Extension manifest
-```
-
 ## How It Works
 
 The extension provides a sophisticated three-tier review system for your pull requests:
@@ -149,13 +129,6 @@ Each review stage is carefully designed to provide increasingly detailed insight
 3. Make your changes
 4. Submit a pull request
 
-## License
-
-[Add your chosen license here]
-
-## Support
-
-If you find this extension helpful, consider supporting its development through the donate button in the options page.
 
 ## Privacy
 

@@ -1,0 +1,130 @@
+/* Landing Page Specific Styles */
+
+/* Hero Section */
+.hero {
+    padding: 80px 20px;
+    text-align: center;
+}
+
+.hero__content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.hero h1 {
+    font-size: 48px;
+    margin-bottom: 20px;
+    color: var(--button-text-color);
+}
+
+.hero p {
+    font-size: 20px;
+    margin-bottom: 30px;
+    color: var(--button-text-color);
+}
+
+/* Features Section */
+.features {
+    padding: 60px 20px;
+    background-color: var(--background-color);
+}
+
+.features h2 {
+    text-align: center;
+    font-size: 32px;
+    margin-bottom: 60px;
+}
+
+.features__grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 100px;
+}
+
+/* Feature Cards */
+.feature-card {
+    display: flex;
+    gap: 40px;
+    align-items: center;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.feature-content {
+    flex: 1;
+    padding: 20px;
+}
+
+.feature-card__image {
+    flex: 1;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--box-shadow-heavy);
+    transition: transform var(--transition-duration) var(--transition-timing);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .feature-card,
+    .card-right {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .feature-content {
+        order: 1;
+    }
+
+    .feature-card__image {
+        order: 2;
+    }
+}
+
+/* CTA Section */
+.cta {
+    background-color: var(--secondary-background-color);
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.cta h2 {
+    font-size: 32px;
+    margin-bottom: 30px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 36px;
+    }
+
+    .hero p {
+        font-size: 18px;
+    }
+
+    .features__grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Optional: Add a subtle animation for the icon */
+@keyframes floatAnimation {
+    0% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+image { 
+    border-radius: 1rem;
+}
