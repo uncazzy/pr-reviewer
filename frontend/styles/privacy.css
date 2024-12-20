@@ -1,0 +1,68 @@
+/* Privacy Policy Page */
+.privacy-header {
+    background-color: var(--secondary-background-color);
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.privacy-header h1 {
+    color: var(--button-text-color);
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+.privacy-header p {
+    color: var(--small-text-color);
+    font-size: 1rem;
+}
+
+.privacy-content {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    line-height: 1.8;
+    color: var(--text-color);
+}
+
+.privacy-content h2 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: var(--button-text-color);
+}
+
+.privacy-content p {
+    margin-bottom: 20px;
+    color: var(--small-text-color);
+}
+
+.privacy-content ul {
+    margin-left: 20px;
+    margin-bottom: 20px;
+    list-style-type: disc;
+    color: var(--text-color);
+}
+
+.privacy-content a {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+
+.privacy-content a:hover {
+    color: var(--primary-hover-color);
+}
+
+.privacy-footer {
+    background-color: var(--secondary-background-color);
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 40px;
+}
+
+.privacy-footer a {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+
+.privacy-footer a:hover {
+    color: var(--primary-hover-color);
+}
