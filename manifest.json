@@ -1,6 +1,7 @@
 {
     "manifest_version": 3,
     "name": "PR Code Reviewer",
+    "short_name": "PR Reviewer",
     "description": "Efficient GitHub pull request code reviewer",
     "version": "1.0",
     "permissions": [
@@ -31,10 +32,16 @@
     ],
     "action": {
         "default_popup": "index.html",
-        "default_icon": "icons/icon.png"
+        "default_icon": {
+            "16": "assets/icons/icon-16.png",
+            "48": "assets/icons/icon-48.png",
+            "128": "assets/icons/icon-128.png"
+        }
     },
     "icons": {
-        "128": "icons/icon.png"
+        "16": "assets/icons/icon-16.png",
+        "48": "assets/icons/icon-48.png",
+        "128": "assets/icons/icon-128.png"
     },
     "options_page": "options/index.html",
     "content_security_policy": {
