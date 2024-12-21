@@ -14,72 +14,67 @@
 <body>
     <header class="privacy-header">
         <h1>Privacy Policy</h1>
-        <p>Your data privacy is important to me. Here's how I handle your information when you use PR Code Reviewer.</p>
+        <p>Your privacy matters. Here's my simple, no-nonsense privacy policy.</p>
     </header>
 
     <main class="privacy-content">
         <section>
             <h2>Overview</h2>
             <p>
-                PR Code Reviewer is a Chrome extension designed to enhance your code reviews using AI-powered insights. This
-                Privacy Policy explains how I handle your data and ensure your privacy when you use the extension.
+                PR Code Reviewer is an open-source Chrome extension that helps you review GitHub pull requests using AI. 
+                The extension runs entirely in your browser - there are no backend servers involved.
             </p>
         </section>
 
         <section>
-            <h2>Data Collection</h2>
+            <h2>Data Handling</h2>
             <p>
-                I do not collect or store any personal data. All operations are performed locally in your browser, and
-                any data processed for code analysis is sent directly to OpenAI's API using the API key you provide.
-            </p>
-        </section>
-
-        <section>
-            <h2>Use of OpenAI API</h2>
-            <p>
-                PR Code Reviewer relies on OpenAI APIs to analyze the content of your GitHub pull requests. When you use
-                the extension:
+                Here's what you need to know about how your data is handled:
             </p>
             <ul>
-                <li>Your code is transmitted to OpenAI's servers for processing and analysis.</li>
-                <li>Your OpenAI API key is stored locally in your browser and is not shared with me or anyone else.</li>
+                <li>No tracking, no analytics, no cookies - the extension doesn't collect any data</li>
+                <li>Your OpenAI API key and settings are stored only in your browser's local storage</li>
+                <li>When you review a PR, the selected code is sent only to OpenAI's servers for analysis</li>
+                <li>Review results are stored temporarily in your browser's local storage and can be cleared anytime</li>
             </ul>
         </section>
 
         <section>
-            <h2>Your Responsibility</h2>
+            <h2>OpenAI Integration</h2>
             <p>
-                As the user, you are responsible for ensuring the security and appropriate use of your OpenAI API key.
-                Please review OpenAI’s <a href="https://openai.com/policies/privacy-policy" target="_blank">Privacy Policy</a>
-                to understand how they handle your data.
+                The only external service this extension uses is OpenAI's API for code analysis. When you use the extension:
+            </p>
+            <ul>
+                <li>Your selected code is sent to OpenAI for review using your provided API key</li>
+                <li>Your API key is stored securely in your browser and is never shared with anyone</li>
+                <li>Please review OpenAI's <a href="https://openai.com/policies/privacy-policy" target="_blank">Privacy Policy</a> 
+                    to understand how they handle your data</li>
+            </ul>
+            <p class="important-notice">
+                <strong>Important:</strong> Do not use this extension with proprietary, sensitive, or confidential code. 
+                Any code you select for review will be sent to OpenAI's servers for analysis. If you have sensitive files 
+                or code that should not be shared with external services, please exclude them from the review process.
             </p>
         </section>
 
         <section>
-            <h2>Security</h2>
+            <h2>Open Source</h2>
             <p>
-                I take your security seriously:
-                <ul>
-                    <li>Your API key and extension settings are stored securely in your browser's local storage.</li>
-                    <li>None of your data is transmitted to my servers or shared with any third-party service other than OpenAI.</li>
-                </ul>
+                This extension is open source - you can review the code, contribute, or report issues on 
+                <a href="https://github.com/uncazzy/pr-reviewer" target="_blank">GitHub</a>.
+                This transparency ensures you can verify exactly how your data is handled.
             </p>
         </section>
 
         <section>
-            <h2>Changes to This Policy</h2>
+            <h2>Questions?</h2>
             <p>
-                I may update this Privacy Policy from time to time. If I make significant changes, I will provide a
-                prominent update on the extension’s landing page. Please check this page periodically for updates.
+                If you have any questions about this privacy policy or the extension, feel free to:
             </p>
-        </section>
-
-        <section>
-            <h2>Contact Me</h2>
-            <p>
-                If you have any questions, concerns, or suggestions about this Privacy Policy, feel free to reach out to me at
-                <a href="mailto:pr-code-review@azzy.cloud">pr-code-review@azzy.cloud</a>.
-            </p>
+            <ul>
+                <li>Email me at <a href="mailto:pr-code-review@azzy.cloud">pr-code-review@azzy.cloud</a></li>
+                <li>Open an issue on the GitHub repository</li>
+            </ul>
         </section>
     </main>
 

@@ -262,3 +262,16 @@
     color: var(--small-text-color);
     font-size: 0.9rem;
 }
+
+
+.cta-button {
+    border: 1px solid var(--primary-color);
+    border-radius: var(--border-radius);
+    padding: 15px;
+    text-decoration: none;
+}
+
+.cta-button:hover {
+    background-color: var(--primary-hover-color);
+    color: white;
+}

@@ -3,6 +3,7 @@
     "name": "PR Code Reviewer",
     "short_name": "PR Reviewer",
     "description": "Efficient GitHub pull request code reviewer",
+    "author": "@uncazzy",
     "version": "1.0",
     "permissions": [
         "scripting",
