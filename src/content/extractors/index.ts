@@ -1,21 +1,10 @@
-import { FileInfo } from './contentScript/dataExtractor';
+import type { FileInfo, ExtractionState, ExtractedDataByPr } from '../../types/extraction';
 
-interface ExtractedData {
-    extractedData: FileInfo[];
-}
-
-interface ExtractedDataByPr {
-    [key: string]: ExtractedData;
-}
-
-import {
-    expandAllFiles,
-    extractAllFilesData,
-    sendExtractedData,
-    waitForFilesToBePresent,
-    extractFileInfo
-} from './contentScript/index.js';
-import { getFromStorage, setInStorage } from '@utils/storage';
+const DEFAULT_EXTRACTION_CONFIG = {
+    maxRetries: 3,
+    retryDelay: 2000,  // 2 seconds
+    maxAttemptAge: 30000  // 30 seconds
+};
 
 // Generate a unique key for the current page
 const getScriptKey = () => {
@@ -95,24 +84,6 @@ async function cleanupOldScriptLocks() {
     }
 }
 
-interface ExtractionAttempt {
-    timestamp: number;
-    error?: string;
-    filesCount: number;
-}
-
-interface ExtractionState {
-    attempts: ExtractionAttempt[];
-    maxRetries: number;
-    retryDelay: number;  // in milliseconds
-}
-
-const DEFAULT_EXTRACTION_CONFIG = {
-    maxRetries: 3,
-    retryDelay: 2000,  // 2 seconds
-    maxAttemptAge: 30000  // 30 seconds
-};
-
 async function attemptExtraction(state: ExtractionState): Promise<FileInfo[]> {
     if (state.attempts.length >= state.maxRetries) {
         throw new Error(`Failed after ${state.maxRetries} attempts`);
@@ -123,15 +94,16 @@ async function attemptExtraction(state: ExtractionState): Promise<FileInfo[]> {
         await expandAllFiles();
         const extractedData = extractAllFilesData();
 
+        const validationError = validateExtractedData(extractedData);
+        if (validationError) {
+            throw new Error(`Validation failed: ${validationError.field} - ${validationError.message}`);
+        }
+
         // Record the attempt
         state.attempts.push({
             timestamp: Date.now(),
             filesCount: extractedData.length
         });
-
-        if (extractedData.length === 0) {
-            throw new Error('No files extracted');
-        }
 
         return extractedData;
     } catch (error) {
@@ -169,6 +141,16 @@ async function attemptExtraction(state: ExtractionState): Promise<FileInfo[]> {
         subtree: true
     });
 })();
+
+import {
+    expandAllFiles,
+    extractAllFilesData,
+    sendExtractedData,
+    waitForFilesToBePresent,
+    extractFileInfo
+} from './contentScript/index.js';
+import { getFromStorage, setInStorage } from '@utils/storage';
+import { validateExtractedData } from './contentScript/validation';
 
 chrome.runtime.onMessage.addListener(function (request, _sender, sendResponse) {
 

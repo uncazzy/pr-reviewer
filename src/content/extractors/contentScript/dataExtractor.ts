@@ -1,10 +1,4 @@
-export interface FileInfo {
-    fileHref: string;
-    fileName: string;
-    fullContent: string;
-    index: number;
-    isLargeFile: boolean;
-}
+import type { FileInfo } from '../../../types/extraction';
 
 /**
  * Extracts information from a file container element
