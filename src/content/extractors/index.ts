@@ -113,38 +113,6 @@ const DEFAULT_EXTRACTION_CONFIG = {
     maxAttemptAge: 30000  // 30 seconds
 };
 
-interface ValidationResult {
-    isValid: boolean;
-    errors: {
-        file?: string;
-        field: string;
-        message: string;
-    }[];
-}
-
-function validateExtractedData(extractedData: FileInfo[]): ValidationResult {
-    const errors: ValidationResult['errors'] = [];
-
-    for (const file of extractedData) {
-        if (!file.name) {
-            errors.push({ field: 'name', message: 'File name is required' });
-        }
-
-        if (!file.size) {
-            errors.push({ field: 'size', message: 'File size is required' });
-        }
-
-        if (!file.type) {
-            errors.push({ field: 'type', message: 'File type is required' });
-        }
-    }
-
-    return {
-        isValid: errors.length === 0,
-        errors
-    };
-}
-
 async function attemptExtraction(state: ExtractionState): Promise<FileInfo[]> {
     if (state.attempts.length >= state.maxRetries) {
         throw new Error(`Failed after ${state.maxRetries} attempts`);
@@ -155,19 +123,15 @@ async function attemptExtraction(state: ExtractionState): Promise<FileInfo[]> {
         await expandAllFiles();
         const extractedData = extractAllFilesData();
 
-        // Validate the extracted data
-        const validation = validateExtractedData(extractedData);
-        if (!validation.isValid) {
-            throw new Error(`Data validation failed: ${validation.errors.map(e => 
-                `${e.file ? `[${e.file}] ` : ''}${e.field}: ${e.message}`
-            ).join(', ')}`);
-        }
-
-        // Record the successful attempt
+        // Record the attempt
         state.attempts.push({
             timestamp: Date.now(),
             filesCount: extractedData.length
         });
+
+        if (extractedData.length === 0) {
+            throw new Error('No files extracted');
+        }
 
         return extractedData;
     } catch (error) {
