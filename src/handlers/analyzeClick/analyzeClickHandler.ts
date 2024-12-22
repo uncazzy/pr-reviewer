@@ -80,9 +80,9 @@ export async function handleAnalyzeClick(
       // Process the selected files
       const mappedSelectedFiles = selectedFiles.map((file, idx) => ({
         fileName: file.fileName,
-        filePath: file.filePath,
+        filePath: file.fileHref,
         fullContent: file.fullContent,
-        fileHref: file.filePath, // Using filePath as fileHref
+        fileHref: file.fileHref,
         index: file.index ?? idx
       }));
 

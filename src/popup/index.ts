@@ -10,7 +10,7 @@ import { createFilePicker } from '@components/file/FilePicker';
 interface ExtractedData {
     fileName: string;
     fullContent: string;
-    filePath: string;
+    fileHref: string;
     [key: string]: unknown;
 }
 
@@ -170,7 +170,7 @@ async function displayFilePicker(): Promise<void> {
                 // Transform the data to match ExtractedDataFile format
                 const transformedData: ExtractedDataFile[] = extractedData.map(data => ({
                     fileName: data.fileName,
-                    filePath: data.filePath,
+                    filePath: data.fileHref,
                     fullContent: data.fullContent.split('\n')
                 }));
 
