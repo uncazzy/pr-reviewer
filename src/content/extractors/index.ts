@@ -95,6 +95,94 @@ async function cleanupOldScriptLocks() {
     }
 }
 
+interface ExtractionAttempt {
+    timestamp: number;
+    error?: string;
+    filesCount: number;
+}
+
+interface ExtractionState {
+    attempts: ExtractionAttempt[];
+    maxRetries: number;
+    retryDelay: number;  // in milliseconds
+}
+
+const DEFAULT_EXTRACTION_CONFIG = {
+    maxRetries: 3,
+    retryDelay: 2000,  // 2 seconds
+    maxAttemptAge: 30000  // 30 seconds
+};
+
+interface ValidationResult {
+    isValid: boolean;
+    errors: {
+        file?: string;
+        field: string;
+        message: string;
+    }[];
+}
+
+function validateExtractedData(extractedData: FileInfo[]): ValidationResult {
+    const errors: ValidationResult['errors'] = [];
+
+    for (const file of extractedData) {
+        if (!file.name) {
+            errors.push({ field: 'name', message: 'File name is required' });
+        }
+
+        if (!file.size) {
+            errors.push({ field: 'size', message: 'File size is required' });
+        }
+
+        if (!file.type) {
+            errors.push({ field: 'type', message: 'File type is required' });
+        }
+    }
+
+    return {
+        isValid: errors.length === 0,
+        errors
+    };
+}
+
+async function attemptExtraction(state: ExtractionState): Promise<FileInfo[]> {
+    if (state.attempts.length >= state.maxRetries) {
+        throw new Error(`Failed after ${state.maxRetries} attempts`);
+    }
+
+    try {
+        await waitForFilesToBePresent();
+        await expandAllFiles();
+        const extractedData = extractAllFilesData();
+
+        // Validate the extracted data
+        const validation = validateExtractedData(extractedData);
+        if (!validation.isValid) {
+            throw new Error(`Data validation failed: ${validation.errors.map(e => 
+                `${e.file ? `[${e.file}] ` : ''}${e.field}: ${e.message}`
+            ).join(', ')}`);
+        }
+
+        // Record the successful attempt
+        state.attempts.push({
+            timestamp: Date.now(),
+            filesCount: extractedData.length
+        });
+
+        return extractedData;
+    } catch (error) {
+        state.attempts.push({
+            timestamp: Date.now(),
+            error: error instanceof Error ? error.message : String(error),
+            filesCount: 0
+        });
+        
+        // Wait before retry
+        await new Promise(resolve => setTimeout(resolve, state.retryDelay));
+        return attemptExtraction(state);
+    }
+}
+
 // Initialize the content script and handle navigation
 (async () => {
     await cleanupOldScriptLocks();
@@ -126,24 +214,42 @@ chrome.runtime.onMessage.addListener(function (request, _sender, sendResponse) {
         console.log('Scraping files...');
 
         (async function () {
-            try {
-                await waitForFilesToBePresent();
-                await expandAllFiles();
-                const extractedData = extractAllFilesData();
+            const state: ExtractionState = {
+                attempts: [],
+                maxRetries: DEFAULT_EXTRACTION_CONFIG.maxRetries,
+                retryDelay: DEFAULT_EXTRACTION_CONFIG.retryDelay
+            };
 
-                if (extractedData.length > 0) {
-                    console.log('Extracted data:', extractedData);
-                    sendExtractedData(extractedData);
-                    sendResponse({ success: true });
-                } else {
-                    console.warn('No extracted data to send.');
-                    sendResponse({ success: false, error: 'No data found' });
+            try {
+                const extractedData = await attemptExtraction(state);
+                console.log('Extracted data:', extractedData);
+                
+                try {
+                    await sendExtractedData(extractedData);
+                    sendResponse({ 
+                        success: true,
+                        attempts: state.attempts.length
+                    });
+                } catch (storageError) {
+                    console.error('Failed to save extracted data:', storageError);
+                    sendResponse({ 
+                        success: false, 
+                        error: 'Failed to save data',
+                        attempts: state.attempts.length
+                    });
                 }
             } catch (error) {
                 console.error('Error in scrapeFiles:', error);
-                sendResponse({ success: false, error: error instanceof Error ? error.message : String(error) });
+                sendResponse({ 
+                    success: false, 
+                    error: error instanceof Error ? error.message : String(error),
+                    attempts: state.attempts.length,
+                    attemptDetails: state.attempts
+                });
             }
         })();
+
+        return true; // Keep the message channel open for sendResponse
     } else if (request.action === 'expandAndScrapeLargeFile') {
         const { fileName, index, basePrUrl } = request;
 
