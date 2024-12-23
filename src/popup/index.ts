@@ -171,7 +171,8 @@ async function displayFilePicker(): Promise<void> {
                 const transformedData: ExtractedDataFile[] = extractedData.map(data => ({
                     fileName: data.fileName,
                     filePath: data.fileHref,
-                    fullContent: data.fullContent.split('\n')
+                    fullContent: data.fullContent.split('\n'),
+                    isLargeFile: data.isLargeFile
                 }));
 
                 await createFilePicker(filePickerDiv, transformedData);
