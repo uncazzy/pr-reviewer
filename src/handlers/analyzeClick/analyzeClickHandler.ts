@@ -31,7 +31,8 @@ export async function handleAnalyzeClick(
   analyzeButton: HTMLButtonElement,
   reanalyzeButton: HTMLButtonElement,
   resultDiv: HTMLDivElement,
-  filePickerDiv: HTMLDivElement
+  filePickerDiv: HTMLDivElement,
+  errorMessageDiv: HTMLDivElement
 ): Promise<void> {
   try {
     const tabInfo = await getCurrentTabUrl();
@@ -139,6 +140,7 @@ export async function handleAnalyzeClick(
     console.error('Error in handleAnalyzeClick:', error);
     analyzeButton.disabled = false;
     loadingDiv.style.display = 'none';
+    errorMessageDiv.style.display = 'flex';
   }
 }
 

@@ -58,3 +58,26 @@ body {
 a.file-name-link {
     color: var(--tertiary-color);
 }
+
+/* Error Message */
+.error-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fde8e8;
+    color: #e53e3e;
+    padding: var(--padding-medium);
+    border-radius: var(--border-radius);
+    margin-bottom: 15px;
+    border: 1px solid #f56565;
+}
+
+.error-message i {
+    margin-right: var(--padding-small);
+    font-size: 18px;
+}
+
+.error-message p {
+    margin: 0;
+    font-size: 14px;
+}

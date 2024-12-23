@@ -40,15 +40,16 @@ const settingsButton = document.getElementById('settings-button') as HTMLButtonE
 const resultDiv = document.getElementById('result') as HTMLDivElement;
 const loadingDiv = document.getElementById('loading') as HTMLDivElement;
 const filePickerDiv = document.getElementById('file-picker') as HTMLDivElement;
+const errorMessageDiv = document.getElementById('error-message') as HTMLDivElement;
 
-if (!analyzeButton || !reanalyzeButton || !settingsButton || !resultDiv || !loadingDiv || !filePickerDiv) {
+if (!analyzeButton || !reanalyzeButton || !settingsButton || !resultDiv || !loadingDiv || !filePickerDiv || !errorMessageDiv) {
     throw new Error('Required DOM elements not found');
 }
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', initializePopup);
 analyzeButton.addEventListener('click', async () => {
-    await handleAnalyzeClick(loadingDiv, analyzeButton, reanalyzeButton, resultDiv, filePickerDiv);
+    await handleAnalyzeClick(loadingDiv, analyzeButton, reanalyzeButton, resultDiv, filePickerDiv, errorMessageDiv);
 });
 
 chrome.storage.onChanged.addListener(handleStorageChanges);
