@@ -30,8 +30,8 @@
    - Select the `dist` directory
 
 4. **Configure**
-   - Click the extension icon
-   - Add your OpenAI API key in settings
+   - Open the extension options
+   - Add your OpenAI API key and select a model
    - Start reviewing PRs!
 
 ## 💡 Usage
@@ -70,7 +70,7 @@ Note: Large files are automatically excluded from selection to ensure optimal pe
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details on:
+Contributions are welcome! Please see [Contributing Guide](CONTRIBUTING.md) for details on:
 
 - Setting up your development environment
 - Submitting pull requests
@@ -80,11 +80,3 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 ## 📄 License
 
 This project is licensed under the MIT License - see [LICENSE](LICENSE) for details.
-
-## ⭐ Support
-
-If you find this extension helpful, please consider:
-- Starring the repository
-- Reporting issues
-- Contributing improvements
-- Sharing with others
