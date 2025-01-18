@@ -5,7 +5,7 @@
  */
 export function createIssueDiv(issue: string): HTMLDivElement {
     const issueDiv = document.createElement('div');
-    issueDiv.className = 'feedback-content';
-    issueDiv.textContent = issue;
+    issueDiv.className = 'issue-text';
+    issueDiv.textContent = issue || 'No issues detected';
     return issueDiv;
 }

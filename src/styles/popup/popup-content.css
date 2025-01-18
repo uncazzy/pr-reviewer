@@ -81,6 +81,8 @@
     color: var(--text-color);
     margin-top: var(--padding-extra-small);
     line-height: 1.4;
+    opacity: 0.85;
+    display: block;
 }
 
 /* Feedback Content */
