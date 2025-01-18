@@ -1,6 +1,6 @@
 /**
- * Collapses the detailed feedback section and handles scrolling behavior
- * @param detailedFeedbackDiv - The div containing detailed feedback
+ * Collapses the detailed feedback view
+ * @param detailedFeedbackDiv - The div element containing the detailed feedback
  * @param button - The button that toggles the feedback visibility
  */
 export function collapseDetailedFeedback(
@@ -9,7 +9,8 @@ export function collapseDetailedFeedback(
 ): void {
     // Hide the detailed feedback
     detailedFeedbackDiv.style.display = 'none';
-    button.textContent = 'Expand Feedback';
+    button.innerHTML = '<i class="fas fa-chevron-down"></i>';
+    button.title = 'View detailed feedback';
 
     // Find the parent .file-feedback div
     const fileFeedbackDiv = detailedFeedbackDiv.closest('.file-feedback');

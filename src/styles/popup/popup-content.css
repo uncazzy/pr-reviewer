@@ -1,16 +1,19 @@
 @import url('../variables.css');
-/* Import variables */
+@import url('../components/action-buttons/index.css');
 
 /* Main Content Styles */
 #result {
     flex-grow: 1;
-    display: flex;
+    display: flex !important;
     flex-direction: column;
     background-color: var(--secondary-background-color);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
     font-size: 15px;
     line-height: 1.6;
+    padding: var(--padding-medium);
+    gap: var(--padding-medium);
+    overflow-y: auto;
 }
 
 /* File Feedback Container */
@@ -19,20 +22,45 @@
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
     padding: var(--padding-medium);
-    margin-bottom: var(--padding-medium);
+}
+
+/* File Header */
+.file-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--padding-medium);
+}
+
+.file-info {
+    flex: 1;
+    min-width: 0; /* Allows text truncation to work */
 }
 
 .file-name {
     font-size: 14px;
-    margin-bottom: 10px;
+    font-weight: 600;
+    margin-bottom: var(--padding-extra-small);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-/* Feedback Labels */
+/* Status Badge Styles */
 .feedback-label {
-    max-width: fit-content;
-    border-radius: var(--border-radius);
-    margin-bottom: 5px;
-    padding: var(--padding-extra-small);
+    display: inline-flex;
+    align-items: center;
+    border-radius: var(--border-radius-pill);
+    padding: var(--padding-large);
+    font-size: 12px;
+    color: #fff;
+    font-weight: 500;
+    margin-top: var(--padding-extra-small);
+    margin-right: var(--padding-small);
+    height: 20px;
+    line-height: 1;
+    white-space: nowrap;
+    column-gap: var(--padding-extra-small);
 }
 
 .looks-good {
@@ -47,44 +75,29 @@
     background-color: var(--danger-color);
 }
 
-/* Status Badge Styles */
-.status-badge {
-    border-radius: var(--border-radius-pill);
-    padding: 5px 10px;
-    font-size: 12px;
-    color: #fff;
-    display: inline-block;
-    margin-left: 10px;
+/* Issue Text */
+.issue-text {
+    font-size: 13px;
+    color: var(--text-color);
+    margin-top: var(--padding-extra-small);
+    line-height: 1.4;
 }
 
 /* Feedback Content */
 .feedback-content {
     margin-top: var(--padding-small);
-}
-
-/* Expand Button */
-.expand-button {
-    background: none;
-    color: var(--small-text-color);
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    font-size: 12px;
-    margin-top: var(--padding-small);
-}
-
-.expand-button:hover {
-    text-decoration: underline;
+    width: 100%;
 }
 
 /* Detailed Feedback */
 .detailed-feedback {
     display: none;
-    margin-top: var(--padding-small);
+    margin-top: var(--padding-medium);
     padding: var(--padding-medium);
-    background-color: var(--background-color);
+    background-color: var(--secondary-background-color);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
+    width: 100%;
 }
 
 /* Error Message */
@@ -171,4 +184,19 @@
 
 .settings-button:hover {
     background-color: #e0e0e0;
+}
+
+/* Expand Button */
+.expand-button {
+    background: none;
+    color: var(--small-text-color);
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-size: 12px;
+    margin-top: var(--padding-small);
+}
+
+.expand-button:hover {
+    text-decoration: underline;
 }

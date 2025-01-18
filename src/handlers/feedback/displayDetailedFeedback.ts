@@ -29,7 +29,10 @@ export async function displayDetailedFeedback(
     });
     
     detailedFeedbackDiv.style.display = 'block';
-    button.textContent = 'Collapse Feedback';
+    
+    // Update button icon to show collapse state
+    button.innerHTML = '<i class="fas fa-chevron-up"></i>';
+    button.title = 'Collapse feedback';
 
     // Create a container for both the buttons (Refresh and Ask Follow-up)
     const buttonContainer = document.createElement('div');

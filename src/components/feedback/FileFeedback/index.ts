@@ -1,7 +1,7 @@
 import { createFileName } from '@components/file/FileName';
 import { createStatusDiv } from '@components/feedback/StatusIndicator';
 import { createIssueDiv } from '@components/feedback/IssueDisplay';
-import { createExpandButton } from '@components/common/ExpandButton';
+import { createActionButtons } from '@components/common/ActionButtons';
 import { createDetailedFeedbackDiv } from '@components/feedback/DetailedFeedback';
 
 export interface FeedbackMessage {
@@ -22,13 +22,31 @@ export function createFileFeedback(message: FeedbackMessage, resultDiv: HTMLElem
     const fileDiv = document.createElement('div');
     fileDiv.className = 'file-feedback';
 
+    // Create header section
+    const fileHeader = document.createElement('div');
+    fileHeader.className = 'file-header';
+
+    // Create file info section
+    const fileInfo = document.createElement('div');
+    fileInfo.className = 'file-info';
+
     const fileName = createFileName(message.fileName, message.fileURL);
     const statusDiv = createStatusDiv(message.status);
     const issueDiv = createIssueDiv(message.issue);
-    const expandButton = createExpandButton(message.fileName);
+
+    // Add file name and status to file info
+    fileInfo.append(fileName, statusDiv, issueDiv);
+    
+    // Create action buttons
+    const actionButtons = createActionButtons(message.fileName);
+
+    // Assemble header
+    fileHeader.append(fileInfo, actionButtons);
+
+    // Create detailed feedback section
     const detailedFeedbackDiv = createDetailedFeedbackDiv(message.fileName);
 
-    // Append each component into the file feedback container
-    fileDiv.append(fileName, statusDiv, issueDiv, expandButton, detailedFeedbackDiv);
-    resultDiv.appendChild(fileDiv); // Append the complete file feedback component to the resultDiv
+    // Assemble all components
+    fileDiv.append(fileHeader, detailedFeedbackDiv);
+    resultDiv.appendChild(fileDiv);
 }

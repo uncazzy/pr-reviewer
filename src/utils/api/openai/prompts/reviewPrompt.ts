@@ -50,7 +50,7 @@ You are a Senior Code Reviewer with expertise in code quality and best practices
 
 **Issue**: Provide a concise one sentence summary for “Warning” or “Requires Changes.” 
 
-If there are no issues, status should be "Looks Good" and you can respond with "No issues detected."
+If there are no issues, status should be "Looks Good" and for reply with "No issues detected." for the "Issues" key.
 `;
 }
 

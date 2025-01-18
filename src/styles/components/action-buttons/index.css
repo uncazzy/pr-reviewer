@@ -1,0 +1,39 @@
+@import url('../../variables.css');
+
+.action-buttons-container {
+    display: flex;
+    gap: var(--padding-extra-small);
+    margin-left: var(--padding-small);
+}
+
+.action-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background-color: var(--background-color);
+    cursor: pointer;
+    transition: all var(--transition-duration) var(--transition-timing);
+}
+
+.action-button:hover {
+    background-color: var(--hover-color);
+    border-color: var(--primary-color);
+}
+
+.action-button i {
+    font-size: 12px;
+    color: var(--text-color);
+    transition: color var(--transition-duration) var(--transition-timing);
+}
+
+.detailed-button:hover i {
+    color: var(--primary-color);
+}
+
+.chat-button:hover i {
+    color: var(--success-color);
+}
