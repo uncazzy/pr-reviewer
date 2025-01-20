@@ -109,7 +109,6 @@ export function handleStorageChanges(changes: ProcessingStorageChanges, area: st
             }
           } else {
             // The change is only in detailedFeedback; skip UI update
-            console.log('Change in extractedDataByPr is only in detailedFeedback; skipping UI update.');
           }
         } else {
           console.error('No active tab found.');

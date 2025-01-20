@@ -30,19 +30,19 @@ export async function waitForFilesToBePresent(
 
         const checkFiles = () => {
             const fileContainers = document.querySelectorAll<HTMLElement>('.file');
-            
+
             if (fileContainers.length > 0) {
-                console.log(`Found ${fileContainers.length} file containers`);
+
                 resolve();
                 return;
             }
 
             attempts++;
             if (attempts < maxAttempts) {
-                console.log(`No files found yet. Attempt ${attempts}/${maxAttempts}`);
+
                 setTimeout(checkFiles, checkInterval);
             } else {
-                console.warn('Timed out waiting for files to be present.');
+
                 resolve(); // Proceed even if files are not present
             }
         };

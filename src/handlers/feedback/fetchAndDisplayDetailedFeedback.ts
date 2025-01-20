@@ -25,7 +25,7 @@ export async function fetchAndDisplayDetailedFeedback(
     button: HTMLButtonElement
 ): Promise<void> {
     try {
-        console.log(`Fetching and displaying detailed feedback for: ${fileName}`);
+        
 
         // Set initial loading state
         detailedFeedbackDiv.style.display = 'block';
@@ -64,7 +64,7 @@ export async function fetchAndDisplayDetailedFeedback(
         const contentLines = fullContent.split('\n');
         
         if (detailedFeedback[fileName]) {
-            console.log(`Using cached detailed feedback for ${fileName}`);
+            
             displayDetailedFeedback(fileName, detailedFeedback[fileName], contentLines, detailedFeedbackDiv, button);
         } else {
             const detailedFeedbackResponse: string = await getDetailedFeedback(fileName, baseUrl);

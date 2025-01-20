@@ -36,13 +36,9 @@ export async function analyzeCodeWithGPT(
     fileName: string,
     fullContent: string
 ): Promise<string> {
-    console.log(`Analyzing file: ${fileName}`);
 
     const systemPrompt = createSystemPrompt(fileName, fullContent);
     const userPrompt = createReviewPrompt(fileName, fullContent);
-
-    console.log("System Prompt being sent to OpenAI:", systemPrompt);
-    console.log('User Prompt being sent to OpenAI:', userPrompt);
 
     const apiCall = async (): Promise<string> => {
         const apiKey = await getApiKey();

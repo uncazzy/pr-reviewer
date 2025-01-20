@@ -64,7 +64,7 @@ export async function sendMessageToLLM(
             });
         });
 
-        const data = await new Promise<StorageData>((resolve) => 
+        const data = await new Promise<StorageData>((resolve) =>
             chrome.storage.local.get('extractedDataByPr', resolve)
         );
         const extractedDataByPr = data.extractedDataByPr || {};
@@ -76,10 +76,10 @@ export async function sendMessageToLLM(
             fileData = prData.extractedData.find(file => file.fileName === fileName);
 
             if (!fileData) {
-                console.warn(`No extracted data found for file: ${fileName}. Proceeding without file context.`);
+                // No extracted data found for file. Proceeding without file context.
             }
         } else {
-            console.warn(`No extractedData found for baseUrl: ${baseUrl}. Proceeding without file context.`);
+            // No extractedData found for baseUrl. Proceeding without file context.
         }
     } catch (error) {
         console.error('Error retrieving extracted data from storage:', error);
@@ -123,10 +123,6 @@ export async function sendMessageToLLM(
 
     // Add the user's new message
     apiMessages.push({ role: 'user', content: userQuestion });
-
-    console.log("System Prompt being sent to OpenAI:", systemPrompt.content);
-    console.log('User Prompt being sent to OpenAI:', userQuestion);
-    console.log('apiMessages being sent to OpenAI:', apiMessages);
 
     try {
         const apiKey = await getApiKey();

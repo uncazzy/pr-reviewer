@@ -1,6 +1,6 @@
 {
   "name": "pr-code-reviewer",
-  "version": "0.1.0",
+  "version": "0.5.0",
   "type": "module",
   "scripts": {
     "dev": "parcel src/popup/index.html src/options/index.html src/background/index.ts src/content/extractors/index.ts manifest.json public/assets/icons/*",

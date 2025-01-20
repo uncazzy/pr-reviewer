@@ -70,7 +70,7 @@ export async function processFiles(
             if (result.status === 'fulfilled') {
                 results.push(result.value);
             } else {
-                console.warn('File processing failed:', result.reason);
+                // File processing failed
             }
         });
 
@@ -91,7 +91,7 @@ export async function processFiles(
         // Save processingComplete flag
         await setInStorage({ processingComplete: true });
 
-        console.log('Results and PR URL updated');
+
     } catch (error) {
         console.error('Unexpected error:', error);
         await setInStorage({ error: error instanceof Error ? error.message : String(error) });

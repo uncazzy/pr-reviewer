@@ -111,18 +111,18 @@ export async function createFilePicker(filePickerDiv: HTMLElement, extractedData
         checkbox.value = file.fileName;
         checkbox.checked = !file.isLargeFile;  // Only check non-large files
 
-        console.log("File:", file)
+        // File: file
 
         checkbox.addEventListener('change', async (e) => {
             const target = e.target as HTMLInputElement;
             if (file.isLargeFile && target.checked) {
                 if (file.fullContent && file.fullContent.length > 1) {
-                    console.log("File is already scraped, skipping...");
+                    // File is already scraped, skipping...
                     fileDiv.classList.remove('large-file-unchecked');
                     return;
                 }
 
-                console.log("File is checked, expanding and scraping...");
+                // File is checked, expanding and scraping...
                 fileDiv.classList.remove('large-file-unchecked');
 
                 // Before sending the message, inject the content script
@@ -143,15 +143,14 @@ export async function createFilePicker(filePickerDiv: HTMLElement, extractedData
                         basePrUrl: basePrUrl  // Pass the URL here
                     }, function (response: { success?: boolean; error?: string }) {
                         if (chrome.runtime.lastError) {
-                            console.error('Error sending message:', chrome.runtime.lastError.message);
+                            // Error sending message
                             return;
                         }
 
                         if (response && response.success) {
-                            console.log('File expanded and scraped successfully');
                             // Optionally, update the UI or fetch updated data
                         } else {
-                            console.error('Error expanding and scraping file:', response ? response.error : 'Unknown error');
+                            // Error expanding and scraping file
                         }
                     });
                 });

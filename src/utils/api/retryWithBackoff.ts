@@ -16,7 +16,6 @@ export async function retryWithBackoff<T>(
             return await fn();
         } catch (error) {
             if (attempt < retries) {
-                console.warn(`Attempt ${attempt} failed. Retrying in ${delay}ms...`);
                 await new Promise(resolve => setTimeout(resolve, delay));
                 delay *= 2; // Exponential backoff
             } else {

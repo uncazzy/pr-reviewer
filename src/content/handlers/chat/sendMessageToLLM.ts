@@ -60,10 +60,10 @@ export async function sendMessageToLLM(
             fileData = foundFile || null;
 
             if (!fileData) {
-                console.warn(`No extracted data found for file: ${fileName}. Proceeding without file context.`);
+                // No extracted data found for file: ${fileName}. Proceeding without file context 
             }
         } else {
-            console.warn(`No extractedData found for baseUrl: ${baseUrl}. Proceeding without file context.`);
+            // No extractedData found for baseUrl: ${baseUrl}. Proceeding without file context.
         }
     } catch (error) {
         console.error('Error retrieving extracted data from storage:', error);
@@ -112,9 +112,6 @@ export async function sendMessageToLLM(
 
     // Add the user's latest question
     apiMessages.push({ role: 'user', content: userQuestion });
-
-    // Log the messages sent to LLM
-    console.log("Sending to LLM: ", apiMessages);
 
     try {
         // Retrieve API key & model from storage
@@ -217,7 +214,6 @@ export async function sendMessageToLLM(
 
                         } catch (err) {
                             // If there's a parsing error, it's likely due to incomplete JSON
-                            console.warn('Incomplete or malformed JSON, awaiting more chunks...', err);
                         }
                     }
                 }

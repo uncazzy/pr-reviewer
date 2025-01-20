@@ -12,7 +12,6 @@ export function displaySavedResults(
     }
 
     if (!Array.isArray(results) || results.length === 0) {
-        console.log('Results are empty or not an array:', results);
         resultDiv.style.display = 'none';
         return;
     }

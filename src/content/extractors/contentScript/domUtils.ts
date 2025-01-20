@@ -29,24 +29,21 @@ export async function expandAllFiles(): Promise<void> {
         if (!expandButton) continue;
 
         if (expandButton.offsetParent !== null && !expandButton.hidden) {
-            console.log('Expanding file container...');
+
             expandButton.click();
             expandedCount++;
 
             // Wait for content to load after expanding
             await new Promise(resolve => setTimeout(resolve, 1000));
         } else if (collapseButton && expandButton.hidden) {
-            console.log('File is already expanded, skipping...');
+            // File is already expanded, skipping...
         }
     }
 
-    console.log(`Expanded ${expandedCount} out of ${fileContainers.length} files`);
-
     if (expandedCount > 0) {
-        console.log('Waiting for content to fully load after expanding...');
         await waitForContentLoad();
     } else {
-        console.warn('No files were expanded. Maybe all files were already expanded.');
+       // No files were expanded. Maybe all files were already expanded
     }
 }
 
@@ -69,7 +66,7 @@ export function waitForContentLoad(config: Partial<ContentLoadConfig> = {}): Pro
             if (!isLoading) {
                 resolve();
             } else if (Date.now() - startTime > maxWaitTime) {
-                console.warn('Content loading timed out');
+                
                 resolve();
             } else {
                 setTimeout(checkContent, checkInterval);

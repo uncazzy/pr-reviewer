@@ -95,7 +95,6 @@ export async function getDetailedFeedback(
 
         // Check if we already have feedback for this file
         if (detailedFeedbacks[fileName]) {
-            console.log(`Retrieving stored detailed feedback for ${fileName}`);
             return detailedFeedbacks[fileName];
         }
 
@@ -122,7 +121,7 @@ export async function getDetailedFeedback(
         detailedFeedbacks[fileName] = detailedFeedback;
         prData.detailedFeedback = detailedFeedbacks;
         extractedDataByPr[baseUrl] = prData;
-        
+
         await setInStorage({ extractedDataByPr });
 
         return detailedFeedback;

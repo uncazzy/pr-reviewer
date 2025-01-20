@@ -55,11 +55,11 @@ export async function handleAnalyzeClick(
 
       // Get the latest extractedData for the current PR
       const extractedDataByPr = (await getFromStorage('extractedDataByPr') as ExtractedDataByPr) || {};
-      console.log('extractedDataByPr:', extractedDataByPr);
+
       const prData = extractedDataByPr[basePrUrl];
-      console.log('prData:', prData);
+
       const extractedData = prData ? prData.extractedData : null;
-      console.log('extractedData:', extractedData);
+
 
       if (!extractedData || extractedData.length === 0) {
         alert('No extracted data available. Please try analyzing the PR again.');
@@ -118,9 +118,9 @@ export async function handleAnalyzeClick(
       currentTab.id!,
       { action: 'scrapeFiles' },
       (response: { success: boolean; error?: string }) => {
-        console.log('Scraping response:', response);
+
         if (response && response.success) {
-          console.log('Sraping completed successfully.');
+          // Sraping completed successfully
         } else {
           console.error('Error during scraping:', response ? response.error : 'Unknown error');
         }

@@ -56,14 +56,13 @@ export function sendExtractedData(extractedData: ExtractedFileData[]): void {
     const baseUrl = getBaseUrl(currentPrUrl);
 
     chrome.storage.local.get('extractedDataByPr', (data: StorageData) => {
-        console.log('Data retrieved from storage:', data);
 
         const extractedDataByPr: ExtractedDataByPr = data.extractedDataByPr || {};
         let prOrder: string[] = data.prOrder || [];
 
         // Add the new PR to prOrder
         prOrder.push(baseUrl);
-        console.log(`Added PR to order: ${baseUrl}`);
+
 
         // Check if the number of PRs exceeds the limit
         if (prOrder.length > MAX_PR_LIMIT) {
@@ -71,7 +70,7 @@ export function sendExtractedData(extractedData: ExtractedFileData[]): void {
             const oldestPr = prOrder.shift(); // Removes the first element
             if (oldestPr) {
                 delete extractedDataByPr[oldestPr];
-                console.log(`Removed oldest PR: ${oldestPr}`);
+
             }
         }
 
@@ -82,7 +81,6 @@ export function sendExtractedData(extractedData: ExtractedFileData[]): void {
 
         // Save back to storage
         setInStorage({ extractedDataByPr, prOrder }).then(() => {
-            console.log('Extracted data saved to local storage for PR:', baseUrl);
 
             // Send a message indicating that extraction is complete
             const message: ExtractionCompleteMessage = {

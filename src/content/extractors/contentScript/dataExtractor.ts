@@ -14,13 +14,13 @@ export function extractFileInfo(
 ): FileInfo | null {
     const fileNameElement = file.querySelector<HTMLAnchorElement>('.file-info .Truncate a');
     if (!fileNameElement) {
-        console.warn('File name element not found');
+        
         return null;
     }
 
     const fileHref = fileNameElement.getAttribute('href');
     if (!fileHref) {
-        console.warn('File href not found');
+        
         return null;
     }
 
@@ -82,8 +82,6 @@ export function extractFileInfo(
  */
 export function extractAllFilesData(): FileInfo[] {
     const fileContainers = document.querySelectorAll('.file');
-    console.log(`Found ${fileContainers.length} file containers`);
-
     const extractedData: FileInfo[] = [];
 
     // Sort fileContainers based on their order in the DOM
@@ -94,18 +92,18 @@ export function extractAllFilesData(): FileInfo[] {
     for (let index = 0; index < sortedFileContainers.length; index++) {
         const fileContainer = sortedFileContainers[index];
         if (!fileContainer) {
-            console.warn(`File container at index ${index} not found`);
+            
             continue;
         }
         const fileInfo = extractFileInfo(fileContainer, index, null);
         if (fileInfo) {
             extractedData.push(fileInfo);
-            console.log('Extracted file info:', fileInfo);
+
         }
     }
 
     if (extractedData.length === 0) {
-        console.warn('No file data extracted.');
+        // No file data extracted
     }
 
     return extractedData;

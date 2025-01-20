@@ -17,8 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const statusDiv = document.getElementById('status') as HTMLDivElement;
     const donateButton = document.getElementById('donateButton') as HTMLButtonElement;
 
-    if (!apiKeyInput || !modelSelect || !saveApiKeyButton || !clearApiKeyButton || 
-        !saveModelButton || !clearPrDataButton || !clearStorageButton || 
+    if (!apiKeyInput || !modelSelect || !saveApiKeyButton || !clearApiKeyButton ||
+        !saveModelButton || !clearPrDataButton || !clearStorageButton ||
         !overlayDiv || !statusDiv || !donateButton) {
         console.error('Required DOM elements not found');
         return;
@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
             statusDiv.style.display = 'flex';
             overlayDiv.style.display = 'block';
             updateStatus('All stored PR data has been cleared.');
-            console.log('Deleting all stored PR data...');
+
 
             // Remove multiple keys from storage
             const keysToRemove: string[] = ['extractedDataByPr', 'apiMessagesHistory', 'chatHistory', 'processingComplete'];
@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     updateStatus('An error occurred while deleting PR data.');
                 } else {
                     updateStatus('All specified PR data has been cleared.');
-                    console.log('Deleted "extractedDataByPr", "apiMessagesHistory", and "results" from storage.');
+
                 }
             });
         }

@@ -23,7 +23,7 @@ const getScriptKey = () => {
 async function initializeContentScript() {
     const scriptKey = getScriptKey();
     if (!scriptKey) {
-        console.log('Not a valid PR page, skipping initialization');
+        
         return;
     }
 
@@ -36,7 +36,7 @@ async function initializeContentScript() {
 
             // If last run was less than 5 seconds ago, skip
             if (timeSinceLastRun < 5000) {
-                console.log('Content script recently ran, skipping');
+                
                 return;
             }
         }
@@ -44,11 +44,11 @@ async function initializeContentScript() {
         // Set the lock with current timestamp
         await chrome.storage.local.set({ [scriptKey]: Date.now() });
 
-        console.log('Content script loaded for:', scriptKey);
+        
 
         // Ensure we're on a PR page before proceeding
         if (!document.querySelector('.pull-request-tab-content')) {
-            console.log('Not on PR page content yet, waiting...');
+            
             await new Promise(resolve => setTimeout(resolve, 1000));
         }
 
@@ -184,10 +184,10 @@ import { validateExtractedData } from './contentScript/validation';
 
 chrome.runtime.onMessage.addListener(function (request, _sender, sendResponse) {
 
-    console.log("Request:", request);
+    
 
     if (request.action === 'scrapeFiles') {
-        console.log('Scraping files...');
+        
 
         (async function () {
             const state: ExtractionState = {
@@ -198,7 +198,7 @@ chrome.runtime.onMessage.addListener(function (request, _sender, sendResponse) {
 
             try {
                 const extractedData = await attemptExtraction(state);
-                console.log('Extracted data:', extractedData);
+                
                 
                 try {
                     await sendExtractedData(extractedData);

@@ -16,8 +16,8 @@ export function createActionButtons(fileName: string): HTMLDivElement {
     detailedButton.className = 'action-button detailed-button';
     detailedButton.innerHTML = '<i class="fas fa-chevron-down"></i>';
     detailedButton.title = 'View detailed feedback';
-    
-    detailedButton.addEventListener('click', function(this: HTMLButtonElement) {
+
+    detailedButton.addEventListener('click', function (this: HTMLButtonElement) {
         const detailedFeedbackDiv = document.getElementById(`detailed-${CSS.escape(fileName)}`) as HTMLDivElement;
         if (detailedFeedbackDiv) {
             const isExpanded = detailedFeedbackDiv.style.display === 'block';
@@ -33,39 +33,39 @@ export function createActionButtons(fileName: string): HTMLDivElement {
     chatButton.className = 'action-button chat-button';
     chatButton.innerHTML = '<i class="fas fa-comments"></i>';
     chatButton.title = 'Chat about this file';
-    
-    chatButton.addEventListener('click', async function() {
+
+    chatButton.addEventListener('click', async function () {
         const baseUrl = await getCurrentTabPrUrl();
-        console.log('Current PR URL:', baseUrl);
-        
+
+
         if (!baseUrl) {
             console.error('Could not get PR URL');
             return;
         }
 
         chrome.storage.local.get(['extractedDataByPr'], (data: any) => {
-            console.log('Storage data:', data);
-            console.log('Looking for PR data at:', baseUrl);
-            
+
+
+
             const prData = data.extractedDataByPr?.[baseUrl];
-            console.log('Found PR data:', prData);
-            
+
+
             if (prData) {
                 const fileData = prData.extractedData?.find((file: any) => file.fileName === fileName);
                 const feedback = prData.detailedFeedback?.[fileName] || '';
                 const fullContent = fileData?.fullContent?.split('\n') || [];
-                
+
                 // Get initial result for this file
                 const initialResult = prData.results?.find((result: any) => result.fileName === fileName);
                 const initialFeedback = initialResult ? `Status: ${initialResult.status}\nIssue: ${initialResult.issue}` : '';
-                
+
                 // Combine initial feedback with detailed feedback
                 const combinedFeedback = initialFeedback + (feedback ? `\n\nDetailed Feedback:\n${feedback}` : '');
-                
-                console.log('File data:', fileData);
-                console.log('Initial result:', initialResult);
-                console.log('Combined feedback:', combinedFeedback);
-                
+
+
+
+
+
                 openChatWithFeedback(fileName, combinedFeedback, fullContent);
             } else {
                 console.error('No PR data found for:', baseUrl);
