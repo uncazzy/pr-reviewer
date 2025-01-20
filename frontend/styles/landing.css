@@ -58,24 +58,33 @@
 }
 
 .feature-content {
-    min-width: 50%;
+    flex: 1;
+    min-width: 0;
     padding: 20px;
 }
 
 .feature-card__image {
+    flex: 1;
     padding: 25px;
+}
+
+.feature-card__image img {
+    max-width: 100%;
+    height: auto;
+    display: block;
 }
 
 /* Features Overview Section */
 .features-overview {
-    padding: 60px 20px;
+    padding: 40px 20px;
     background-color: var(--secondary-background-color);
+    overflow-x: hidden;
 }
 
 .features-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 30px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
@@ -153,62 +162,91 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .hero h1 {
+        font-size: 32px;
+    }
+
+    .hero p {
+        font-size: 16px;
+    }
+
+    .features__grid {
+        gap: 40px;
+    }
 
     .feature-card,
-    .card-right {
+    .card-right,
+    .card-left {
         flex-direction: column;
         gap: 20px;
+        padding: 15px;
     }
 
     .feature-content {
         order: 1;
+        padding: 10px;
+        text-align: center;
     }
 
     .feature-card__image {
         order: 2;
-    }
-}
-
-/* CTA Section */
-.cta {
-    background-color: var(--secondary-background-color);
-    text-align: center;
-    padding: 60px 20px;
-}
-
-.cta p {
-    color: var(--small-text-color);
-    margin-bottom: 30px;
-    font-size: 1.1rem;
-}
-
-.cta h2 {
-    font-size: 32px;
-    margin-bottom: 30px;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .hero h1 {
-        font-size: 36px;
+        padding: 10px;
     }
 
-    .hero p {
-        font-size: 18px;
-    }
-
-    .features__grid {
-        grid-template-columns: 1fr;
+    .feature-card__image img {
+        max-width: 100%;
+        margin: 0 auto;
     }
 
     .features-grid {
         grid-template-columns: 1fr;
+        padding: 10px;
     }
 
     .faq-grid {
         grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 10px;
     }
 
+    .faq-item {
+        padding: 20px;
+    }
+
+    .cta {
+        padding: 40px 20px;
+    }
+
+    .cta h2 {
+        font-size: 24px;
+    }
+
+    .cta p {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero {
+        padding: 40px 15px;
+    }
+
+    .hero h1 {
+        font-size: 28px;
+    }
+
+    .features h2,
+    .faq h2 {
+        font-size: 24px;
+        margin-bottom: 30px;
+    }
+
+    .feature-item {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 768px) {
     .footer-links a {
         display: block;
         margin: 10px 0;
@@ -228,6 +266,24 @@
     100% {
         transform: translateY(0);
     }
+}
+
+/* CTA Section */
+.cta {
+    background-color: var(--secondary-background-color);
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.cta p {
+    color: var(--small-text-color);
+    margin-bottom: 30px;
+    font-size: 1.1rem;
+}
+
+.cta h2 {
+    font-size: 32px;
+    margin-bottom: 30px;
 }
 
 /* Footer */
@@ -262,7 +318,6 @@
     color: var(--small-text-color);
     font-size: 0.9rem;
 }
-
 
 .cta-button {
     border: 1px solid var(--primary-color);
