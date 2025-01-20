@@ -1,0 +1,83 @@
+@import url('../variables.css');
+@import url('./popup-header.css');
+@import url('./popup-content.css');
+@import url('./filePicker.css');
+
+/* General Body and Typography */
+html,
+body {
+    width: 600px;
+    height: 600px;
+    display: flex;
+    flex-direction: column;
+}
+
+body {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+/* Analyze Button */
+#analyze {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: var(--padding-medium);
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 16px;
+    cursor: pointer;
+    margin-bottom: 15px;
+    transition: background-color var(--transition-duration);
+}
+
+#analyze i {
+    margin-right: var(--padding-small);
+}
+
+#analyze:hover {
+    background-color: var(--primary-hover-color);
+}
+
+#analyze:disabled {
+    background-color: #555;
+    cursor: not-allowed;
+}
+
+/* Button Container */
+.button-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+a.file-name-link {
+    color: var(--tertiary-color);
+}
+
+/* Error Message */
+.error-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fde8e8;
+    color: #e53e3e;
+    padding: var(--padding-medium);
+    border-radius: var(--border-radius);
+    margin-bottom: 15px;
+    border: 1px solid #f56565;
+}
+
+.error-message i {
+    margin-right: var(--padding-small);
+    font-size: 18px;
+}
+
+.error-message p {
+    margin: 0;
+    font-size: 14px;
+}

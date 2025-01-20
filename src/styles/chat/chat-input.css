@@ -1,0 +1,46 @@
+@import url('../variables.css');
+
+/* Chat Input Container */
+.chat-input-container {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    background-color: var(--border-color);
+    padding: var(--padding-medium);
+    border-top: 1px solid var(--border-color-light);
+    width: 100%;
+}
+
+/* Input Bar */
+.chat-input {
+    flex-grow: 1;
+    color: var(--text-color);
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color-light);
+    border-radius: var(--border-radius);
+    padding: var(--padding-small);
+    font-size: 14px;
+    resize: none;
+    min-height: 40px;
+    margin-right: var(--padding-small);
+}
+
+/* Send Button */
+.send-button {
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    padding: var(--padding-small) var(--padding-medium);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color var(--transition-duration);
+}
+
+.send-button:hover {
+    background-color: var(--primary-hover-color);
+}
+
+.send-button i {
+    pointer-events: none;
+}

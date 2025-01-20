@@ -1,0 +1,27 @@
+@import url('../variables.css'); /* Import global variables */
+
+/* Form Styles Specific to the Options Page */
+input[type="text"],
+select {
+    width: 100%;
+    padding: var(--padding-small);
+    margin-bottom: 15px;
+    box-sizing: border-box;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background-color: #3e3e3e;
+    color: #f1f1f1;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    font-size: large;
+    margin: 10px;
+}
+
+/* Model Selection Dropdown */
+#modelSelect {
+    max-width: fit-content;
+    display: flex;
+}

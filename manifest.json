@@ -1,0 +1,63 @@
+{
+    "manifest_version": 3,
+    "name": "PR Code Reviewer",
+    "short_name": "PR Code Reviewer",
+    "description": "Efficient GitHub pull request code reviewer",
+    "author": "@uncazzy",
+    "version": "1.0",
+    "permissions": [
+        "scripting",
+        "tabs",
+        "storage"
+    ],
+    "host_permissions": [
+        "https://github.com/*/pull/*",
+        "https://github.com/*/pull/*/commits",
+        "https://github.com/*/pull/*/checks",
+        "https://github.com/*/pull/*/files"
+    ],
+    "background": {
+        "service_worker": "background/index.js",
+        "type": "module"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "https://github.com/*/*/pull/*/files*"
+            ],
+            "js": [
+                "content/index.js"
+            ],
+            "run_at": "document_idle"
+        }
+    ],
+    "action": {
+        "default_popup": "popup/index.html",
+        "default_icon": {
+            "16": "assets/icons/icon-16.png",
+            "48": "assets/icons/icon-48.png",
+            "128": "assets/icons/icon-128.png"
+        }
+    },
+    "icons": {
+        "16": "assets/icons/icon-16.png",
+        "48": "assets/icons/icon-48.png",
+        "128": "assets/icons/icon-128.png"
+    },
+    "options_page": "options/index.html",
+    "content_security_policy": {
+        "extension_pages": "script-src 'self'; object-src 'self'"
+    },
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "*.js",
+                "*.js.map",
+                "icons/*"
+            ],
+            "matches": [
+                "https://github.com/*"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,67 @@
+@import url('../variables.css');
+
+/* Chat Header */
+.chat-header {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-shrink: 0;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--border-color);
+    padding: var(--padding-medium);
+    border-bottom: 1px solid var(--border-color-light);
+    width: 100%;
+    z-index: 2000;
+}
+
+/* Header Content Container */
+.header-content-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+/* Chat File Name */
+.chat-file-name {
+    font-size: 18px;
+    font-weight: normal;
+    color: #ffffff;
+    margin: 0;
+}
+
+/* Chat Header Buttons */
+.chat-header-buttons {
+    display: flex;
+    align-items: center;
+}
+
+.close-chat,
+.new-chat-button {
+    background: none;
+    border: none;
+    color: var(--text-color-light);
+    cursor: pointer;
+    font-size: 18px;
+    transition: color var(--transition-duration);
+    padding: var(--padding-small);
+}
+
+.close-chat {
+    font-size: 24px;
+}
+
+.close-chat:hover,
+.new-chat-button:hover {
+    color: var(--tertiary-color);
+}
+
+.close-chat i,
+.new-chat-button i {
+    pointer-events: none;
+}
+
+.new-chat-button i {
+    margin-right: var(--padding-small);
+}

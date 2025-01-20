@@ -1,0 +1,30 @@
+@import url('../variables.css'); /* Import variables */
+
+/* Header Styles */
+.header {
+    position: sticky;
+    top: 0;
+    background-color: var(--background-color);
+    padding: var(--padding-medium);
+    z-index: 1000;
+}
+
+.header h1 {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: var(--padding-medium);
+    text-align: center;
+    color: #ffffff;
+}
+
+.header .accent {
+    color: var(--primary-color);
+}
+
+
+#reanalyze {
+    background: none;
+    position: absolute;
+    left: 10px;
+    top: 25px;
+}

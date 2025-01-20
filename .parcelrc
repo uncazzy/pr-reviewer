@@ -1,0 +1,12 @@
+{
+  "extends": "@parcel/config-webextension",
+  "transformers": {
+    "*.{js,mjs,jsx,cjs,ts,tsx}": ["@parcel/transformer-js"],
+    "*.{css,pcss}": ["@parcel/transformer-css"]
+  },
+  "resolvers": ["@parcel/resolver-default", "parcel-resolver-ts-base-url"],
+  "namers": ["@parcel/namer-default"],
+  "packagers": {
+    "manifest.json": "@parcel/packager-raw-url"
+  }
+}

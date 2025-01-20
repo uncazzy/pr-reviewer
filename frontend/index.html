@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI-powered code review suggestions for GitHub pull requests">
+    <title>PR Code Reviewer</title>
+    <link rel="stylesheet" href="./styles/global.css">
+    <link rel="stylesheet" href="./styles/landing.css">
+    <link rel="icon" href="./public/assets/icons/icon-48.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="hero__content">
+            <div class="logo-container">
+
+                <h1><img src="./public/assets/icons/icon-48.png" alt="PR Code Reviewer Icon" class="hero__icon"
+                        style="width: 35px; height: 35px; margin-right: 2px;">PR Code
+                    Reviewer</h1>
+            </div>
+            <p>Transform your GitHub pull requests with AI-powered code reviews</p>
+            <a href="https://chrome.google.com/webstore/detail/your-extension-id" target="_blank" class="cta-button">
+                <i class="fab fa-chrome"></i> Add to Chrome - It's Free
+            </a>
+        </div>
+    </header>
+
+    <section class="features-overview">
+        <div class="features-grid">
+            <div class="feature-item">
+                <i class="fas fa-robot"></i>
+                <h3>Intelligent Reviews</h3>
+                <p>Get instant, detailed feedback powered by OpenAI's GPT-4</p>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-bolt"></i>
+                <h3>Lightning Fast</h3>
+                <p>Set up in seconds, get reviews in moments</p>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-shield-alt"></i>
+                <h3>Privacy First</h3>
+                <p>Your code, your API key, complete control</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="features">
+        <h2>How It Works</h2>
+        <div class="features__grid">
+            <!-- File Picker -->
+            <div class="feature-card card-right">
+                <div class="feature-card__image">
+                    <img src="./public/images/file-picker.png" alt="File picker interface" class="feature-image">
+                </div>
+                <div class="feature-content">
+                    <h3>1. Smart File Selection</h3>
+                    <p>Choose which files to review with our intuitive file picker. Focus on what matters most.</p>
+                </div>
+            </div>
+
+            <!-- Initial Review -->
+            <div class="feature-card card-left">
+                <div class="feature-content">
+                    <h3>2. Initial Assessment</h3>
+                    <p>Get a quick overview of critical issues, security concerns, and potential improvements.</p>
+                </div>
+                <div class="feature-card__image">
+                    <img src="./public/images/initial-review.png" alt="Initial review" class="feature-image">
+                </div>
+            </div>
+
+            <!-- Detailed Feedback -->
+            <div class="feature-card card-right">
+                <div class="feature-card__image">
+                    <img src="./public/images/detailed-feedback.png" alt="Detailed feedback" class="feature-image">
+                </div>
+                <div class="feature-content">
+                    <h3>3. Comprehensive Analysis</h3>
+                    <p>Receive detailed recommendations with practical code examples and best practices.</p>
+                </div>
+            </div>
+
+            <!-- Interactive Chat -->
+            <div class="feature-card card-left">
+                <div class="feature-content">
+                    <h3>4. Interactive Discussion</h3>
+                    <p>Ask questions and get clarifications about specific parts of your code.</p>
+                </div>
+                <div class="feature-card__image">
+                    <img src="./public/images/chat.png" alt="Chat interface" class="feature-image">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="faq">
+        <h2>Frequently Asked Questions</h2>
+        <div class="faq-grid">
+            <div class="faq-item">
+                <h3><i class="fas fa-shield-alt"></i> Is my code secure?</h3>
+                <p>Your code is only analyzed using your personal OpenAI API key. The extension runs entirely in your
+                    browser - there are no intermediate servers, and we don't store any of your code or API keys.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3><i class="fas fa-key"></i> Do I need an OpenAI API key?</h3>
+                <p>Yes, you'll need your own OpenAI API key to use the extension. This ensures you have complete control
+                    over the API usage and costs.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3><i class="fas fa-code-branch"></i> Which types of code can it review?</h3>
+                <p>The extension can review any programming language or framework that appears in your GitHub pull
+                    requests. However, avoid using it with proprietary or sensitive code.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3><i class="fas fa-dollar-sign"></i> How much does it cost?</h3>
+                <p>The extension is free! You only pay for your OpenAI API usage, which typically costs a few cents per
+                    code review depending on the size of your changes.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3><i class="fas fa-cogs"></i> How do I get started?</h3>
+                <p>1. Install the extension 2. Add your OpenAI API key in the options 3. Navigate to any GitHub PR and
+                    click the extension icon. It's that simple!</p>
+            </div>
+
+            <div class="faq-item">
+                <h3><i class="fas fa-code"></i> Is it open source?</h3>
+                <p>Yes! The extension is fully open source. You can review the code, contribute, or report issues on our
+                    GitHub repository.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <h2>Ready to transform your code reviews?</h2>
+        <p>Join developers who are saving hours on code reviews every week</p>
+        <a href="https://chrome.google.com/webstore/detail/your-extension-id" target="_blank" class="cta-button">
+            <i class="fab fa-chrome"></i> Install Extension
+        </a>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="privacy.html"><i class="fas fa-shield-alt"></i> Privacy Policy</a>
+                <a href="https://github.com/uncazzy/pr-reviewer" target="_blank"><i class="fab fa-github"></i>
+                    GitHub</a>
+            </div>
+            <p> 2025 PR Code Reviewer. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+
+</html>

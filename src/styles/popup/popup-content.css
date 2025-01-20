@@ -1,0 +1,204 @@
+@import url('../variables.css');
+@import url('../components/action-buttons/index.css');
+
+/* Main Content Styles */
+#result {
+    flex-grow: 1;
+    display: flex !important;
+    flex-direction: column;
+    background-color: var(--secondary-background-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 15px;
+    line-height: 1.6;
+    padding: var(--padding-medium);
+    gap: var(--padding-medium);
+    overflow-y: auto;
+}
+
+/* File Feedback Container */
+.file-feedback {
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: var(--padding-medium);
+}
+
+/* File Header */
+.file-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--padding-medium);
+}
+
+.file-info {
+    flex: 1;
+    min-width: 0; /* Allows text truncation to work */
+}
+
+.file-name {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: var(--padding-extra-small);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Status Badge Styles */
+.feedback-label {
+    display: inline-flex;
+    align-items: center;
+    border-radius: var(--border-radius-pill);
+    padding: var(--padding-large);
+    font-size: 12px;
+    color: #fff;
+    font-weight: 500;
+    margin-top: var(--padding-extra-small);
+    margin-right: var(--padding-small);
+    height: 20px;
+    line-height: 1;
+    white-space: nowrap;
+    column-gap: var(--padding-extra-small);
+}
+
+.looks-good {
+    background-color: var(--success-color);
+}
+
+.warning {
+    background-color: var(--warning-color);
+}
+
+.requires-changes {
+    background-color: var(--danger-color);
+}
+
+/* Issue Text */
+.issue-text {
+    font-size: 13px;
+    color: var(--text-color);
+    margin-top: var(--padding-extra-small);
+    line-height: 1.4;
+    opacity: 0.85;
+    display: block;
+}
+
+/* Feedback Content */
+.feedback-content {
+    margin-top: var(--padding-small);
+    width: 100%;
+}
+
+/* Detailed Feedback */
+.detailed-feedback {
+    display: none;
+    margin-top: var(--padding-medium);
+    padding: var(--padding-medium);
+    background-color: var(--secondary-background-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    width: 100%;
+}
+
+/* Error Message */
+.error-message {
+    color: var(--danger-color);
+    margin-top: var(--padding-small);
+}
+
+/* Loading Spinner */
+#loading {
+    display: none;
+    text-align: center;
+}
+
+#loading i {
+    font-size: 32px;
+    animation: spin 1s linear infinite;
+    color: var(--primary-color);
+}
+
+/* Keyframes for Spinner */
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Loading Container */
+.loading {
+    text-align: center;
+    padding: var(--padding-medium);
+}
+
+.loading i {
+    margin-right: 5px;
+}
+
+/* Refresh and Collapse Buttons */
+.refresh-button,
+.collapse-button {
+    margin: var(--padding-small);
+    padding: var(--padding-small) var(--padding-medium);
+    background-color: #f0f0f0;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+}
+
+.collapse-button {
+    margin-right: 0px;
+}
+
+.refresh-button:hover,
+.collapse-button:hover {
+    background-color: #e0e0e0;
+}
+
+/* Settings Button */
+.settings-button {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    background-color: #f0f0f0;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease;
+}
+
+.settings-button i {
+    font-size: 16px;
+    color: #333;
+}
+
+.settings-button:hover {
+    background-color: #e0e0e0;
+}
+
+/* Expand Button */
+.expand-button {
+    background: none;
+    color: var(--small-text-color);
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-size: 12px;
+    margin-top: var(--padding-small);
+}
+
+.expand-button:hover {
+    text-decoration: underline;
+}
