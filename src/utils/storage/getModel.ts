@@ -5,6 +5,7 @@ interface ModelStorage {
 }
 
 export async function getModel(): Promise<string> {
-  const { openaiModel = 'gpt-4o-mini' } = await getFromStorage<ModelStorage>('openaiModel');
-  return openaiModel;
+  const result = await getFromStorage<ModelStorage>('openaiModel');
+  const model = typeof result === 'string' ? result : result?.openaiModel ?? 'gpt-4o-mini';
+  return model;
 }
