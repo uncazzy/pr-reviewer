@@ -6,7 +6,6 @@
     "author": "@uncazzy",
     "version": "0.5.0",
     "permissions": [
-        "scripting",
         "tabs",
         "storage"
     ],
