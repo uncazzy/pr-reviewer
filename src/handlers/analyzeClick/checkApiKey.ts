@@ -13,9 +13,7 @@ interface StorageData {
 export async function checkApiKey(): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
         const model = await getModel();
-        console.log("model", model)
         const provider = getProviderFromModel(model);
-        console.log("provider", provider)
         const storageKey = provider === 'deepseek' ? 'deepseekApiKey' : 'openaiApiKey';
         const providerName = provider === 'deepseek' ? 'DeepSeek' : 'OpenAI';
 

@@ -6,7 +6,6 @@ export function getProviderFromModel(model: string): 'openai' | 'deepseek' {
 
 export async function getModel(): Promise<string> {
     const result = await getFromStorage<string>('selectedModel');
-    console.log("result", result)
     return result ?? 'gpt-4o-mini';
 }
 
