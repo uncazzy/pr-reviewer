@@ -1,27 +1,24 @@
 # PR Code Reviewer
 
-🔍 A Chrome extension that leverages OpenAI to provide intelligent code review suggestions for GitHub pull requests. Like its namesake from Greek mythology, PR Code Reviewer keeps a vigilant eye on your code, providing comprehensive feedback and enabling contextual discussions about your code changes directly in the GitHub interface.
+🔍 A Chrome extension that leverages advanced AI models to provide intelligent code review suggestions for GitHub pull requests. PR Code Reviewer analyzes your code changes in real-time, providing comprehensive feedback and enabling contextual discussions about your code directly in the GitHub interface.
 
 ## ✨ Features
 
-- 🤖 **AI-Powered Code Review**: Intelligent feedback using OpenAI
+- 🤖 **AI-Powered Code Review**: Intelligent feedback using state-of-the-art language models
 - 💬 **Interactive Code Chat**: Contextual discussions about specific code changes
 - 📝 **Multi-tier Review**: Initial assessment + comprehensive feedback
 - ⚡ **Efficient**: Quick analysis of selected files in large PRs
-- ⚙️ **Configurable**: Customizable OpenAI models and settings
+- 🔒 **Privacy First**: Your API keys stay in your browser
+- ⚙️ **Configurable**: Choose from multiple AI providers (OpenAI, DeepSeek, etc.)
 - 🔄 **Re-analysis**: Easily reanalyze changes after updates
 
 ## 🚀 Quick Start
 
-1. **Install Dependencies**
-   ```bash
-   npm install
-   ```
+1. **Install Extension**
+   - Install the extension from Chrome Web Store
 
-2. **Build Extension**
-   ```bash
-   npm run build
-   ```
+2. **Configure**
+   - Add your API key and select a model in the options
 
 3. **Load in Chrome**
    - Open `chrome://extensions/`
@@ -29,10 +26,8 @@
    - Click "Load unpacked"
    - Select the `dist` directory
 
-4. **Configure**
-   - Open the extension options
-   - Add your OpenAI API key and select a model
-   - Start reviewing code!
+4. **Start Reviewing**
+   - Navigate to any GitHub pull request
 
 ## 💡 Usage
 
@@ -46,12 +41,12 @@
 
 Note: Large files are automatically excluded from selection to ensure optimal performance.
 
-## 🔒 Privacy & Security
+## 🔒 Security & Privacy
 
-- Requires OpenAI API key (stored locally)
-- Code is sent to OpenAI for analysis
-- Review OpenAI's privacy policy before use
-- No data is stored on external servers
+- API keys are stored locally in your browser
+- Code is sent directly to your chosen AI provider
+- Review your provider's privacy policy before use
+- Avoid using with sensitive/proprietary code
 
 ## 🛠️ Development
 
@@ -59,7 +54,8 @@ Note: Large files are automatically excluded from selection to ensure optimal pe
 - Node.js (v18+)
 - npm
 - Chrome browser
-- OpenAI API key
+- API key from supported providers (OpenAI, DeepSeek, etc.)
+- GitHub account for PR access
 
 ### Local Setup
 1. Clone the repository

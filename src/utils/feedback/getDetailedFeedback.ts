@@ -1,6 +1,6 @@
 import { getFromStorage, setInStorage } from '@utils/storage';
 import { createSystemPrompt, createDetailedFeedbackPrompt } from '@utils/api/openai/prompts/detailedFeedbackPrompt';
-import { fetchDetailedFeedbackFromOpenAI } from '@utils/api/openai/fetchDetailedFeedbackFromOpenAI';
+import { fetchDetailedFeedbackFromOpenAI } from '@/utils/api/openai/fetchDetailedFeedback';
 
 /**
  * Data structure for extracted data

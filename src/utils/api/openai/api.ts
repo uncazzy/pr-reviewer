@@ -1,29 +1,7 @@
-import { getApiKey, getModel } from '@utils/storage';
+import OpenAI from 'openai';
+import { getApiKey, getModel, getProvider } from '@utils/storage';
 import { retryWithBackoff } from '../retryWithBackoff.ts';
 import { createSystemPrompt, createReviewPrompt } from './prompts/reviewPrompt';
-
-interface OpenAIMessage {
-    role: 'system' | 'user' | 'assistant';
-    content: string;
-}
-
-interface OpenAIResponse {
-    choices: Array<{
-        message: {
-            content: string;
-        };
-    }>;
-    error?: {
-        message: string;
-    };
-}
-
-interface OpenAIRequestBody {
-    model: string;
-    messages: OpenAIMessage[];
-    max_tokens: number;
-    temperature: number;
-}
 
 /**
  * Sends a code review request to OpenAI's API
@@ -41,43 +19,44 @@ export async function analyzeCodeWithGPT(
     const userPrompt = createReviewPrompt(fileName, fullContent);
 
     const apiCall = async (): Promise<string> => {
-        const apiKey = await getApiKey();
-        const model = await getModel();
+        try {
+            const apiKey = await getApiKey();
+            const model = await getModel();
+            const provider = await getProvider();
 
-        if (!apiKey) {
-            throw new Error('OpenAI API key not found');
+            if (!apiKey) {
+                throw new Error(`${provider === 'deepseek' ? 'DeepSeek' : 'OpenAI'} API key not found.`);
+            }
+
+            const openai = new OpenAI({
+                apiKey,
+                baseURL: provider === 'deepseek' ? 'https://api.deepseek.com' : undefined,
+                dangerouslyAllowBrowser: true
+            });
+
+            const response = await openai.chat.completions.create({
+                model,
+                messages: [
+                    {
+                        role: 'system',
+                        content: systemPrompt
+                    },
+                    {
+                        role: 'user',
+                        content: userPrompt
+                    }
+                ]
+            });
+
+            if (!response.choices?.[0]?.message?.content) {
+                throw new Error('No response content received from the API');
+            }
+
+            return response.choices[0].message.content;
+        } catch (error) {
+            console.error('Error analyzing code:', error);
+            throw error;
         }
-
-        const requestBody: OpenAIRequestBody = {
-            model,
-            messages: [
-                { role: 'system', content: userPrompt },
-                { role: 'user', content: systemPrompt }
-            ],
-            max_tokens: 1500,
-            temperature: 0.2
-        };
-
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
-            },
-            body: JSON.stringify(requestBody)
-        });
-
-        const data: OpenAIResponse = await response.json();
-
-        if (data.error) {
-            throw new Error(`OpenAI API Error: ${data.error.message}`);
-        }
-
-        if (!data.choices?.[0]?.message?.content) {
-            throw new Error('Invalid response format from OpenAI API');
-        }
-
-        return data.choices[0].message.content;
     };
 
     return retryWithBackoff(apiCall);

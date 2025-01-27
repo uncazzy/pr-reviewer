@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "name": "PR Code Reviewer",
+    "name": "AI-Powered PR Code Reviewer with Chat",
     "short_name": "PR Code Reviewer",
     "description": "Efficient GitHub pull request code reviewer",
     "author": "@uncazzy",

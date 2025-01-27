@@ -1,11 +1,16 @@
 import { getFromStorage } from './getFromStorage';
 
-interface ModelStorage {
-  openaiModel?: string;
+export function getProviderFromModel(model: string): 'openai' | 'deepseek' {
+    return model.startsWith('deepseek-') ? 'deepseek' : 'openai';
 }
 
 export async function getModel(): Promise<string> {
-  const result = await getFromStorage<ModelStorage>('openaiModel');
-  const model = typeof result === 'string' ? result : result?.openaiModel ?? 'gpt-4o-mini';
-  return model;
+    const result = await getFromStorage<string>('selectedModel');
+    console.log("result", result)
+    return result ?? 'gpt-4o-mini';
+}
+
+export async function getProvider(): Promise<'openai' | 'deepseek'> {
+    const model = await getModel();
+    return getProviderFromModel(model);
 }

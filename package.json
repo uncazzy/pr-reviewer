@@ -23,14 +23,17 @@
     "@parcel/transformer-js": "^2.10.3",
     "@types/chrome": "^0.0.254",
     "@types/node": "^22.10.2",
+    "buffer": "^6.0.3",
     "parcel": "^2.10.3",
     "parcel-resolver-ts-base-url": "^1.0.1",
+    "process": "^0.11.10",
     "typescript": "^5.7.2"
   },
   "dependencies": {
     "@babel/preset-env": "^7.25.4",
     "@fortawesome/fontawesome-free": "^6.7.2",
     "highlight.js": "^11.11.0",
-    "marked": "^15.0.4"
+    "marked": "^15.0.4",
+    "openai": "^4.80.1"
   }
 }
