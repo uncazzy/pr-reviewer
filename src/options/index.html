@@ -15,9 +15,11 @@
     <!-- Overview Section -->
     <div class="section">
         <h2>Overview</h2>
-        <p>PR Code Reviewer is a Chrome extension for efficient GitHub pull request reviews. Powered by advanced AI models, it
+        <p>PR Code Reviewer is a Chrome extension for efficient GitHub pull request reviews. Powered by advanced AI
+            models, it
             provides detailed, contextual feedback on your code changes.</p>
-        <p>The extension formats new, modified, or removed code into prompts for AI analysis to deliver precise feedback,
+        <p>The extension formats new, modified, or removed code into prompts for AI analysis to deliver precise
+            feedback,
             focusing on best practices, potential issues, and suggestions for improvement.</p>
     </div>
 
@@ -25,7 +27,8 @@
     <div class="section">
         <h2>How It Works</h2>
         <p>When you click the extension icon on a GitHub PR page, it automatically identifies code additions,
-            deletions, and edits, which it sends to the selected AI model. Feedback is based only on PR changes, maintaining repository
+            deletions, and edits, which it sends to the selected AI model. Feedback is based only on PR changes,
+            maintaining repository
             privacy.</p>
         <p>For sensitive files, avoid using the extension to ensure privacy.</p>
     </div>
@@ -33,18 +36,19 @@
     <!-- Privacy & Security Section -->
     <div class="section">
         <h2>Privacy & Security</h2>
-        <p>Using PR Code Reviewer means code snippets from PRs are sent to your chosen AI provider for analysis per their
+        <p>Using PR Code Reviewer means code snippets from PRs are sent to your chosen AI provider for analysis per
+            their
             respective privacy policies. Your API keys and settings are stored locally in your browser.</p>
     </div>
 
     <!-- API Configuration Section -->
     <div class="section">
         <h2>API Configuration</h2>
-        
+
         <!-- API Keys Section -->
         <div class="api-key-section">
             <h2>API Keys</h2>
-            
+
             <!-- OpenAI API Key -->
             <div class="api-key-input">
                 <h3>OpenAI</h3>
@@ -61,8 +65,8 @@
             <!-- DeepSeek API Key -->
             <div class="api-key-input">
                 <h3>DeepSeek</h3>
-                <p>Get a DeepSeek API key by signing up for a DeepSeek account <a
-                        href="https://platform.deepseek.com/" target="_blank">here</a>.</p>
+                <p>Get a DeepSeek API key by signing up for a DeepSeek account <a href="https://platform.deepseek.com/"
+                        target="_blank">here</a>.</p>
                 <label for="deepseekApiKey" class="label">DeepSeek API Key:</label>
                 <input type="text" id="deepseekApiKey" class="input-field" placeholder="Enter your DeepSeek API Key">
                 <div>
@@ -77,20 +81,26 @@
     <div class="section">
         <h2>Model Selection</h2>
         <p>Select which model you want to use for code review and chat.</p>
-        
+
         <label for="modelSelect" class="label">Select Model:</label>
         <select id="modelSelect" class="select-field">
             <optgroup label="OpenAI Models">
-                <option value="gpt-4o-mini" selected>gpt-4o-mini</option>
-                <option value="gpt-4o">gpt-4o</option>
-                <option value="gpt-4-turbo">gpt-4-turbo</option>
-                <option value="gpt-4">gpt-4</option>
+                <option value="gpt-4o-mini" title="Fastest option, ideal for quick reviews" selected>gpt-4o-mini
+                </option>
+                <option value="gpt-4o" title="Balanced speed and accuracy">gpt-4o</option>
+                <option value="gpt-4-turbo" title="More comprehensive analysis with good performance">gpt-4-turbo
+                </option>
+                <option value="gpt-4" title="Most thorough OpenAI model, better for complex code">gpt-4</option>
             </optgroup>
             <optgroup label="DeepSeek Models">
-                <option value="deepseek-chat">deepseek-chat</option>
-                <option value="deepseek-reasoner">deepseek-reasoner</option>
+                <option value="deepseek-chat" title="General code understanding and explanations, low price">deepseek-chat
+                </option>
+                <option value="deepseek-reasoner"
+                    title="Most detailed analysis, takes longer but provides thorough reasoning">deepseek-reasoner
+                </option>
             </optgroup>
         </select>
+
         <button id="saveModel" class="button">Save Model Selection</button>
 
         <div class="coming-soon-notice">
