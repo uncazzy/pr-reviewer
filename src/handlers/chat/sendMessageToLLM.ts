@@ -1,4 +1,5 @@
-import { getApiKey, getModel } from '../../utils/storage/index.ts';
+import OpenAI from 'openai';
+import { getApiKey, getModel, getProvider } from '../../utils/storage/index.ts';
 import { chatMessages, ChatMessage } from './chatUtils.ts';
 import { createChatPrompt, createSystemPrompt } from '../../utils/api/openai/prompts/chatPrompt.ts';
 import { getBaseUrl } from '../../utils/results/index.ts';
@@ -127,6 +128,7 @@ export async function sendMessageToLLM(
     try {
         const apiKey = await getApiKey();
         const model = await getModel();
+        const provider = await getProvider();
 
         // Create the loading message
         const loadingMessage: ChatMessage = {
@@ -137,26 +139,25 @@ export async function sendMessageToLLM(
         await renderMessage(loadingMessage, messagesContainer);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-        // Make the API call to OpenAI
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
-            },
-            body: JSON.stringify({
-                model: model,
-                messages: apiMessages,
-                temperature: 0.2
-            })
+        // Initialize OpenAI client
+        const openai = new OpenAI({
+            apiKey,
+            baseURL: provider === 'deepseek' ? 'https://api.deepseek.com' : undefined,
+            dangerouslyAllowBrowser: true
         });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+        // Make the API call
+        const response = await openai.chat.completions.create({
+            model,
+            messages: apiMessages,
+            temperature: 0.2
+        });
+
+        if (!response.choices?.[0]?.message?.content) {
+            throw new Error('No response content received from the API');
         }
 
-        const result = await response.json();
-        const assistantResponse = result.choices[0].message.content;
+        const assistantResponse = response.choices[0].message.content;
 
         // Remove the loading message from both UI and chatMessages array
         const loadingMessageIndex = chatMessages.indexOf(loadingMessage);
@@ -175,7 +176,10 @@ export async function sendMessageToLLM(
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
         // Add the assistant's response to apiMessages and save to storage
-        apiMessages.push({ role: 'assistant', content: assistantResponse });
+        apiMessages.push({ 
+            role: 'assistant', 
+            content: assistantResponse
+        });
         apiMessagesHistory[fileName] = apiMessages;
         chrome.storage.local.set({ apiMessagesHistory });
 
@@ -190,7 +194,7 @@ export async function sendMessageToLLM(
         console.error('Error in API call:', error);
         const errorMessage: ChatMessage = {
             role: 'assistant',
-            content: '<p><em>Sorry, there was an error processing your request. Please try again.</em></p>'
+            content: `<p class="error">Error: ${error instanceof Error ? error.message : 'An error occurred while processing your request.'}</p>`
         };
         chatMessages.push(errorMessage);
         await renderMessage(errorMessage, messagesContainer);

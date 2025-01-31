@@ -1,5 +1,5 @@
 export { analyzeCodeWithGPT } from './openai/api.js'
-export { fetchDetailedFeedbackFromOpenAI } from './openai/fetchDetailedFeedbackFromOpenAI.js'
+export { fetchDetailedFeedbackFromOpenAI } from './openai/fetchDetailedFeedback.js'
 export { processFiles } from './processFiles.js'
 export { retryWithBackoff } from './retryWithBackoff.js'
 

@@ -1,15 +1,15 @@
 import '@fortawesome/fontawesome-free/css/all.min.css';
-
-interface StorageData {
-    openaiApiKey?: string;
-    openaiModel?: string;
-}
+import { getProviderFromModel } from '@utils/storage';
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Get DOM elements
     const apiKeyInput = document.getElementById('apiKey') as HTMLInputElement;
+    const deepseekApiKeyInput = document.getElementById('deepseekApiKey') as HTMLInputElement;
     const modelSelect = document.getElementById('modelSelect') as HTMLSelectElement;
     const saveApiKeyButton = document.getElementById('saveApiKey') as HTMLButtonElement;
+    const saveDeepseekApiKeyButton = document.getElementById('saveDeepseekApiKey') as HTMLButtonElement;
     const clearApiKeyButton = document.getElementById('clearApiKey') as HTMLButtonElement;
+    const clearDeepseekApiKeyButton = document.getElementById('clearDeepseekApiKey') as HTMLButtonElement;
     const saveModelButton = document.getElementById('saveModel') as HTMLButtonElement;
     const clearPrDataButton = document.getElementById('clearPrData') as HTMLButtonElement;
     const clearStorageButton = document.getElementById('clearStorage') as HTMLButtonElement;
@@ -17,97 +17,90 @@ document.addEventListener('DOMContentLoaded', () => {
     const statusDiv = document.getElementById('status') as HTMLDivElement;
     const donateButton = document.getElementById('donateButton') as HTMLButtonElement;
 
-    if (!apiKeyInput || !modelSelect || !saveApiKeyButton || !clearApiKeyButton ||
+    if (!apiKeyInput || !deepseekApiKeyInput || !modelSelect || 
+        !saveApiKeyButton || !saveDeepseekApiKeyButton || !clearApiKeyButton || !clearDeepseekApiKeyButton || 
         !saveModelButton || !clearPrDataButton || !clearStorageButton ||
         !overlayDiv || !statusDiv || !donateButton) {
         console.error('Required DOM elements not found');
         return;
     }
 
-    donateButton.addEventListener('click', handleDonation);
-
-    // Load saved API key and model
-    chrome.storage.local.get(['openaiApiKey', 'openaiModel'], (data: StorageData) => {
-        if (data.openaiApiKey) {
-            apiKeyInput.value = data.openaiApiKey;
+    // Load saved values
+    chrome.storage.local.get(['openaiApiKey', 'deepseekApiKey', 'selectedModel'], (result) => {
+        if (result.openaiApiKey) {
+            apiKeyInput.value = result.openaiApiKey;
         }
-        if (data.openaiModel) {
-            modelSelect.value = data.openaiModel;
-        } else {
-            // Set default model if not already set
-            const defaultModel = "gpt-4o-mini";
-            modelSelect.value = defaultModel;
-            chrome.storage.local.set({ 'openaiModel': defaultModel });
+        if (result.deepseekApiKey) {
+            deepseekApiKeyInput.value = result.deepseekApiKey;
+        }
+        if (result.selectedModel) {
+            modelSelect.value = result.selectedModel;
         }
     });
 
-    // Event listener for the "Save API Key" button
-    saveApiKeyButton.addEventListener('click', () => {
+    // Save OpenAI API key
+    saveApiKeyButton.addEventListener('click', async () => {
         const apiKey = apiKeyInput.value.trim();
-        chrome.storage.local.set({ 'openaiApiKey': apiKey }, () => {
-            statusDiv.style.display = 'flex';
-            overlayDiv.style.display = 'block';
-            updateStatus('API Key saved.');
-        });
+        await chrome.storage.local.set({ openaiApiKey: apiKey });
+        showSuccessMessage('OpenAI API key saved successfully!');
     });
 
-    // Event listener for the "Clear API Key" button
-    clearApiKeyButton.addEventListener('click', () => {
+    // Save DeepSeek API key
+    saveDeepseekApiKeyButton.addEventListener('click', async () => {
+        const apiKey = deepseekApiKeyInput.value.trim();
+        await chrome.storage.local.set({ deepseekApiKey: apiKey });
+        showSuccessMessage('DeepSeek API key saved successfully!');
+    });
+
+    // Clear OpenAI API key
+    clearApiKeyButton.addEventListener('click', async () => {
+        await chrome.storage.local.remove('openaiApiKey');
         apiKeyInput.value = '';
-        chrome.storage.local.remove('openaiApiKey', () => {
-            statusDiv.style.display = 'flex';
-            overlayDiv.style.display = 'block';
-            updateStatus('API Key cleared.');
-        });
+        showSuccessMessage('OpenAI API key cleared successfully!');
     });
 
-    // Event listener for the "Save Model Selection" button
-    saveModelButton.addEventListener('click', () => {
+    // Clear DeepSeek API key
+    clearDeepseekApiKeyButton.addEventListener('click', async () => {
+        await chrome.storage.local.remove('deepseekApiKey');
+        deepseekApiKeyInput.value = '';
+        showSuccessMessage('DeepSeek API key cleared successfully!');
+    });
+
+    // Save model selection
+    saveModelButton.addEventListener('click', async () => {
         const selectedModel = modelSelect.value;
-        chrome.storage.local.set({ 'openaiModel': selectedModel }, () => {
-            statusDiv.style.display = 'flex';
-            overlayDiv.style.display = 'block';
-            updateStatus('Model selection saved.');
-        });
-    });
-
-    // Event listener for the "Delete All PR Data" button
-    clearPrDataButton.addEventListener('click', () => {
-        if (confirm('Are you sure you want to delete all stored PR data? This action cannot be undone.')) {
-            statusDiv.style.display = 'flex';
-            overlayDiv.style.display = 'block';
-            updateStatus('All stored PR data has been cleared.');
-
-
-            // Remove multiple keys from storage
-            const keysToRemove: string[] = ['extractedDataByPr', 'apiMessagesHistory', 'chatHistory', 'processingComplete'];
-            chrome.storage.local.remove(keysToRemove, () => {
-                if (chrome.runtime.lastError) {
-                    console.error('Error deleting PR data:', chrome.runtime.lastError);
-                    updateStatus('An error occurred while deleting PR data.');
-                } else {
-                    updateStatus('All specified PR data has been cleared.');
-
-                }
-            });
+        const provider = getProviderFromModel(selectedModel);
+        
+        // Check if the required API key is set
+        const apiKey = provider === 'deepseek' ? deepseekApiKeyInput.value : apiKeyInput.value;
+        if (!apiKey.trim()) {
+            showErrorMessage(`${provider === 'deepseek' ? 'DeepSeek' : 'OpenAI'} API key is required for this model.`);
+            return;
         }
+
+        await chrome.storage.local.set({ selectedModel });
+        showSuccessMessage('Model selection saved successfully!');
     });
 
-    // Event listener for the "Clear All Stored Data" button
+    // Clear all stored data
     clearStorageButton.addEventListener('click', () => {
         if (confirm('Are you sure you want to clear all stored data? This action cannot be undone.')) {
             chrome.storage.local.clear(() => {
-                statusDiv.style.display = 'flex';
-                overlayDiv.style.display = 'block';
                 apiKeyInput.value = '';
+                deepseekApiKeyInput.value = '';
                 modelSelect.value = 'gpt-4o-mini'; // Reset to default
-                updateStatus('All stored data has been cleared.');
+                showSuccessMessage('All stored data has been cleared.');
             });
         }
     });
 
-    function updateStatus(message: string): void {
+    // Handle donation button click
+    donateButton.addEventListener('click', handleDonation);
+
+    function showSuccessMessage(message: string): void {
         statusDiv.textContent = message;
+        statusDiv.style.display = 'flex';
+        overlayDiv.style.display = 'block';
         setTimeout(() => {
             statusDiv.textContent = '';
             statusDiv.style.display = 'none';
@@ -115,8 +108,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 2000);
     }
 
-    function handleDonation(): void {
-        const donationUrl = 'https://buymeacoffee.com/azurd';
-        chrome.tabs.create({ url: donationUrl, active: true });
+    function showErrorMessage(message: string): void {
+        statusDiv.textContent = message;
+        statusDiv.style.display = 'flex';
+        overlayDiv.style.display = 'block';
+        statusDiv.style.color = 'var(--danger-color)';
+        setTimeout(() => {
+            statusDiv.textContent = '';
+            statusDiv.style.display = 'none';
+            overlayDiv.style.display = 'none';
+            statusDiv.style.color = 'var(--text-color)';
+        }, 3000);
     }
 });
+
+function handleDonation(): void {
+    const donationUrl = 'https://buymeacoffee.com/azurd';
+    chrome.tabs.create({ url: donationUrl, active: true });
+}
