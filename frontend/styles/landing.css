@@ -118,6 +118,12 @@
     font-size: 0.9rem;
 }
 
+.links-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
 /* FAQ Section */
 .faq {
     padding: 60px 20px;
